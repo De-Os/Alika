@@ -20,6 +20,9 @@ namespace Alika.Libs.VK
                 this.vk = vk;
             }
 
+            /// <summary>
+            /// messages.send
+            /// </summary>
             public int Send(int peer_id, string text = null, string payload = null, List<string> attachments = null, int? sticker_id = null)
             {
                 Dictionary<string, dynamic> request = new Dictionary<string, dynamic>();
@@ -32,6 +35,9 @@ namespace Alika.Libs.VK
                 return this.vk.Call<int>("messages.send", request);
             }
 
+            /// <summary>
+            /// messages.getConversations
+            /// </summary>
             public GetConversationsResponse GetConversations(int offset = 0, int count = 20, string filter = "all", int start_message_id = 0, string fields = "")
             {
                 Dictionary<string, dynamic> request = new Dictionary<string, dynamic>();
@@ -51,6 +57,9 @@ namespace Alika.Libs.VK
                 return response;
             }
 
+            /// <summary>
+            /// messages.getConversationsById
+            /// </summary>
             public GetConversationsResponse GetConversationsById(List<int> peer_ids, string fields = "")
             {
                 Dictionary<string, dynamic> request = new Dictionary<string, dynamic>();
@@ -67,6 +76,9 @@ namespace Alika.Libs.VK
                 return response;
             }
 
+            /// <summary>
+            /// messages.getHistory
+            /// </summary>
             public GetHistoryResponse GetHistory(int peer_id, int offset = 0, int count = 20, int start_message_id = 0, bool rev = false, string fields = "")
             {
                 Dictionary<string, dynamic> request = new Dictionary<string, dynamic>();
@@ -85,7 +97,10 @@ namespace Alika.Libs.VK
                 App.cache.Update(response.groups);
                 return response;
             }
-
+            
+            /// <summary>
+            /// messages.getByid
+            /// </summary>
             public GetHistoryResponse GetById(List<int> msg_ids, string fields = "")
             {
                 Dictionary<string, dynamic> request = new Dictionary<string, dynamic>();
@@ -101,6 +116,9 @@ namespace Alika.Libs.VK
                 return response;
             }
 
+            /// <summary>
+            /// Uploading photo from bytes (for uploading from Clipboard)
+            /// </summary>
             public Attachment.Photo UploadPhoto(byte[] bytes, int peer_id)
             {
                 RestRequest request = new RestRequest();
@@ -108,6 +126,9 @@ namespace Alika.Libs.VK
                 return this.UploadPhoto(request, peer_id);
             }
 
+            /// <summary>
+            /// Uploading StorageFile photo
+            /// </summary>
             public async Task<Attachment.Photo> UploadPhoto(StorageFile file, int peer_id)
             {
                 RestRequest request = new RestRequest();
@@ -129,13 +150,18 @@ namespace Alika.Libs.VK
                 })[0];
             }
 
+            /// <summary>
+            /// Uploading document from bytes (for uploading from Clipboard)
+            /// </summary>
             public object UploadDocument(byte[] bytes, int peer_id, string type = "doc")
             {
                 RestRequest request = new RestRequest();
                 request.AddFile("file", bytes, "file.da");
                 return this.UploadDocument(request, type, peer_id);
             }
-
+            /// <summary>
+            /// Uploading StorageFile document
+            /// </summary>
             public async Task<object> UploadDocument(StorageFile file, int peer_id, string type = "doc")
             {
                 RestRequest request = new RestRequest();

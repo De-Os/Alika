@@ -87,7 +87,7 @@ namespace Alika.UI
                                           {
                                               if ((this.SelectedItem as ChatItem).peer_id == msg.peer_id)
                                               {
-
+                                                  // TODO: Scroll to top?
                                               }
                                           }
                                           return;

@@ -13,6 +13,9 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI
 {
+    /// <summary>
+    /// Main selector
+    /// </summary>
     public class StickersSelector : Grid
     {
         public int peer_id { get; set; }
@@ -68,8 +71,8 @@ namespace Alika.UI
                     SelectionMode = ListViewSelectionMode.None
                 };
                 Grid top = new Grid();
-                top.ColumnDefinitions.Add(new ColumnDefinition { Width = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Auto) });
-                top.ColumnDefinitions.Add(new ColumnDefinition { Width = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Star) });
+                top.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+                top.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                 Button back = new Button
                 {
                     Content = new Image
@@ -102,6 +105,7 @@ namespace Alika.UI
             }
             else
             {
+                // Reset search
                 App.cache.StickersSelector.Search.Visibility = Visibility.Visible;
                 App.cache.StickersSelector.Search.Text = "";
                 ListView list = App.cache.StickersSelector.Semantic.ZoomedOutView as ListView;
@@ -112,6 +116,9 @@ namespace Alika.UI
             }
         }
 
+        /// <summary>
+        /// Pack name with thumbnail
+        /// </summary>
         public class StickerName : ListViewItem
         {
             public GetStickersResponse.StickerPackInfo Pack { get; set; }
@@ -153,6 +160,9 @@ namespace Alika.UI
             }
         }
 
+        /// <summary>
+        /// Pack stickers 
+        /// </summary>
         public class StickerSet : Grid
         {
             public GetStickersResponse.StickerPackInfo PackInfo;
@@ -166,7 +176,7 @@ namespace Alika.UI
 
                 this.PackInfo.product.stickers.ForEach((sticker) =>
                 {
-                    if (grids[x].Children.Count == 4)
+                    if (grids[x].Children.Count == 4) // Limit to 4 stickers in one row
                     {
                         grids.Add(new Grid());
                         x++;
@@ -202,8 +212,8 @@ namespace Alika.UI
                     this.Sticker = sticker;
                     this.CornerRadius = new Windows.UI.Xaml.CornerRadius(10);
                     this.PointerPressed += (a, b) => Task.Factory.StartNew(() => App.vk.messages.Send(App.cache.StickersSelector.peer_id, sticker_id: this.Sticker.sticker_id));
-                    this.PointerEntered += (a, b) => this.Background = Coloring.Transparent.Percent(50);
-                    this.PointerExited += (a, b) => this.Background = Coloring.Transparent.Full;
+                    this.PointerEntered += (a, b) => this.Background = Coloring.Transparent.Percent(50); // Sticker "selection" by background color
+                    this.PointerExited += (a, b) => this.Background = Coloring.Transparent.Full; // Remove selection
                     this.Children.Add(this.Image);
                     this.LoadImage();
                 }
@@ -216,7 +226,10 @@ namespace Alika.UI
         }
     }
 
-    public class StickerSuggestionHolder : Grid
+    /// <summary>
+    /// Suggestions holder
+    /// </summary>
+    public class StickerSuggestionHolder : Grid // TODO: Non-static images for animated stickers
     {
         public Attachment.Sticker Sticker { get; set; }
         public Image Image { get; set; } = new Image
@@ -246,8 +259,8 @@ namespace Alika.UI
             this.Margin = new Thickness(5);
             this.CornerRadius = new CornerRadius(10);
 
-            this.PointerEntered += (a, b) => this.Background = Coloring.Transparent.Percent(75);
-            this.PointerExited += (a, b) => { if (!this._selected) this.Background = Coloring.Transparent.Full; };
+            this.PointerEntered += (a, b) => this.Background = Coloring.Transparent.Percent(75); // Don't using this.Selected because it can bring issues with arrow keys choosing
+            this.PointerExited += (a, b) => { if (!this._selected) this.Background = Coloring.Transparent.Full; }; // Same^
 
             this.Children.Add(this.Image);
 

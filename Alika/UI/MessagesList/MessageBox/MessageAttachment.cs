@@ -15,6 +15,9 @@ namespace Alika.UI
 {
     public class MessageAttachment
     {
+        /// <summary>
+        /// Photo holder and viewer
+        /// </summary>
         public class Photo : Grid
         {
             public Attachment.Photo Picture { get; set; }
@@ -44,7 +47,10 @@ namespace Alika.UI
                 this.Preview.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.Picture.GetBestQuality().url));
             }
 
-            public class Viewer : ContentDialog
+            /// <summary>
+            /// ContentDialog with zoom and download button
+            /// </summary>
+            public class Viewer     : ContentDialog
             {
                 public Attachment.Photo Picture { get; set; }
                 public Image Image = new Image();
@@ -96,6 +102,7 @@ namespace Alika.UI
                         Margin = new Thickness(0, 5, 10, 0),
                         HorizontalAlignment = HorizontalAlignment.Right,
                     };
+                    // Downloading photo to selected file
                     download.Click += async (object s, RoutedEventArgs e) =>
                     {
                         var savePicker = new Windows.Storage.Pickers.FileSavePicker();
@@ -136,6 +143,9 @@ namespace Alika.UI
             }
         }
 
+        /// <summary>
+        /// Document holder
+        /// </summary>
         public class Document : Button
         {
             public Attachment.Document document { get; set; }
@@ -212,6 +222,9 @@ namespace Alika.UI
             }
         }
 
+        /// <summary>
+        /// Uploaded file holder
+        /// </summary>
         public class Uploaded : Grid
         {
             public Button Remove = new Button

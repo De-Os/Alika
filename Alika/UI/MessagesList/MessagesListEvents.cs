@@ -34,6 +34,7 @@ namespace Alika.UI
             this.stickers.Flyout = new Flyout { Content = App.cache.StickersSelector };
         }
 
+        // Attach photo from Clipboard
         private async void TextPaste(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
         {
             if (e.Key == VirtualKey.V && Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down))
@@ -70,10 +71,12 @@ namespace Alika.UI
             else e.Handled = false;
         }
 
+        // Some key controls
         public void TextBoxPreviewKeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
         {
             if (e.Key == VirtualKey.Enter)
             {
+                // Send if any sticker choosen on stickers suggestion
                 if (this.stickers_suggestions.Visibility == Visibility.Visible)
                 {
                     e.Handled = true;
@@ -89,6 +92,7 @@ namespace Alika.UI
                 }
                 else
                 {
+                    // Send || add line to TextBox
                     if (Window.Current.CoreWindow.GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down))
                     {
                         this.send_text.Text += Environment.NewLine;
@@ -100,10 +104,23 @@ namespace Alika.UI
             }
             else if (e.Key == VirtualKey.Tab)
             {
+                // Tab focusing on stickers suggestion
                 if (this.stickers_suggestions.Visibility == Visibility.Visible)
                 {
-                    StickerSuggestionHolder holder = ((this.stickers_suggestions.Children[0] as ScrollViewer).Content as Grid).Children[0] as StickerSuggestionHolder;
-                    holder.Selected = !holder.Selected;
+                    ScrollViewer scroll = this.stickers_suggestions.Children[0] as ScrollViewer;
+                    Grid stickers = scroll.Content as Grid;
+                    bool selection = true;
+                    for(int x = 0; x < stickers.Children.Count; x++)
+                    {
+                        StickerSuggestionHolder holder = stickers.Children[x] as StickerSuggestionHolder;
+                        if (holder.Selected)
+                        {
+                            selection = false;
+                            scroll.ChangeView(0, null, null); // Scroll to first sticker when unfocused
+                        }
+                        holder.Selected = false;
+                    }
+                    (stickers.Children[0] as StickerSuggestionHolder).Selected = selection;
                     e.Handled = true;
                 }
                 else e.Handled = false;
@@ -112,6 +129,10 @@ namespace Alika.UI
             {
                 if (this.stickers_suggestions.Visibility == Visibility.Visible)
                 {
+                    /*
+                     * Arrow navigation on stickers suggestion
+                     * Animation on scrolling disabled due to bugs on fast switching
+                     */
                     Grid stickers = (this.stickers_suggestions.Children[0] as ScrollViewer).Content as Grid;
                     double scroll = 0;
                     for (int x = 0; x < stickers.Children.Count; x++)
@@ -151,11 +172,11 @@ namespace Alika.UI
             else e.Handled = false;
         }
 
+        // Focusing on message TextBox when char/digit key pressed
         public void PreviewKeyEvent(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
         {
             if (this.send_text.FocusState == FocusState.Unfocused && e.Key != VirtualKey.Enter)
             {
-                e.Handled = true;
                 bool shift = Window.Current.CoreWindow.GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down);
                 if (e.Key.IsCharKey(shift) != null)
                 {
@@ -163,10 +184,12 @@ namespace Alika.UI
                     this.send_text.Text += e.Key.GetCharsFromKeys(shift, Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down));
                     this.send_text.SelectionStart = this.send_text.Text.Length;
                 }
+                e.Handled = true;
             }
             else e.Handled = false;
         }
 
+        // Send message
         public void Send(object sender, RoutedEventArgs e)
         {
             Task.Factory.StartNew(async () =>
@@ -175,7 +198,7 @@ namespace Alika.UI
                 List<string> attachments = new List<String>();
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
-                    text = this.send_text.Text.Replace("\r\n", "\n").Replace("\r", "\n");
+                    text = this.send_text.Text.Replace("\r\n", "\n").Replace("\r", "\n"); // i hate \r\n
                     if (this.attach_grid.Children.Count > 0)
                     {
                         for (int x = 0; x < this.attach_grid.Children.Count; x++)
@@ -189,6 +212,7 @@ namespace Alika.UI
                 if (text.Length > 0 || attachments.Count > 0)
                 {
                     string temptext;
+                    // Send multiple messages if text length > 4096
                     while (text.Length > 0 || attachments.Count > 0)
                     {
                         temptext = text.Substring(0, text.Length > Limits.Messages.MAX_LENGTH ? Limits.Messages.MAX_LENGTH : text.Length);
@@ -202,7 +226,8 @@ namespace Alika.UI
 
         }
 
-        public void OnScroll(object s, ScrollViewerViewChangedEventArgs e)
+        // Load new messages when user scrolled to top
+        public void OnScroll(object s, ScrollViewerViewChangedEventArgs e) // TODO: Fix it
         {
             if (e.IsIntermediate)
             {
@@ -215,6 +240,7 @@ namespace Alika.UI
             }
         }
 
+        // Attachment button selection
         public async void AttachSelection(object sender, RoutedEventArgs e)
         {
             FileOpenPicker picker = new FileOpenPicker();
@@ -235,6 +261,7 @@ namespace Alika.UI
             }
         }
 
+        // Upload image from clipboard
         public void AttachUploadByteImage(byte[] bytes)
         {
             Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Wait, 0);
@@ -247,6 +274,7 @@ namespace Alika.UI
             Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
         }
 
+        // Upload image from FileOpenpicker
         public async void AttachUpload(StorageFile file)
         {
 
@@ -277,6 +305,7 @@ namespace Alika.UI
 
         }
 
+        // Sticker suggestion by word
         public async void StickerSuggestion(object sender, TextChangedEventArgs e)
         {
             if (App.cache.StickerDictionary == null) return;
@@ -314,7 +343,7 @@ namespace Alika.UI
             {
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
-                    this.stickers_suggestions.Visibility = Visibility.Collapsed;
+                    this.stickers_suggestions.Visibility = Visibility.Collapsed; // Hide if word suggestions not found
                 });
             }
         }

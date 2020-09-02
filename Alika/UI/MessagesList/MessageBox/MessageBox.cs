@@ -15,6 +15,9 @@ using Windows.UI.Xaml.Media;
 
 namespace Alika.UI
 {
+    /// <summary>
+    /// Message box which holds MessageGrid (needed for future features)
+    /// </summary>
     class MessageBox : ListViewItem
     {
         public MessageGrid message { get; set; }
@@ -28,6 +31,9 @@ namespace Alika.UI
             this.Content = (this.message);
         }
 
+        /// <summary>
+        /// Grid with avatar & text
+        /// </summary>
         public class MessageGrid : Grid
         {
             public TextBubble textBubble { get; set; }
@@ -47,6 +53,7 @@ namespace Alika.UI
 
                 this.LoadAvatar(msg.from_id);
 
+                // Changing avatar position if message from current user
                 if (msg.from_id == App.vk.user_id)
                 {
                     this.ColumnDefinitions.Add(new ColumnDefinition());
@@ -95,6 +102,10 @@ namespace Alika.UI
                 this.avatar.Margin = margin;
             }
         }
+
+        /// <summary>
+        /// Name,text, attachments & buttons holder
+        /// </summary>
         public class TextBubble : Grid
         {
             public Message message { get; set; }
@@ -135,7 +146,7 @@ namespace Alika.UI
 
                 this.borderGrid.RowDefinitions.Add(new RowDefinition());
                 Grid.SetRow(this.textGrid, 0);
-                if (this.message.text.Length > 0 || this.message.attachments.Count == 0) this.borderGrid.Children.Add(this.textGrid);
+                if (this.message.text.Length > 0 || this.message.attachments.Count == 0) this.borderGrid.Children.Add(this.textGrid); // TODO: Remove (this.message.attachments.Count == 0) and make service messages support
                 if (this.message.attachments.Count > 0)
                 {
                     this.borderGrid.RowDefinitions.Add(new RowDefinition());
@@ -171,7 +182,7 @@ namespace Alika.UI
                     List<Match> markdown = new List<Match>();
 
                     MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(text);
-                    MatchCollection links = new Regex(@"((http|https)\:\/\/)?[\w]*\.(com|online|ru|net|ua|su|tk|ml|ga|cf|gq|gg|me|рф|org|biz|info|cc|ws|pro|tv|in|xyz|рф)(\/[\w\?\-\=\&.]*)*").Matches(text);
+                    MatchCollection links = new Regex(@"((http|https)\:\/\/)?[\w]*\.[a-zA-Z0-9]{1,6}(\/[\w\?\-\=\&.]*)*").Matches(text);
                     if (pushes.Count > 0) foreach (Match push in pushes) markdown.Add(push);
                     if (links.Count > 0) foreach (Match link in links) markdown.Add(link);
 
@@ -184,24 +195,34 @@ namespace Alika.UI
                             if (i == 0 && !text.StartsWith(m.Value)) p.Inlines.Add(new Run { Text = text.Substring(0, m.Index) });
                             if (i > 0 && markdown[i - 1].Index != m.Index)
                             {
-                                Match prev = markdown[i - 1];
-                                int start = prev.Index + prev.Length;
-                                p.Inlines.Add(new Run { Text = text.Substring(start, m.Index - start) });
+                                try
+                                {
+                                    Match prev = markdown[i - 1];
+                                    int start = prev.Index + prev.Length;
+                                    p.Inlines.Add(new Run { Text = text.Substring(start, m.Index - start) });
+                                }
+                                catch { }
                             }
-                            if (!m.Value.Contains("["))
+                            // TODO: Fix crash on some messagesъtry
+                            try
                             {
-                                string lnk = m.Value;
-                                if (!lnk.StartsWith("http://") && !lnk.StartsWith("https://")) lnk = "http://" + lnk;
-                                Hyperlink link = new Hyperlink { NavigateUri = new Uri(lnk) };
-                                link.Inlines.Add(new Run { Text = m.Value });
-                                p.Inlines.Add(link);
+                                if (!m.Value.Contains("["))
+                                {
+                                    string lnk = m.Value;
+                                    if (!lnk.StartsWith("http://") && !lnk.StartsWith("https://")) lnk = "http://" + lnk;
+                                    Hyperlink link = new Hyperlink { NavigateUri = new Uri(lnk) };
+                                    link.Inlines.Add(new Run { Text = m.Value });
+                                    p.Inlines.Add(link);
+
+                                }
+                                else
+                                {
+                                    Hyperlink link = new Hyperlink { NavigateUri = new Uri("https://vk.com/" + m.Value.Split("|")[0].Replace("[", "")) };
+                                    link.Inlines.Add(new Run { Text = m.Value.Split("|")[1].Replace("]", "") });
+                                    p.Inlines.Add(link);
+                                }
                             }
-                            else
-                            {
-                                Hyperlink link = new Hyperlink { NavigateUri = new Uri("https://vk.com/" + m.Value.Split("|")[0].Replace("[", "")) };
-                                link.Inlines.Add(new Run { Text = m.Value.Split("|")[1].Replace("]", "") });
-                                p.Inlines.Add(link);
-                            }
+                            catch { }
                             if (i == markdown.Count - 1 && !text.EndsWith(m.Value)) p.Inlines.Add(new Run { Text = text.Substring(m.Index + m.Length) });
                         }
                     }
@@ -242,6 +263,7 @@ namespace Alika.UI
                         }
                         else if (att.type == "sticker")
                         {
+                            // TODO: Add sticker handler class
                             if (att.sticker.animation_url == null)
                             {
                                 Image img = new Image
@@ -273,7 +295,7 @@ namespace Alika.UI
                         }
                         else if (att.type == "audio_message")
                         {
-
+                            // TODO: Create custom player
                             MediaPlayerElement audio = new MediaPlayerElement
                             {
                                 Background = Coloring.Transparent.Full,
@@ -321,7 +343,7 @@ namespace Alika.UI
                 }
             }
 
-            public void LoadButtons()
+            public void LoadButtons() // TODO: Support for callback buttons?
             {
                 if (this.message.keyboard != null && this.message.keyboard.inline)
                 {

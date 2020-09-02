@@ -119,17 +119,22 @@
   </resheader>
   <data name="Close" xml:space="preserve">
     <value>Close</value>
+    <comment>Close button text</comment>
   </data>
   <data name="LastSeen" xml:space="preserve">
     <value>Was online at: %date%</value>
+    <comment>Last online text</comment>
   </data>
   <data name="Online" xml:space="preserve">
     <value>Online</value>
+    <comment>Online text</comment>
   </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
+    <comment>Save button text</comment>
   </data>
   <data name="TextBoxPlaceholder" xml:space="preserve">
     <value>Message...</value>
+    <comment>Message TextBox placeholder</comment>
   </data>
 </root>

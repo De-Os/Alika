@@ -29,7 +29,7 @@ namespace Alika.Libs.VK
             this.users = new VK.Users(this);
             this.groups = new VK.Groups(this);
 
-            this.user_id = this.users.Get(new List<int>(), "photo_200")[0].user_id;
+            this.user_id = this.users.Get(new List<int>(), "photo_200")[0].user_id; // Getting current user's user_id & adding it's photo to cache
         }
 
         public LongPoll GetLP()
@@ -37,12 +37,20 @@ namespace Alika.Libs.VK
             return new LongPoll(this);
         }
 
+        /// <summary>
+        /// Main method to call & deserialize api methods
+        /// </summary>
+        /// <typeparam name="Type">Deserializing type</typeparam>
+        /// <param name="method">Method name</param>
+        /// <param name="fields">Parameters</param>
+        /// <returns>Deserialized object</returns>
         public Type Call<Type>(string method, Dictionary<string, dynamic> fields = null)
         {
             var result = this.CallMethod(method, fields);
             BasicResponse<Type> job = JsonConvert.DeserializeObject<BasicResponse<Type>>(result);
             if (job.error != null)
             {
+                // TODO: Captcha handling
                 /*if (job.error.code == 14 && this.captchaSettings != null)
                 {
                     System.Diagnostics.Debug.WriteLine(ObjectDumper.Dump(job.error));
@@ -61,9 +69,14 @@ namespace Alika.Libs.VK
             return job.response;
         }
 
+        /// <summary>
+        /// Use it only if you need non-deserialized output
+        /// </summary>
+        /// <param name="method">Method name</param>
+        /// <param name="fields">Parameters</param>
+        /// <returns>JSON string</returns>
         public string CallMethod(string method, Dictionary<string, dynamic> fields = null)
         {
-
             var http = new RestClient("https://api.vk.com/method");
             var request = new RestRequest(method);
             request.AddParameter("access_token", this.token);
@@ -74,15 +87,20 @@ namespace Alika.Libs.VK
                 foreach (KeyValuePair<string, dynamic> field in fields) request.AddParameter(field.Key, field.Value);
             }
 
-
             return http.Post(request).Content;
         }
 
+        /// <summary>
+        /// store.getStockItems with type=stickers
+        /// </summary>
         public GetStickersResponse GetStickers()
         {
             return this.Call<GetStickersResponse>("store.getStockItems", new Dictionary<string, dynamic> { { "type", "stickers" } });
         }
 
+        /// <summary>
+        /// store.getStickersKeywords
+        /// </summary>
         public GetStickersKeywordsResponse GetStickersKeywords()
         {
             return this.Call<GetStickersKeywordsResponse>("store.getStickersKeywords", new Dictionary<string, dynamic> { });

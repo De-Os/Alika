@@ -119,11 +119,14 @@
   </resheader>
   <data name="NoEmptyChoose" xml:space="preserve">
     <value>Choose at least 1 file</value>
+    <comment>Not used</comment>
   </data>
   <data name="NoMoreAttachs" xml:space="preserve">
     <value>You can't upload more than %count% attachments</value>
+    <comment>Upload limit alert text</comment>
   </data>
   <data name="UploadError" xml:space="preserve">
     <value>Error while uploading file: %error%</value>
+    <comment>Uploading error alert text</comment>
   </data>
 </root>

@@ -14,6 +14,9 @@ namespace Alika.Libs.VK
                 this.vk = vk;
             }
 
+            /// <summary>
+            /// groups.getById
+            /// </summary>
             public List<Group> GetById(List<int> group_ids, string fields = "")
             {
                 Dictionary<string, dynamic> request = new Dictionary<string, dynamic>();

@@ -31,23 +31,13 @@ namespace Alika
         }
         private void RegisterEvents()
         {
+            // Arrow navigation
             this.number.KeyDown += (object sender, KeyRoutedEventArgs e) =>
             {
                 if (e.Key == Windows.System.VirtualKey.Enter || e.Key == Windows.System.VirtualKey.Down)
                 {
                     this.number.Focus(FocusState.Programmatic);
                     this.password.Focus(FocusState.Pointer);
-                }
-            };
-            this.number.TextChanged += (object sender, TextChangedEventArgs e) =>
-            {
-                if (this.number.Text.Length > 0)
-                {
-                    if (!Regex.IsMatch(this.number.Text.Last().ToString(), @"[\+\d]"))
-                    {
-                        this.number.Text = this.number.Text.Substring(0, this.number.Text.Length - 1);
-                        this.number.SelectionStart = this.number.Text.Length;
-                    }
                 }
             };
             this.password.KeyDown += (object sender, KeyRoutedEventArgs e) =>
@@ -61,6 +51,18 @@ namespace Alika
                 {
                     this.password.Focus(FocusState.Programmatic);
                     this.number.Focus(FocusState.Pointer);
+                }
+            };
+            // Validating number
+            this.number.TextChanged += (object sender, TextChangedEventArgs e) =>
+            {
+                if (this.number.Text.Length > 0)
+                {
+                    if (!Regex.IsMatch(this.number.Text.Last().ToString(), @"[\+\d]"))
+                    {
+                        this.number.Text = this.number.Text.Substring(0, this.number.Text.Length - 1);
+                        this.number.SelectionStart = this.number.Text.Length;
+                    }
                 }
             };
         }
@@ -88,6 +90,7 @@ namespace Alika
             var request = new RestRequest();
             request.AddParameter("password", password);
             request.AddParameter("grant_type", "password");
+            // TODO: Make normal config with constants
             request.AddParameter("client_id", 2274003);
             request.AddParameter("client_secret", "hHbZxrka2uZ6jB1inYsH");
             request.AddParameter("username", number);
@@ -129,6 +132,9 @@ namespace Alika
             }
             else await new MessageDialog("Check your internet connection", "Error!").ShowAsync();
         }
+        /// <summary>
+        /// Dialog when captcha needed
+        /// </summary>
         public class Captcha : ContentDialog
         {
             public Grid content;
@@ -179,6 +185,9 @@ namespace Alika
                 this.Content = this.content;
             }
         }
+        /// <summary>
+        /// Dialog when 2fa needed
+        /// </summary>
         public class CodeDialog : ContentDialog
         {
             public Grid content;

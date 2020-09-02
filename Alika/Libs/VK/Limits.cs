@@ -1,5 +1,8 @@
 ﻿namespace Alika.Libs.VK
 {
+    /// <summary>
+    /// Some limits for future?
+    /// </summary>
     public static class Limits
     {
         public static class Messages

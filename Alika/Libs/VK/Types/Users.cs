@@ -14,6 +14,9 @@ namespace Alika.Libs.VK
                 this.vk = vk;
             }
 
+            /// <summary>
+            /// users.get
+            /// </summary>
             public List<User> Get(List<int> user_ids, string fields = "", string name_case = "Nom")
             {
                 Dictionary<string, dynamic> request = new Dictionary<string, dynamic>();

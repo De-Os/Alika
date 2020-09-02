@@ -18,18 +18,18 @@ namespace Alika
 {
     sealed partial class App : Application
     {
-        public static bool systemDarkTheme = new UISettings().GetColorValue(UIColorType.Background).ToString() == "#FF000000";
-        public static Caching cache = new Caching();
-        public static string appName = "alika.vk";
-        public static PasswordVault vault = new PasswordVault();
-        public static VK vk;
-        public LongPoll lp;
-        public MainPage main_page;
-        public LoginPage login_page;
+        public static bool systemDarkTheme = new UISettings().GetColorValue(UIColorType.Background).ToString() == "#FF000000"; // Bool for detecting system theme
+        public static Caching cache = new Caching(); // Global caching
+        public static string appName = "alika.vk"; // Appname for password vault
+        public static PasswordVault vault = new PasswordVault(); // Password vault instance
+        public static VK vk; // VK lib
+        public LongPoll lp; // LongPoll
+        public MainPage main_page; // Main page
+        public LoginPage login_page; // Login page
 
         public App()
         {
-            ImageCache.Instance.CacheDuration = TimeSpan.FromDays(7);
+            ImageCache.Instance.CacheDuration = TimeSpan.FromDays(7); // TODO: Make setting to change cache duration
             this.InitializeComponent();
             this.Suspending += OnSuspending;
         }

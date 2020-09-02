@@ -12,6 +12,10 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI
 {
+
+    /// <summary>
+    /// Dialog grid
+    /// </summary>
     public partial class MessagesList : Grid
     {
         public int peer_id { get; set; }
@@ -118,8 +122,7 @@ namespace Alika.UI
             this.msg_scroll.Content = this.messages;
 
             this.send_text.SetValue(ScrollViewer.HorizontalScrollBarVisibilityProperty, ScrollBarVisibility.Disabled);
-            this.send_text.SetValue(ScrollViewer.VerticalScrollBarVisibilityProperty, ScrollBarVisibility.Auto);
-
+            this.send_text.SetValue(ScrollViewer.VerticalScrollBarVisibilityProperty, ScrollBarVisibility.Disabled);
 
             this.bottom_menu.RowDefinitions.Add(new RowDefinition());
             this.bottom_menu.RowDefinitions.Add(new RowDefinition());
@@ -237,6 +240,7 @@ namespace Alika.UI
             this.top_menu.Children.Add(text);
         }
 
+        // Scroll after loaded messages list (костыль)
         public void FirstScroll(object s, SizeChangedEventArgs e)
         {
             if ((s as ListView).IsLoaded)
@@ -248,6 +252,8 @@ namespace Alika.UI
             }
         }
 
+        // Scroll on new message (костыль)
+        // TODO: Fix it
         public void MsgScroll(object s, SizeChangedEventArgs e)
         {
             if (this.msg_scroll.VerticalOffset >= this.msg_scroll.ScrollableHeight * 0.9) this.ScrollToDown();
@@ -273,6 +279,7 @@ namespace Alika.UI
                     if (this.messages.Items.Count > 0)
                     {
                         MessageBox prev = this.messages.Items[this.messages.Items.Count - 1] as MessageBox;
+                        // Change corner radius on previous message and remove avatar if it is from same user
                         if (prev.message.textBubble.message.from_id == message.from_id)
                         {
                             prev.message.avatar.Visibility = Visibility.Collapsed;
@@ -305,6 +312,7 @@ namespace Alika.UI
                     if (this.messages.Items.Count > 0)
                     {
                         MessageBox next = this.messages.Items[0] as MessageBox;
+                        // Change corner radius on next message and remove avatar if it is from same user
                         if (next.message.textBubble.message.from_id == message.from_id)
                         {
                             next.message.avatar.Visibility = Visibility.Visible;

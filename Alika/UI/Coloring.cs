@@ -7,6 +7,9 @@ namespace Alika.UI
     {
         public static class Transparent
         {
+            /// <summary>
+            /// Fully transparent
+            /// </summary>
             public static SolidColorBrush Full = new SolidColorBrush(new Windows.UI.Color
             {
                 A = 0,
@@ -26,6 +29,10 @@ namespace Alika.UI
                 });
             }
 
+            /// <summary>
+            /// Percent transparency
+            /// </summary>
+            /// <param name="percent">Opacity percents</param>
             public static SolidColorBrush Percent(int percent)
             {
                 return Coloring.Transparent.Percent((double)percent / 100);

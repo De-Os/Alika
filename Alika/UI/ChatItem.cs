@@ -10,38 +10,35 @@ using Windows.UI.Xaml.Media;
 
 namespace Alika.UI
 {
+    /// <summary>
+    /// Chat holder in chats list
+    /// </summary>
     class ChatItem : ListViewItem
     {
         public string avatar;
         public string name;
         public int peer_id;
         public Message message;
-        public Grid grid;
-        public Grid textGrid;
-        public TextBlock nameBlock;
-        public TextBlock textBlock;
-        public Border image;
+        public Grid grid = new Grid();
+        public Grid textGrid = new Grid();
+        public TextBlock nameBlock = new TextBlock
+        {
+            FontSize = 15,
+            FontWeight = FontWeights.Bold,
+            TextTrimming = TextTrimming.CharacterEllipsis
+        };
+        public TextBlock textBlock = new TextBlock
+        {
+            TextTrimming = TextTrimming.CharacterEllipsis
+        };
+        public Border image = new Border
+        {
+            BorderThickness = new Thickness(0),
+            CornerRadius = new CornerRadius(60, 60, 60, 60)
+        };
 
         public ChatItem(int peer_id, string avatar, string name, Message last_msg)
         {
-            this.grid = new Grid();
-            this.textGrid = new Grid();
-            this.nameBlock = new TextBlock
-            {
-                FontSize = 15,
-                FontWeight = FontWeights.Bold,
-                TextTrimming = TextTrimming.CharacterEllipsis
-            };
-            this.textBlock = new TextBlock {
-                TextTrimming = TextTrimming.CharacterEllipsis
-            };
-            this.image = new Border
-            {
-                BorderThickness = new Thickness(0),
-                CornerRadius = new CornerRadius(60, 60, 60, 60)
-            };
-
-
             this.peer_id = peer_id;
             this.avatar = avatar;
             this.name = name;
@@ -71,7 +68,7 @@ namespace Alika.UI
                 this.image.Height = 50;
                 this.image.Width = 50;
                 ImageBrush ava = new ImageBrush();
-                ava.ImageSource = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.avatar));//new BitmapImage(new Uri(this.avatar, UriKind.RelativeOrAbsolute));
+                ava.ImageSource = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.avatar));
                 ava.Stretch = Stretch.Fill;
                 this.image.Background = ava;
                 Grid.SetColumn(this.image, 0);
@@ -100,8 +97,5 @@ namespace Alika.UI
                 this.textBlock.Text = this.message.text;
             }
         }
-
-
-
     }
 }
