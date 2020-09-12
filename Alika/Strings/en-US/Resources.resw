@@ -141,4 +141,7 @@
     <value>Search</value>
     <comment>Search placeholder/text</comment>
   </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
 </root>

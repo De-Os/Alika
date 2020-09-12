@@ -8,7 +8,7 @@ namespace Alika.Libs.VK.Longpoll
 {
     public class LongPoll
     {
-        private VK vk;
+        private readonly VK vk;
         private bool stop;
 
         private RestClient http;

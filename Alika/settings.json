@@ -1,0 +1,10 @@
+﻿{
+	"vk":{
+		"api": "5.129",
+		"login": {
+			"client_id": 2274003,
+			"client_secret": "hHbZxrka2uZ6jB1inYsH",
+			"scope": ["messages", "offline"]
+		}
+	}
+}

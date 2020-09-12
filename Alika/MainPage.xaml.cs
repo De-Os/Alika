@@ -1,5 +1,6 @@
 ﻿using Alika.Libs.VK.Responses;
 using Alika.UI;
+using Alika.UI.Dialog;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -13,14 +14,17 @@ namespace Alika
 {
     public sealed partial class MainPage : Page
     {
-        public ChatsList chats_list;
+        public ChatsList chats_list = new ChatsList();
+        public int peer_id;
+
         public MainPage()
         {
             this.InitializeComponent();
-            this.chats_list = new ChatsList();
+
             this.chats_scroll.Content = this.chats_list;
             this.chats_scroll.ViewChanged += this.OnChatsScroll;
             this.chats_list.SelectionChanged += this.OnChatSelection;
+
             Task.Factory.StartNew(async () =>
             {
                 // Updating cache stickers on app startup 
@@ -49,6 +53,7 @@ namespace Alika
                     var list = new MessagesList(selected.peer_id);
                     this.dialog.Children.Add(list);
                     this.dialog.Children.Add(list.stickers_suggestions);
+                    this.peer_id = selected.peer_id;
                 });
             });
         }
@@ -72,7 +77,7 @@ namespace Alika
                             if ((int)update[0] == 4)
                             {
                                 Message msg = new Message(update);
-                                if (update[7] != null) msg = App.vk.messages.GetById(new List<int> { msg.id }).messages[0];
+                                if (update[7] != null) msg = App.vk.Messages.GetById(new List<int> { msg.id }).messages[0];
                                 if (selected.peer_id == msg.peer_id)
                                 {
                                     MessagesList list = this.dialog.Children[0] as MessagesList;

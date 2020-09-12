@@ -211,7 +211,7 @@ namespace Alika.UI
                 {
                     this.Sticker = sticker;
                     this.CornerRadius = new Windows.UI.Xaml.CornerRadius(10);
-                    this.PointerPressed += (a, b) => Task.Factory.StartNew(() => App.vk.messages.Send(App.cache.StickersSelector.peer_id, sticker_id: this.Sticker.sticker_id));
+                    this.PointerPressed += (a, b) => Task.Factory.StartNew(() => App.vk.Messages.Send(App.cache.StickersSelector.peer_id, sticker_id: this.Sticker.sticker_id));
                     this.PointerEntered += (a, b) => this.Background = Coloring.Transparent.Percent(50); // Sticker "selection" by background color
                     this.PointerExited += (a, b) => this.Background = Coloring.Transparent.Full; // Remove selection
                     this.Children.Add(this.Image);

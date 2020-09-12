@@ -59,6 +59,25 @@ namespace Alika.UI
                 });
             }
 
+            public static class VoiceMessage
+            {
+                public static SolidColorBrush Dark = new SolidColorBrush(new Windows.UI.Color
+                {
+                    A = 255,
+                    R = 0,
+                    G = 0,
+                    B = 0
+                });
+
+                public static SolidColorBrush Light = new SolidColorBrush(new Windows.UI.Color
+                {
+                    A = 255,
+                    R = 255,
+                    G = 255,
+                    B = 255
+                });
+            }
+
             public static class Keyboard
             {
                 public static string GetColor(string type)

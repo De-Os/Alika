@@ -1,16 +1,14 @@
 ﻿using Alika.Libs;
-using Alika.Libs.VK;
 using Alika.Libs.VK.Responses;
 using System;
 using System.Collections.Generic;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
-using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
 
-namespace Alika.UI
+namespace Alika.UI.Dialog
 {
 
     /// <summary>
@@ -19,7 +17,7 @@ namespace Alika.UI
     public partial class MessagesList : Grid
     {
         public int peer_id { get; set; }
-        public Grid top_menu = new Grid();
+        public TopMenu top_menu;
         public ListView messages = new ListView
         {
             SelectionMode = ListViewSelectionMode.None
@@ -105,6 +103,8 @@ namespace Alika.UI
 
         public void Render()
         {
+            this.top_menu = new UI.Dialog.TopMenu(this.peer_id);
+
             this.RowDefinitions.Add(new RowDefinition { Height = new GridLength(60) });
             this.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
             this.RowDefinitions.Add(new RowDefinition { Height = new GridLength(60, GridUnitType.Auto) });
@@ -116,8 +116,6 @@ namespace Alika.UI
             this.Children.Add(this.top_menu);
             this.Children.Add(this.msg_scroll);
             this.Children.Add(this.bottom_menu);
-
-            this.LoadTopMenu();
 
             this.msg_scroll.Content = this.messages;
 
@@ -167,79 +165,6 @@ namespace Alika.UI
             });
         }
 
-        public void LoadTopMenu()
-        {
-            this.top_menu.ColumnDefinitions.Add(new ColumnDefinition());
-            this.top_menu.ColumnDefinitions.Add(new ColumnDefinition());
-
-            string title = null;
-            string desc = null;
-            if (this.peer_id > 0)
-            {
-                if (this.peer_id > Limits.Messages.PEERSTART)
-                {
-                    if (!App.cache.Conversations.Exists(c => c.conversation.peer.id == this.peer_id)) App.vk.messages.GetConversationsById(new List<int> { this.peer_id }, fields: "photo_200,online_info");
-                    var conv = App.cache.Conversations.Find(c => c.conversation.peer.id == this.peer_id);
-                    title = conv.conversation.settings.title;
-                    desc = "Беседа";
-                }
-                else
-                {
-                    if (!App.cache.Users.Exists(u => u.user_id == this.peer_id)) App.vk.users.Get(new List<int> { this.peer_id }, fields: "photo_200,online_info");
-                    var user = App.cache.Users.Find(u => u.user_id == this.peer_id);
-                    title = user.first_name + " " + user.last_name;
-                    if (user.online_info.is_online)
-                    {
-                        desc = Utils.LocString("Dialog/Online");
-                    }
-                    else
-                    {
-                        DateTime online = user.online_info.last_seen.ToDateTime();
-                        if (online.Day == DateTime.Today.Day)
-                        {
-                            desc = Utils.LocString("Dialog/LastSeen").Replace("%date%", online.ToString("HH:mm"));
-                        }
-                        else desc = Utils.LocString("Dialog/LastSeen").Replace("%date%", online.ToString("HH:mm d.M"));
-                    }
-                }
-            }
-            else
-            {
-                if (!App.cache.Groups.Exists(g => g.id == this.peer_id)) App.vk.groups.GetById(new List<int> { this.peer_id }, fields: "photo_200");
-                var group = App.cache.Groups.Find(g => g.id == this.peer_id);
-                title = group.name;
-                desc = "Сообщество";
-            }
-
-            Grid text = new Grid
-            {
-                Margin = new Thickness(10, 0, 0, 0)
-            };
-            text.RowDefinitions.Add(new RowDefinition());
-            text.RowDefinitions.Add(new RowDefinition());
-            Grid.SetColumn(text, 0);
-            TextBlock name = new TextBlock
-            {
-                FontWeight = FontWeights.Bold,
-                Text = title,
-                FontSize = 18,
-                VerticalAlignment = VerticalAlignment.Bottom,
-                HorizontalAlignment = HorizontalAlignment.Left
-            };
-            Grid.SetRow(name, 0);
-            text.Children.Add(name);
-            TextBlock about = new TextBlock
-            {
-                Text = desc,
-                FontSize = 15,
-                VerticalAlignment = VerticalAlignment.Top,
-                HorizontalAlignment = HorizontalAlignment.Left
-            };
-            Grid.SetRow(about, 1);
-            text.Children.Add(about);
-            this.top_menu.Children.Add(text);
-        }
-
         // Scroll after loaded messages list (костыль)
         public void FirstScroll(object s, SizeChangedEventArgs e)
         {
@@ -263,7 +188,7 @@ namespace Alika.UI
 
         public void LoadMessages()
         {
-            List<Message> messages = App.vk.messages.GetHistory(this.peer_id).messages;
+            List<Message> messages = App.vk.Messages.GetHistory(this.peer_id).messages;
             messages.Reverse();
             messages.ForEach((Message msg) => this.AddMessage(msg, true));
         }
@@ -292,14 +217,13 @@ namespace Alika.UI
                             {
                                 corners.BottomLeft = 0;
                                 msg_corners.TopLeft = 0;
-                                msg.message.textBubble.border.CornerRadius = msg_corners;
                             }
                             else
                             {
                                 corners.BottomRight = 0;
                                 msg_corners.TopRight = 0;
-                                msg.message.textBubble.border.CornerRadius = msg_corners;
                             }
+                            msg.message.textBubble.border.CornerRadius = msg_corners;
                             prev.message.textBubble.border.CornerRadius = corners;
                             msg.message.textBubble.name.Visibility = Visibility.Collapsed;
                             msg.message.textBubble.border.Margin = new Thickness(10, 2.5, 10, 5);
@@ -327,14 +251,13 @@ namespace Alika.UI
                             {
                                 corners.TopLeft = 0;
                                 msg_corner.BottomLeft = 0;
-                                msg.message.textBubble.border.CornerRadius = msg_corner;
                             }
                             else
                             {
                                 corners.TopRight = 0;
                                 msg_corner.BottomRight = 0;
-                                msg.message.textBubble.border.CornerRadius = msg_corner;
                             }
+                            msg.message.textBubble.border.CornerRadius = msg_corner;
                             next.message.textBubble.border.CornerRadius = corners;
                             msg.message.textBubble.border.Margin = new Thickness(10, 5, 10, 2.5);
                         }

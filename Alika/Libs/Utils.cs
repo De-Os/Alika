@@ -4,10 +4,14 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.Resources;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.System;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 
 namespace Alika.Libs
 {
@@ -105,10 +109,7 @@ namespace Alika.Libs
                 return ms.ToArray();
             }
         }
-        public static string AssetTheme(string filename, string path = "UI/")
-        {
-            return "ms-appx:///Assets/" + path + (App.systemDarkTheme ? "Light" : "Dark") + "/" + filename;
-        }
+        public static string AssetTheme(string filename, string path = "UI/") => "ms-appx:///Assets/" + path + (App.systemDarkTheme ? "Light" : "Dark") + "/" + filename;
 
         public static string FormatSize(int bytes, int round = 2)
         {
@@ -122,16 +123,56 @@ namespace Alika.Libs
             decimal number = (decimal)bytes;
             while (Math.Round(number / 1024) > 0)
             {
-                number = number / 1024;
+                number /= 1024;
                 counter++;
                 if (counter == suffixes.Count()) break;
             }
             return Math.Round(number, round).ToString() + " " + suffixes[counter];
         }
 
-        public static DateTime ToDateTime(this int unixtime)
+        public static DateTime ToDateTime(this int unixtime) => new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(unixtime).ToLocalTime();
+
+        public static string RuToEng(this string str) => str.StrTr("йцукенгшщзхъфывапролджэячсмитьбю.ё!\"№;%:?*", "qwertyuiop[]asdfghjkl;'zxcvbnm,./`!@#$%^&*");
+
+        public static string StrTr(this string str, string from, string to)
         {
-            return new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc).AddSeconds(unixtime).ToLocalTime();
+            if (from.Length != to.Length) return null;
+            for (int x = 0; x < from.Length; x++) str = str.Replace(from[x], to[x]);
+            return str;
+        }
+
+        public static string AppPath(string path) => Package.Current.InstalledLocation.Path + "/" + path;
+
+        public static string OnlineText(bool online, int last_time) => Utils.OnlineText(online, last_time.ToDateTime());
+
+        public static string OnlineText(bool online, DateTime last_time)
+        {
+            if (online)
+            {
+                return Utils.LocString("Dialog/Online");
+            }
+            else
+            {
+                if (last_time.Day == DateTime.Today.Day)
+                {
+                    return Utils.LocString("Dialog/LastSeen").Replace("%date%", last_time.ToString("HH:mm"));
+                }
+                else return Utils.LocString("Dialog/LastSeen").Replace("%date%", last_time.ToString("HH:mm d.M"));
+            }
+        }
+
+        public static void RemoveParent(this UIElement element)
+        {
+            var parent = VisualTreeHelper.GetParent(element);
+            if (parent == null) return;
+            if (parent is Panel p)
+            {
+                p.Children.Remove(element);
+            }
+            else if (parent is ContentControl c)
+            {
+                c.Content = null;
+            }
         }
     }
 }

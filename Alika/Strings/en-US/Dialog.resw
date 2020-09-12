@@ -121,13 +121,81 @@
     <value>Close</value>
     <comment>Close button text</comment>
   </data>
+  <data name="Conference" xml:space="preserve">
+    <value>Conference</value>
+    <comment>Conference title in top menu</comment>
+  </data>
+  <data name="ConversationInfo" xml:space="preserve">
+    <value>Conversation info</value>
+  </data>
+  <data name="Demote" xml:space="preserve">
+    <value>Demote user</value>
+  </data>
+  <data name="Group" xml:space="preserve">
+    <value>Group</value>
+    <comment>Group title in top menu</comment>
+  </data>
+  <data name="InvitedTime" xml:space="preserve">
+    <value>Joined: %time%</value>
+  </data>
+  <data name="JoinedInfo" xml:space="preserve">
+    <value>Invited by %user%</value>
+  </data>
+  <data name="Kick" xml:space="preserve">
+    <value>Kick</value>
+  </data>
   <data name="LastSeen" xml:space="preserve">
     <value>Was online at: %date%</value>
     <comment>Last online text</comment>
   </data>
+  <data name="Management" xml:space="preserve">
+    <value>Management</value>
+  </data>
+  <data name="Members" xml:space="preserve">
+    <value>Members</value>
+  </data>
+  <data name="MembersCount" xml:space="preserve">
+    <value>Members: %count%</value>
+  </data>
   <data name="Online" xml:space="preserve">
     <value>Online</value>
     <comment>Online text</comment>
+  </data>
+  <data name="Permissions" xml:space="preserve">
+    <value>Permissions</value>
+  </data>
+  <data name="PermissionsCall" xml:space="preserve">
+    <value>Make group call</value>
+  </data>
+  <data name="PermissionsChangeAdmins" xml:space="preserve">
+    <value>Change admins</value>
+  </data>
+  <data name="PermissionsChangeInfo" xml:space="preserve">
+    <value>Edit information</value>
+  </data>
+  <data name="PermissionsInvite" xml:space="preserve">
+    <value>Invite</value>
+  </data>
+  <data name="PermissionsLink" xml:space="preserve">
+    <value>See invite link</value>
+  </data>
+  <data name="PermissionsMentions" xml:space="preserve">
+    <value>Use mass mentions</value>
+  </data>
+  <data name="PermissionsPin" xml:space="preserve">
+    <value>Pin messages</value>
+  </data>
+  <data name="PermissionsTypeAll" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="PermissionsTypeOwner" xml:space="preserve">
+    <value>Owner</value>
+  </data>
+  <data name="PermissionsTypeOwnerAndAdmins" xml:space="preserve">
+    <value>Owner and admins</value>
+  </data>
+  <data name="Promote" xml:space="preserve">
+    <value>Promote user</value>
   </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
@@ -136,5 +204,17 @@
   <data name="TextBoxPlaceholder" xml:space="preserve">
     <value>Message...</value>
     <comment>Message TextBox placeholder</comment>
+  </data>
+  <data name="TopMenuAttachments" xml:space="preserve">
+    <value>Attachments</value>
+    <comment>Attachments text in top menu</comment>
+  </data>
+  <data name="TopMenuInformation" xml:space="preserve">
+    <value>Information</value>
+    <comment>Information about conversation text in top menu</comment>
+  </data>
+  <data name="TopMenuLeave" xml:space="preserve">
+    <value>Leave</value>
+    <comment>Leave from chat text in top menu</comment>
   </data>
 </root>

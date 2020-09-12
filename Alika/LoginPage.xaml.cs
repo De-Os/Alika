@@ -4,6 +4,7 @@ using RestSharp;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Windows.Security.Credentials;
 using Windows.UI.Popups;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
@@ -90,12 +91,11 @@ namespace Alika
             var request = new RestRequest();
             request.AddParameter("password", password);
             request.AddParameter("grant_type", "password");
-            // TODO: Make normal config with constants
-            request.AddParameter("client_id", 2274003);
-            request.AddParameter("client_secret", "hHbZxrka2uZ6jB1inYsH");
+            request.AddParameter("client_id", App.settings.vk.login.client_id);
+            request.AddParameter("client_secret", App.settings.vk.login.client_secret);
             request.AddParameter("username", number);
-            request.AddParameter("scope", "messages,offline");
-            request.AddParameter("v", "5.122");
+            request.AddParameter("scope", String.Join(",", App.settings.vk.login.scope));
+            request.AddParameter("v", App.settings.vk.api);
             request.AddParameter("2fa_supported", 1);
             if (captcha_sid != null)
             {
@@ -126,7 +126,8 @@ namespace Alika
                 }
                 else
                 {
-                    App.vault.Add(new Windows.Security.Credentials.PasswordCredential(App.appName, "default", (string)parsed["access_token"]));
+                    var vault = new PasswordVault();
+                    vault.Add(new PasswordCredential(App.appName, "default", (string)parsed["access_token"]));
                     this.OnSuccesful?.Invoke();
                 }
             }
@@ -154,8 +155,10 @@ namespace Alika
                 this.content.RowDefinitions.Add(new RowDefinition());
                 this.content.RowDefinitions.Add(new RowDefinition());
 
-                this.img = new Image();
-                this.img.Source = new BitmapImage(new Uri(url));
+                this.img = new Image
+                {
+                    Source = new BitmapImage(new Uri(url))
+                };
                 Grid.SetRow(this.img, 0);
                 this.content.Children.Add(img);
 

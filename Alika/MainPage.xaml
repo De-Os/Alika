@@ -8,16 +8,21 @@
     mc:Ignorable="d"
     Background="{ThemeResource SystemControlAcrylicWindowBrush}">
 
-    <Grid Margin="0, 30, 0, 0">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.4*" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" Margin="-10, 0, 0, 0" x:Name="chats_grid">
-            <ScrollViewer x:Name="chats_scroll" HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Visible">
 
-            </ScrollViewer>
+    <Grid Margin="0, 30, 0, 0">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.4*" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0" Margin="-10, 0, 0, 0" x:Name="chats_grid">
+                <ScrollViewer x:Name="chats_scroll" HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Visible">
+
+                </ScrollViewer>
+            </Grid>
+            <Grid Grid.Column="1" x:Name="dialog"></Grid>
         </Grid>
-        <Grid Grid.Column="1" x:Name="dialog"></Grid>
+        <!--popup elements (костыль)-->
+        <Grid x:Name="popup" x:FieldModifier="public"></Grid>
     </Grid>
 </Page>

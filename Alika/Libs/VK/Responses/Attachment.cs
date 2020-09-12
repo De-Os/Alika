@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Alika.Libs.VK.Responses
 {
-    [NotMapped]
     public class Attachment
     {
         [JsonProperty("type")]
@@ -336,6 +335,28 @@ namespace Alika.Libs.VK.Responses
             public string thumb_96 { get; set; }
             [JsonProperty("thumb_48")]
             public string thumb_48 { get; set; }
+        }
+    }
+
+    public class GetHistoryAttachmentsResponse
+    {
+        [JsonProperty("items")]
+        public List<AttachmentElement> items { get; set; }
+        [JsonProperty("next_from")]
+        public string next_from { get; set; }
+        [JsonProperty("profiles")]
+        public List<User> profiles { get; set; }
+        [JsonProperty("groups")]
+        public List<Group> groups { get; set; }
+
+        public class AttachmentElement
+        {
+            [JsonProperty("message_id")]
+            public int message_id { get; set; }
+            [JsonProperty("from_id")]
+            public int from_id { get; set; }
+            [JsonProperty("attachment")]
+            public Attachment attachment { get; set; }
         }
     }
 }

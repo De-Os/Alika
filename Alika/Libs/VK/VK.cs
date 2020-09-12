@@ -1,4 +1,5 @@
 ﻿using Alika.Libs.VK.Longpoll;
+using Alika.Libs.VK.Methods;
 using Alika.Libs.VK.Responses;
 using Newtonsoft.Json;
 using RestSharp;
@@ -9,13 +10,9 @@ namespace Alika.Libs.VK
 {
     public partial class VK
     {
-        private string token;
+        private readonly string token;
         public string version;
         public int user_id;
-
-        public VK.Messages messages;
-        public VK.Users users;
-        public VK.Groups groups;
 
         public CaptchaSettings captchaSettings;
 
@@ -25,11 +22,7 @@ namespace Alika.Libs.VK
             this.version = version;
             this.captchaSettings = captcha;
 
-            this.messages = new VK.Messages(this);
-            this.users = new VK.Users(this);
-            this.groups = new VK.Groups(this);
-
-            this.user_id = this.users.Get(new List<int>(), "photo_200")[0].user_id; // Getting current user's user_id & adding it's photo to cache
+            this.user_id = this.Users.Get(new List<int>(), "photo_200")[0].user_id; // Getting current user's user_id & adding it's photo to cache
         }
 
         public LongPoll GetLP()
@@ -48,7 +41,7 @@ namespace Alika.Libs.VK
         {
             var result = this.CallMethod(method, fields);
             BasicResponse<Type> job = JsonConvert.DeserializeObject<BasicResponse<Type>>(result);
-            if (job.error != null)
+            if (job?.error != null)
             {
                 // TODO: Captcha handling
                 /*if (job.error.code == 14 && this.captchaSettings != null)
@@ -79,12 +72,12 @@ namespace Alika.Libs.VK
         {
             var http = new RestClient("https://api.vk.com/method");
             var request = new RestRequest(method);
-            request.AddParameter("access_token", this.token);
-            request.AddParameter("v", this.version);
+            request.AddOrUpdateParameter("access_token", this.token);
+            request.AddOrUpdateParameter("v", this.version);
 
             if (fields != null && fields.Count > 0)
             {
-                foreach (KeyValuePair<string, dynamic> field in fields) request.AddParameter(field.Key, field.Value);
+                foreach (KeyValuePair<string, dynamic> field in fields) request.AddOrUpdateParameter(field.Key, field.Value);
             }
 
             return http.Post(request).Content;
@@ -105,5 +98,9 @@ namespace Alika.Libs.VK
         {
             return this.Call<GetStickersKeywordsResponse>("store.getStickersKeywords", new Dictionary<string, dynamic> { });
         }
+
+        public Groups Groups => new Groups(this);
+        public Users Users => new Users(this);
+        public Messages Messages => new Messages(this);
     }
 }

@@ -20,7 +20,7 @@ namespace Alika.UI
         {
             _ = await Task.Factory.StartNew(async () =>
               {
-                  var conversations = App.vk.messages.GetConversations(count: count, offset: offset, fields: "photo_200,online_info", start_message_id: start_msg_id);
+                  var conversations = App.vk.Messages.GetConversations(count: count, offset: offset, fields: "photo_200,online_info", start_message_id: start_msg_id);
                   await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                   {
                       conversations.conversations.ForEach((GetConversationsResponse.ConversationResponse conv) =>

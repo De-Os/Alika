@@ -21,7 +21,7 @@
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <PackageCertificateThumbprint>99ECE3637E695A93916F2E6FE943DEEC12CF0B8A</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundle>Never</AppxBundle>
     <AppxBundlePlatforms>x86|x64|arm|arm64</AppxBundlePlatforms>
@@ -129,12 +129,13 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Caching.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="Libs\Utils.cs" />
     <Compile Include="Libs\VK\CaptchaDialog.cs" />
     <Compile Include="Libs\VK\Limits.cs" />
     <Compile Include="Libs\VK\Responses\Stickers.cs" />
     <Compile Include="Libs\VK\Responses\UploadServers.cs" />
-    <Compile Include="Libs\VK\Types\Groups.cs" />
+    <Compile Include="Libs\VK\Methods\Groups.cs" />
     <Compile Include="Libs\VK\Longpoll\LongPoll.cs" />
     <Compile Include="Libs\VK\Responses\Attachment.cs" />
     <Compile Include="Libs\VK\Responses\BasicResponse.cs" />
@@ -142,8 +143,8 @@
     <Compile Include="Libs\VK\Responses\Groups.cs" />
     <Compile Include="Libs\VK\Responses\Message.cs" />
     <Compile Include="Libs\VK\Responses\Users.cs" />
-    <Compile Include="Libs\VK\Types\Messages.cs" />
-    <Compile Include="Libs\VK\Types\Users.cs" />
+    <Compile Include="Libs\VK\Methods\Messages.cs" />
+    <Compile Include="Libs\VK\Methods\Users.cs" />
     <Compile Include="Libs\VK\VK.cs" />
     <Compile Include="LoginPage.xaml.cs">
       <DependentUpon>LoginPage.xaml</DependentUpon>
@@ -152,13 +153,17 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\ChatInformation.cs" />
     <Compile Include="UI\ChatItem.cs" />
     <Compile Include="UI\ChatsList.cs" />
     <Compile Include="UI\Coloring.cs" />
-    <Compile Include="UI\MessagesList\MessageBox\MessageAttachment.cs" />
-    <Compile Include="UI\MessagesList\MessageBox\MessageBox.cs" />
-    <Compile Include="UI\MessagesList\MessagesList.cs" />
-    <Compile Include="UI\MessagesList\MessagesListEvents.cs" />
+    <Compile Include="UI\Dialog\MessageBox\MessageAttachment.cs" />
+    <Compile Include="UI\Dialog\MessageBox\MessageBox.cs" />
+    <Compile Include="UI\Dialog\MessagesList.cs" />
+    <Compile Include="UI\Dialog\MessagesListEvents.cs" />
+    <Compile Include="UI\Dialog\TopMenu.cs" />
+    <Compile Include="UI\MediaViewer.cs" />
+    <Compile Include="UI\Popup.cs" />
     <Compile Include="UI\StickersSelector.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -167,18 +172,58 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\UI\Dark\add_user.svg" />
+    <Content Include="Assets\UI\Dark\album.svg" />
     <Content Include="Assets\UI\Dark\back.svg" />
+    <Content Include="Assets\UI\Dark\call.svg" />
+    <Content Include="Assets\UI\Dark\camera.svg" />
     <Content Include="Assets\UI\Dark\clip.svg" />
     <Content Include="Assets\UI\Dark\close.svg" />
     <Content Include="Assets\UI\Dark\document.svg" />
+    <Content Include="Assets\UI\Dark\download.svg" />
+    <Content Include="Assets\UI\Dark\edit.svg" />
+    <Content Include="Assets\UI\Dark\fly_menu.svg" />
+    <Content Include="Assets\UI\Dark\info.svg" />
+    <Content Include="Assets\UI\Dark\leave.svg" />
+    <Content Include="Assets\UI\Dark\link.svg" />
+    <Content Include="Assets\UI\Dark\mention.svg" />
+    <Content Include="Assets\UI\Dark\pause.svg" />
+    <Content Include="Assets\UI\Dark\person.svg" />
+    <Content Include="Assets\UI\Dark\pin.svg" />
+    <Content Include="Assets\UI\Dark\play.svg" />
     <Content Include="Assets\UI\Dark\send.svg" />
+    <Content Include="Assets\UI\Dark\settings.svg" />
     <Content Include="Assets\UI\Dark\sticker.svg" />
+    <Content Include="Assets\UI\Dark\user.svg" />
+    <Content Include="Assets\UI\Dark\video.svg" />
+    <Content Include="Assets\UI\Dark\eye.svg" />
+    <Content Include="Assets\UI\Light\add_user.svg" />
+    <Content Include="Assets\UI\Light\album.svg" />
     <Content Include="Assets\UI\Light\back.svg" />
+    <Content Include="Assets\UI\Light\call.svg" />
+    <Content Include="Assets\UI\Light\camera.svg" />
     <Content Include="Assets\UI\Light\clip.svg" />
     <Content Include="Assets\UI\Light\close.svg" />
     <Content Include="Assets\UI\Light\document.svg" />
+    <Content Include="Assets\UI\Light\download.svg" />
+    <Content Include="Assets\UI\Light\edit.svg" />
+    <Content Include="Assets\UI\Light\eye.svg" />
+    <Content Include="Assets\UI\Light\fly_menu.svg" />
+    <Content Include="Assets\UI\Light\info.svg" />
+    <Content Include="Assets\UI\Light\leave.svg" />
+    <Content Include="Assets\UI\Light\link.svg" />
+    <Content Include="Assets\UI\Light\mention.svg" />
+    <Content Include="Assets\UI\Light\microphone.svg" />
+    <Content Include="Assets\UI\Light\pause.svg" />
+    <Content Include="Assets\UI\Light\person.svg" />
+    <Content Include="Assets\UI\Light\pin.svg" />
+    <Content Include="Assets\UI\Light\play.svg" />
     <Content Include="Assets\UI\Light\send.svg" />
+    <Content Include="Assets\UI\Light\settings.svg" />
     <Content Include="Assets\UI\Light\sticker.svg" />
+    <Content Include="Assets\UI\Light\user.svg" />
+    <Content Include="Assets\UI\Light\video.svg" />
+    <Content Include="Assets\UI\Dark\microphone.svg" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -222,7 +267,7 @@
       <Version>12.0.3</Version>
     </PackageReference>
     <PackageReference Include="ObjectDumper.NET">
-      <Version>2.5.20228.1</Version>
+      <Version>3.0.20251.1</Version>
     </PackageReference>
     <PackageReference Include="RestSharp">
       <Version>106.11.4</Version>
@@ -230,6 +275,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Alika_TemporaryKey.pfx" />
+    <Content Include="settings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <PRIResource Include="Strings\ru-RU\Attachments.resw" />
+    <PRIResource Include="Strings\en-US\Attachments.resw" />
     <PRIResource Include="Strings\en-US\FilesChoose.resw" />
     <PRIResource Include="Strings\ru-RU\FilesChoose.resw" />
     <PRIResource Include="Strings\ru-RU\Dialog.resw" />

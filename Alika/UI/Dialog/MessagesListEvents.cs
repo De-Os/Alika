@@ -16,7 +16,7 @@ using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace Alika.UI
+namespace Alika.UI.Dialog
 {
     public partial class MessagesList
     {
@@ -84,23 +84,20 @@ namespace Alika.UI
                     {
                         if (holder.Selected)
                         {
-                            Task.Factory.StartNew(() => App.vk.messages.Send(this.peer_id, sticker_id: holder.Sticker.sticker_id));
+                            Task.Factory.StartNew(() => App.vk.Messages.Send(this.peer_id, sticker_id: holder.Sticker.sticker_id));
                             this.send_text.Text = "";
                             return;
                         }
                     }
                 }
-                else
+                // Send || add line to TextBox
+                if (Window.Current.CoreWindow.GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down))
                 {
-                    // Send || add line to TextBox
-                    if (Window.Current.CoreWindow.GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down))
-                    {
-                        this.send_text.Text += Environment.NewLine;
-                        this.send_text.SelectionStart = this.send_text.Text.Length;
-                    }
-                    else this.Send(null, null);
-                    e.Handled = true;
+                    this.send_text.Text += Environment.NewLine;
+                    this.send_text.SelectionStart = this.send_text.Text.Length;
                 }
+                else this.Send(null, null);
+                e.Handled = true;
             }
             else if (e.Key == VirtualKey.Tab)
             {
@@ -110,7 +107,7 @@ namespace Alika.UI
                     ScrollViewer scroll = this.stickers_suggestions.Children[0] as ScrollViewer;
                     Grid stickers = scroll.Content as Grid;
                     bool selection = true;
-                    for(int x = 0; x < stickers.Children.Count; x++)
+                    for (int x = 0; x < stickers.Children.Count; x++)
                     {
                         StickerSuggestionHolder holder = stickers.Children[x] as StickerSuggestionHolder;
                         if (holder.Selected)
@@ -217,7 +214,7 @@ namespace Alika.UI
                     {
                         temptext = text.Substring(0, text.Length > Limits.Messages.MAX_LENGTH ? Limits.Messages.MAX_LENGTH : text.Length);
                         System.Diagnostics.Debug.WriteLine(temptext);
-                        try { App.vk.messages.Send(this.peer_id, text: temptext, attachments: attachments.Count > 0 ? attachments : null); } catch { break; }
+                        try { App.vk.Messages.Send(this.peer_id, text: temptext, attachments: attachments.Count > 0 ? attachments : null); } catch { break; }
                         text = text.Substring(temptext.Length);
                         attachments = new List<string>();
                     }
@@ -233,7 +230,7 @@ namespace Alika.UI
             {
                 if (this.msg_scroll.VerticalOffset == 0)
                 {
-                    List<Message> messages = App.vk.messages.GetHistory(this.peer_id, start_message_id: (this.messages.Items[0] as MessageBox).message.textBubble.message.id).messages;
+                    List<Message> messages = App.vk.Messages.GetHistory(this.peer_id, start_message_id: (this.messages.Items[0] as MessageBox).message.textBubble.message.id).messages;
                     messages.ForEach((Message msg) => this.AddMessage(msg, false));
                     this.msg_scroll.ChangeView(null, 0, null, true);
                 }
@@ -243,9 +240,11 @@ namespace Alika.UI
         // Attachment button selection
         public async void AttachSelection(object sender, RoutedEventArgs e)
         {
-            FileOpenPicker picker = new FileOpenPicker();
-            picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
-            picker.ViewMode = PickerViewMode.Thumbnail;
+            FileOpenPicker picker = new FileOpenPicker
+            {
+                SuggestedStartLocation = PickerLocationId.PicturesLibrary,
+                ViewMode = PickerViewMode.Thumbnail
+            };
             picker.FileTypeFilter.Add("*");
             var files = await picker.PickMultipleFilesAsync();
             if (files.Count > 0)
@@ -265,7 +264,7 @@ namespace Alika.UI
         public void AttachUploadByteImage(byte[] bytes)
         {
             Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Wait, 0);
-            var photo = App.vk.messages.UploadPhoto(bytes, this.peer_id);
+            var photo = App.vk.Messages.UploadPhoto(bytes, this.peer_id);
             var upl = new MessageAttachment.Uploaded(photo);
             Grid.SetColumn(upl, this.attach_grid.ColumnDefinitions.Count);
             upl.Remove.Click += (object s, RoutedEventArgs e) => this.attach_grid.Children.Remove(upl);
@@ -284,12 +283,12 @@ namespace Alika.UI
                 MessageAttachment.Uploaded upl = null;
                 if (Limits.Messages.PHOTO_TYPES.Contains(file.FileType))
                 {
-                    var photo = await App.vk.messages.UploadPhoto(file, this.peer_id);
+                    var photo = await App.vk.Messages.UploadPhoto(file, this.peer_id);
                     upl = new MessageAttachment.Uploaded(pic: photo);
                 }
                 else
                 {
-                    var doc = await App.vk.messages.UploadDocument(file, this.peer_id) as Attachment.Document;
+                    var doc = await App.vk.Messages.UploadDocument(file, this.peer_id) as Attachment.Document;
                     upl = new MessageAttachment.Uploaded(doc: doc);
                 }
                 Grid.SetColumn(upl, this.attach_grid.ColumnDefinitions.Count);
@@ -319,7 +318,7 @@ namespace Alika.UI
                     App.cache.StickerDictionary[text].ForEach((sticker) =>
                     {
                         var holder = new StickerSuggestionHolder(sticker);
-                        holder.PointerPressed += (a, m) => Task.Factory.StartNew(() => App.vk.messages.Send(peer_id, sticker_id: sticker.sticker_id));
+                        holder.PointerPressed += (a, m) => Task.Factory.StartNew(() => App.vk.Messages.Send(peer_id, sticker_id: sticker.sticker_id));
                         holder.PointerPressed += (a, m) => this.send_text.Text = "";
                         Grid.SetColumn(holder, grid.ColumnDefinitions.Count);
                         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });

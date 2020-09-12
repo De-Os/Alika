@@ -2,7 +2,9 @@
 using Alika.Libs.VK;
 using Alika.Libs.VK.Longpoll;
 using Microsoft.Toolkit.Uwp.UI;
+using Newtonsoft.Json;
 using System;
+using System.IO;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Core;
@@ -20,11 +22,11 @@ namespace Alika
     {
         public static bool systemDarkTheme = new UISettings().GetColorValue(UIColorType.Background).ToString() == "#FF000000"; // Bool for detecting system theme
         public static Caching cache = new Caching(); // Global caching
+        public static Config settings = JsonConvert.DeserializeObject<Config>(File.ReadAllText(Utils.AppPath("settings.json")));
         public static string appName = "alika.vk"; // Appname for password vault
-        public static PasswordVault vault = new PasswordVault(); // Password vault instance
         public static VK vk; // VK lib
+        public static MainPage main_page; // Main page
         public LongPoll lp; // LongPoll
-        public MainPage main_page; // Main page
         public LoginPage login_page; // Login page
 
         public App()
@@ -36,9 +38,7 @@ namespace Alika
 
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            Frame rootFrame = Window.Current.Content as Frame;
-
-            if (rootFrame == null)
+            if (!(Window.Current.Content is Frame rootFrame))
             {
                 rootFrame = new Frame();
 
@@ -51,7 +51,7 @@ namespace Alika
             {
                 if (rootFrame.Content == null)
                 {
-                    if (App.vault.RetrieveAll().Count > 0)
+                    if (this.DoesPasswordExists())
                     {
                         this.LoadMain();
                     }
@@ -69,20 +69,35 @@ namespace Alika
                 Window.Current.Activate();
             }
         }
+
+        private bool DoesPasswordExists()
+        {
+            try
+            {
+                var vault = new PasswordVault();
+                return vault.Retrieve(App.appName, "default") != null;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public void LoadMain()
         {
-            App.vk = new VK(App.vault.Retrieve(App.appName, "default").Password, "5.122", new CaptchaSettings
+            var vault = new PasswordVault();
+            App.vk = new VK(vault.Retrieve(App.appName, "default").Password, App.settings.vk.api, new CaptchaSettings
             {
                 Title = new TextBlock { Text = Utils.LocString("Login/CaptchaTitle"), FontWeight = FontWeights.Bold },
                 Placeholder = Utils.LocString("Login/CaptchaPlaceholder"),
                 Button = new TextBlock { Text = Utils.LocString("Login/OkButton") }
             });
 
-            this.main_page = new MainPage();
+            App.main_page = new MainPage();
 
             this.lp = vk.GetLP();
-            this.lp.Event += this.main_page.OnLpUpdates;
-            (Window.Current.Content as Frame).Content = this.main_page;
+            this.lp.Event += App.main_page.OnLpUpdates;
+            (Window.Current.Content as Frame).Content = App.main_page;
         }
         void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {

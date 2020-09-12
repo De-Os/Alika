@@ -120,16 +120,91 @@
   <data name="Close" xml:space="preserve">
     <value>Закрыть</value>
   </data>
+  <data name="Conference" xml:space="preserve">
+    <value>Беседа</value>
+  </data>
+  <data name="ConversationInfo" xml:space="preserve">
+    <value>Информация о беседе</value>
+  </data>
+  <data name="Demote" xml:space="preserve">
+    <value>Разжаловать администратора</value>
+  </data>
+  <data name="Group" xml:space="preserve">
+    <value>Группа</value>
+  </data>
+  <data name="InvitedTime" xml:space="preserve">
+    <value>Присоединился: %time%</value>
+  </data>
+  <data name="JoinedInfo" xml:space="preserve">
+    <value>Приглашён пользователем %user%</value>
+  </data>
+  <data name="Kick" xml:space="preserve">
+    <value>Исключить</value>
+  </data>
   <data name="LastSeen" xml:space="preserve">
     <value>Был(а) онлайн в: %date%</value>
   </data>
+  <data name="Management" xml:space="preserve">
+    <value>Управление</value>
+  </data>
+  <data name="Members" xml:space="preserve">
+    <value>Участники</value>
+  </data>
+  <data name="MembersCount" xml:space="preserve">
+    <value>Участников: %count%</value>
+  </data>
   <data name="Online" xml:space="preserve">
     <value>Онлайн</value>
+  </data>
+  <data name="Permissions" xml:space="preserve">
+    <value>Права</value>
+  </data>
+  <data name="PermissionsCall" xml:space="preserve">
+    <value>Делать групповые звонки</value>
+  </data>
+  <data name="PermissionsChangeAdmins" xml:space="preserve">
+    <value>Назначать администраторов</value>
+  </data>
+  <data name="PermissionsChangeInfo" xml:space="preserve">
+    <value>Редактировать информацию</value>
+  </data>
+  <data name="PermissionsInvite" xml:space="preserve">
+    <value>Приглашать в беседу</value>
+  </data>
+  <data name="PermissionsLink" xml:space="preserve">
+    <value>Просматривать ссылку-приглашение</value>
+  </data>
+  <data name="PermissionsMentions" xml:space="preserve">
+    <value>Использовать @all и @online</value>
+  </data>
+  <data name="PermissionsPin" xml:space="preserve">
+    <value>Закреплять сообщения</value>
+  </data>
+  <data name="PermissionsTypeAll" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="PermissionsTypeOwner" xml:space="preserve">
+    <value>Создатель</value>
+  </data>
+  <data name="PermissionsTypeOwnerAndAdmins" xml:space="preserve">
+    <value>Создатель и администраторы</value>
+  </data>
+  <data name="Promote" xml:space="preserve">
+    <value>Назначить администратором</value>
   </data>
   <data name="Save" xml:space="preserve">
     <value>Сохранить</value>
   </data>
   <data name="TextBoxPlaceholder" xml:space="preserve">
     <value>Сообщение...</value>
+  </data>
+  <data name="TopMenuAttachments" xml:space="preserve">
+    <value>Вложения</value>
+  </data>
+  <data name="TopMenuInformation" xml:space="preserve">
+    <value>Информация</value>
+  </data>
+  <data name="TopMenuLeave" xml:space="preserve">
+    <value>Покинуть</value>
   </data>
 </root>

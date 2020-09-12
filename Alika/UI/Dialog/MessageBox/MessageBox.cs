@@ -1,12 +1,9 @@
 ﻿using Alika.Libs.VK.Responses;
 using Microsoft.Toolkit.Uwp.UI;
-using Microsoft.Toolkit.Uwp.UI.Lottie;
-using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Windows.Media.Core;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -78,12 +75,12 @@ namespace Alika.UI
                 string url;
                 if (user_id > 0)
                 {
-                    if (!App.cache.Users.Exists(u => u.user_id == user_id)) App.vk.users.Get(new List<int> { user_id }, fields: "photo_200");
+                    if (!App.cache.Users.Exists(u => u.user_id == user_id)) App.vk.Users.Get(new List<int> { user_id }, fields: "photo_200");
                     url = App.cache.Users.Find(u => u.user_id == user_id).photo_200;
                 }
                 else
                 {
-                    if (!App.cache.Groups.Exists(g => g.id == user_id)) App.vk.groups.GetById(new List<int> { user_id }, fields: "photo_200");
+                    if (!App.cache.Groups.Exists(g => g.id == user_id)) App.vk.Groups.GetById(new List<int> { user_id }, fields: "photo_200");
                     url = App.cache.Groups.Find(g => g.id == user_id).photo_200;
                 }
 
@@ -92,9 +89,11 @@ namespace Alika.UI
                     this.avatar.Height = 40;
                     this.avatar.Width = 40;
 
-                    ImageBrush ava = new ImageBrush();
-                    ava.ImageSource = await ImageCache.Instance.GetFromCacheAsync(new Uri(url));
-                    ava.Stretch = Stretch.Fill;
+                    ImageBrush ava = new ImageBrush
+                    {
+                        ImageSource = await ImageCache.Instance.GetFromCacheAsync(new Uri(url)),
+                        Stretch = Stretch.Fill
+                    };
                     this.avatar.Background = ava;
                 }
                 Thickness margin = this.avatar.Margin;
@@ -182,7 +181,7 @@ namespace Alika.UI
                     List<Match> markdown = new List<Match>();
 
                     MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(text);
-                    MatchCollection links = new Regex(@"((http|https)\:\/\/)?[\w]*\.[a-zA-Z0-9]{1,6}(\/[\w\?\-\=\&.]*)*").Matches(text);
+                    MatchCollection links = new Regex(@"((http|https)\:\/\/)?[\w]*\.[a-zA-Z]{1,6}(\/[\w\?\-\=\&.]*)*").Matches(text);
                     if (pushes.Count > 0) foreach (Match push in pushes) markdown.Add(push);
                     if (links.Count > 0) foreach (Match link in links) markdown.Add(link);
 
@@ -235,13 +234,13 @@ namespace Alika.UI
             {
                 if (this.message.from_id > 0)
                 {
-                    if (!App.cache.Users.Exists(u => u.user_id == this.message.from_id)) App.vk.users.Get(new List<int> { this.message.from_id }, fields: "photo_200");
+                    if (!App.cache.Users.Exists(u => u.user_id == this.message.from_id)) App.vk.Users.Get(new List<int> { this.message.from_id }, fields: "photo_200");
                     User user = App.cache.Users.Find(u => u.user_id == this.message.from_id);
                     this.name.Text = user.first_name + " " + user.last_name;
                 }
                 else
                 {
-                    if (!App.cache.Groups.Exists(g => g.id == this.message.from_id)) App.vk.groups.GetById(new List<int> { this.message.from_id }, fields: "photo_200");
+                    if (!App.cache.Groups.Exists(g => g.id == this.message.from_id)) App.vk.Groups.GetById(new List<int> { this.message.from_id }, fields: "photo_200");
                     this.name.Text = App.cache.Groups.Find(g => g.id == this.message.from_id).name;
                 }
                 if (this.message.from_id == App.vk.user_id) this.name.HorizontalTextAlignment = TextAlignment.Right;
@@ -263,60 +262,14 @@ namespace Alika.UI
                         }
                         else if (att.type == "sticker")
                         {
-                            // TODO: Add sticker handler class
-                            if (att.sticker.animation_url == null)
-                            {
-                                Image img = new Image
-                                {
-                                    Height = 160,
-                                    Width = 160,
-                                    Margin = new Thickness(10),
-                                    Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(att.sticker.GetBestQuality(App.systemDarkTheme)))
-                                };
-                                Grid.SetRow(img, this.attachGrid.RowDefinitions.Count - 1);
-                                this.attachGrid.Children.Add(img);
-                            }
-                            else
-                            {
-                                AnimatedVisualPlayer img = new AnimatedVisualPlayer
-                                {
-                                    Height = 160,
-                                    Width = 160,
-                                    Margin = new Thickness(10),
-                                    Source = new LottieVisualSource
-                                    {
-                                        UriSource = new Uri(App.systemDarkTheme ? att.sticker.animation_url.Replace(".json", "b.json") : att.sticker.animation_url)
-                                    }
-                                };
-                                Grid.SetRow(img, this.attachGrid.RowDefinitions.Count - 1);
-                                this.attachGrid.Children.Add(img);
-                            }
+                            MessageAttachment.Sticker sticker = new MessageAttachment.Sticker(att.sticker);
+                            Grid.SetRow(sticker, this.attachGrid.RowDefinitions.Count - 1);
+                            this.attachGrid.Children.Add(sticker);
                             this.border.Background = Coloring.Transparent.Full;
                         }
                         else if (att.type == "audio_message")
                         {
-                            // TODO: Create custom player
-                            MediaPlayerElement audio = new MediaPlayerElement
-                            {
-                                Background = Coloring.Transparent.Full,
-                                VerticalContentAlignment = VerticalAlignment.Center,
-                                MaxWidth = 400,
-                                Margin = new Thickness(10)
-                            };
-                            audio.Loaded += (object s, RoutedEventArgs e) => (s as MediaPlayerElement).Source = MediaSource.CreateFromUri(new Uri(att.audio_message.link_mp3));
-                            audio.AreTransportControlsEnabled = true;
-                            audio.TransportControls = new MediaTransportControls
-                            {
-                                IsCompact = true,
-                                IsRepeatEnabled = false,
-                                IsFullWindowButtonVisible = false,
-                                IsZoomButtonVisible = false,
-                                IsCompactOverlayButtonVisible = false,
-                                VerticalAlignment = VerticalAlignment.Center,
-                                VerticalContentAlignment = VerticalAlignment.Center
-                            };
-
-                            this.border.Background = new SolidColorBrush(Coloring.FromHash(App.systemDarkTheme ? "000000" : "ffffff"));
+                            var audio = new MessageAttachment.AudioMessage(att.audio_message);
                             Grid.SetRow(audio, this.attachGrid.RowDefinitions.Count - 1);
                             this.attachGrid.Children.Add(audio);
                         }
@@ -368,7 +321,7 @@ namespace Alika.UI
                                 HorizontalAlignment = HorizontalAlignment.Center,
                                 VerticalAlignment = VerticalAlignment.Center
                             };
-                            btn.Click += (object sender, RoutedEventArgs e) => Task.Factory.StartNew(() => App.vk.messages.Send(this.peer_id, text: button.action.label, payload: button.action.payload));
+                            btn.Click += (object sender, RoutedEventArgs e) => Task.Factory.StartNew(() => App.vk.Messages.Send(this.peer_id, text: button.action.label, payload: button.action.payload));
                             Grid.SetColumn(btn, grid.ColumnDefinitions.Count);
                             grid.ColumnDefinitions.Add(new ColumnDefinition());
                             grid.Children.Add(btn);

@@ -98,7 +98,9 @@ namespace Alika.Libs.VK.Responses
                     [JsonProperty("state")]
                     public string state { get; set; }
                     [JsonProperty("acl")]
-                    public PeerAccessSettings access { get; set; }
+                    public AccessSettings access { get; set; }
+                    //[JsonProperty("permissions")]
+                    public Permissions permissions { get; set; }
                     [JsonProperty("photo")]
                     public PeerPhotos photos { get; set; }
                     [JsonProperty("active_ids")]
@@ -107,7 +109,25 @@ namespace Alika.Libs.VK.Responses
                     [JsonProperty("is_group_channel")]
                     public bool is_channel { get; set; }
 
-                    public class PeerAccessSettings
+                    public class Permissions
+                    {
+                        [JsonProperty("invite")]
+                        public string invite { get; set; }
+                        [JsonProperty("change_info")]
+                        public string change_info { get; set; }
+                        [JsonProperty("change_pin")]
+                        public string change_pin { get; set; }
+                        [JsonProperty("use_mass_mentions")]
+                        public string use_mass_mentions { get; set; }
+                        [JsonProperty("see_invite_link")]
+                        public string see_invite_link { get; set; }
+                        [JsonProperty("call")]
+                        public string call { get; set; }
+                        [JsonProperty("change_admins")]
+                        public string change_admins { get; set; }
+                    }
+
+                    public class AccessSettings
                     {
                         [JsonProperty("can_change_info")]
                         public bool can_change_info { get; set; }
@@ -147,6 +167,7 @@ namespace Alika.Libs.VK.Responses
             }
         }
     }
+
     public class GetHistoryResponse
     {
         [JsonProperty("count")]
@@ -158,5 +179,43 @@ namespace Alika.Libs.VK.Responses
         public List<User> profiles { get; set; }
         [JsonProperty("groups", NullValueHandling = NullValueHandling.Ignore)]
         public List<Group> groups { get; set; }
+    }
+
+    public class GetConversationsByIdResponse
+    {
+        [JsonProperty("count")]
+        public int count { get; set; }
+        [JsonProperty("items")]
+        public List<GetConversationsResponse.ConversationResponse.ConversationInfo> conversations { get; set; }
+        [JsonProperty("profiles", NullValueHandling = NullValueHandling.Ignore)]
+        public List<User> profiles { get; set; }
+        [JsonProperty("groups", NullValueHandling = NullValueHandling.Ignore)]
+        public List<Group> groups { get; set; }
+    }
+
+    public class GetConversationMembersResponse
+    {
+        [JsonProperty("count")]
+        public int count { get; set; }
+        [JsonProperty("items")]
+        public List<Member> members { get; set; }
+        [JsonProperty("profiles")]
+        public List<User> profiles { get; set; }
+        [JsonProperty("groups")]
+        public List<Group> groups { get; set; }
+
+        public class Member
+        {
+            [JsonProperty("member_id")]
+            public int member_id { get; set; }
+            [JsonProperty("invited_by")]
+            public int invited_by { get; set; }
+            [JsonProperty("join_date")]
+            public int join_date { get; set; }
+            [JsonProperty("is_admin")]
+            public bool is_admin { get; set; }
+            [JsonProperty("can_kick")]
+            public bool can_kick { get; set; }
+        }
     }
 }
