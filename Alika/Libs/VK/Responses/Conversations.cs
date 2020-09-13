@@ -99,7 +99,7 @@ namespace Alika.Libs.VK.Responses
                     public string state { get; set; }
                     [JsonProperty("acl")]
                     public AccessSettings access { get; set; }
-                    //[JsonProperty("permissions")]
+                    [JsonProperty("permissions")]
                     public Permissions permissions { get; set; }
                     [JsonProperty("photo")]
                     public PeerPhotos photos { get; set; }
@@ -216,6 +216,37 @@ namespace Alika.Libs.VK.Responses
             public bool is_admin { get; set; }
             [JsonProperty("can_kick")]
             public bool can_kick { get; set; }
+        }
+    }
+
+    public class ChangeChatPhotoResponse
+    {
+        [JsonProperty("message_id")]
+        public int message_id { get; set; }
+        [JsonProperty("chat")]
+        public MultiDialog chat { get; set; }
+        public class MultiDialog
+        {
+            [JsonProperty("type")]
+            public string type { get; set; }
+            [JsonProperty("title")]
+            public string title { get; set; }
+            [JsonProperty("admin_id")]
+            public int admin_id { get; set; }
+            [JsonProperty("members_count")]
+            public int members_count { get; set; }
+            [JsonProperty("id")]
+            public int id { get; set; }
+            [JsonProperty("users")]
+            public List<int> users { get; set; }
+            [JsonProperty("photo_50")]
+            public string photo_50 { get; set; }
+            [JsonProperty("photo_100")]
+            public string photo_100 { get; set; }
+            [JsonProperty("photo_200")]
+            public string photo_200 { get; set; }
+            [JsonProperty("is_default_photo")]
+            public bool is_default_photo { get; set; }
         }
     }
 }

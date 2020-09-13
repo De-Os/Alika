@@ -237,5 +237,49 @@ namespace Alika.Libs.VK.Methods
                 {"role", admin ? "admin" : "member" }
             });
         }
+
+        public ChangeChatPhotoResponse DeleteChatPhoto(int peer_id)
+        {
+            if (peer_id > Limits.Messages.PEERSTART) peer_id -= Limits.Messages.PEERSTART;
+            return this._vk.Call<ChangeChatPhotoResponse>("messages.deleteChatPhoto", new Dictionary<string, dynamic> {
+                {"chat_id", peer_id}
+            });
+        }
+
+        public int EditTitle(int peer_id, string title)
+        {
+            if (peer_id > Limits.Messages.PEERSTART) peer_id -= Limits.Messages.PEERSTART;
+            return this._vk.Call<int>("messages.editChat", new Dictionary<string, dynamic> {
+                {"chat_id", peer_id},
+                {"title", title}
+            });
+        }
+
+        public ChangeChatPhotoResponse SetChatPhoto(int peer_id, byte[] bytes)
+        {
+            RestRequest request = new RestRequest();
+            request.AddFile("photo", bytes, "file.png");
+            return this.SetChatPhoto(request, peer_id);
+        }
+
+        public async Task<ChangeChatPhotoResponse> SetChatPhoto(StorageFile file, int peer_id)
+        {
+            RestRequest request = new RestRequest();
+            request.AddFile("photo", await file.ReadBytesAsync(), file.Name, file.ContentType);
+            return this.SetChatPhoto(request, peer_id);
+        }
+
+        private ChangeChatPhotoResponse SetChatPhoto(RestRequest request, int peer_id)
+        {
+            if (peer_id > Limits.Messages.PEERSTART) peer_id -= Limits.Messages.PEERSTART;
+            RestClient http = new RestClient(this._vk.Call<UploadServers.ChatPhoto>("photos.getChatUploadServer", new Dictionary<string, dynamic> {
+                    {"chat_id", peer_id}
+                }).upload_url);
+            var upload = http.Post(request);
+            var response = JsonConvert.DeserializeObject<BasicResponse<string>>(upload.Content);
+            return this._vk.Call<ChangeChatPhotoResponse>("messages.setChatPhoto", new Dictionary<string, dynamic> {
+                    {"file", response.response}
+                });
+        }
     }
 }

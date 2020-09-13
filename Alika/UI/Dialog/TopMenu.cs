@@ -12,6 +12,14 @@ namespace Alika.UI.Dialog
     public class TopMenu : Grid
     {
         public int peer_id;
+        public TextBlock name = new TextBlock
+        {
+            FontWeight = FontWeights.Bold,
+            FontSize = 18,
+            VerticalAlignment = VerticalAlignment.Bottom,
+            HorizontalAlignment = HorizontalAlignment.Left
+        };
+
         public TopMenu(int peer_id)
         {
             this.peer_id = peer_id;
@@ -54,16 +62,9 @@ namespace Alika.UI.Dialog
             text.RowDefinitions.Add(new RowDefinition());
             text.RowDefinitions.Add(new RowDefinition());
             Grid.SetColumn(text, 0);
-            TextBlock name = new TextBlock
-            {
-                FontWeight = FontWeights.Bold,
-                Text = title,
-                FontSize = 18,
-                VerticalAlignment = VerticalAlignment.Bottom,
-                HorizontalAlignment = HorizontalAlignment.Left
-            };
-            Grid.SetRow(name, 0);
-            text.Children.Add(name);
+            this.name.Text = title;
+            Grid.SetRow(this.name, 0);
+            text.Children.Add(this.name);
             TextBlock about = new TextBlock
             {
                 Text = desc,
@@ -99,6 +100,7 @@ namespace Alika.UI.Dialog
         {
             public int peer_id;
             public Grid content = new Grid();
+
             public FlyoutMenu(int peer_id)
             {
                 this.peer_id = peer_id;

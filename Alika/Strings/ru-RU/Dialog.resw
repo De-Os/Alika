@@ -192,6 +192,9 @@
   <data name="Promote" xml:space="preserve">
     <value>Назначить администратором</value>
   </data>
+  <data name="RemovePhoto" xml:space="preserve">
+    <value>Удалить фотографию</value>
+  </data>
   <data name="Save" xml:space="preserve">
     <value>Сохранить</value>
   </data>

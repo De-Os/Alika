@@ -1,11 +1,13 @@
 ﻿using Alika.Libs;
 using Alika.Libs.VK;
 using Alika.Libs.VK.Responses;
+using Alika.UI.Dialog;
 using Microsoft.Toolkit.Uwp.UI;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
+using Windows.Storage.Pickers;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Text;
@@ -20,6 +22,8 @@ namespace Alika.UI
         public int peer_id;
         public GetConversationsResponse.ConversationResponse.ConversationInfo conversation;
 
+        public AvatarAndName avatarAndName;
+
         public Popup popup = new Popup
         {
             Title = Utils.LocString("Dialog/Conversationinfo")
@@ -27,7 +31,6 @@ namespace Alika.UI
 
         public ChatInformation(int peer_id)
         {
-
             this.peer_id = peer_id;
 
             this.Load();
@@ -35,18 +38,39 @@ namespace Alika.UI
 
         public async void Load()
         {
-            this.conversation = App.vk.Messages.GetConversationsById(new List<int> { this.peer_id }, "photo_200").conversations[0];
+            this.conversation = App.cache.GetConversation(this.peer_id);
 
             this.HorizontalAlignment = HorizontalAlignment.Stretch;
             this.Width = 500;
 
             this.AddSeparator();
-            this.Children.Add(new AvatarAndName(this.conversation));
+            this.avatarAndName = new AvatarAndName(this.conversation);
+            this.Children.Add(this.avatarAndName);
             this.AddSeparator();
             this.Children.Add(new AttachmentsList(this.peer_id));
             this.AddSeparator();
 
-            if (this.peer_id > Limits.Messages.PEERSTART) this.Children.Add(new ConversationItems(this.conversation));
+            if (this.peer_id > Limits.Messages.PEERSTART)
+            {
+                var convMenu = new ConversationItems(this.conversation);
+                convMenu.AvatarUpdated += (av) => {
+                    if (av == null)
+                    {
+                        this.avatarAndName.Avatar.ProfilePicture = null;
+                    }
+                    else this.avatarAndName.LoadImage(av);
+                    this.conversation.settings.photos.photo_200 = av;
+                    Task.Factory.StartNew(() => App.cache.Update(this.peer_id));
+                };
+                convMenu.TitleUpdated += (name) =>
+                {
+                    this.avatarAndName.Title.Text = name;
+                    this.conversation.settings.title = name;
+                    (App.main_page.dialog.Children[0] as MessagesList).top_menu.name.Text = name;
+                    Task.Factory.StartNew(() => App.cache.Update(this.peer_id));
+                };
+                this.Children.Add(convMenu);
+            }
 
             this.popup.Content = new ScrollViewer
             {
@@ -127,7 +151,7 @@ namespace Alika.UI
                 this.Children.Add(text);
 
                 this.LoadTitle();
-                this.LoadImage();
+                this.LoadImage(App.cache.GetAvatar(this.conv.peer.id));
             }
 
             public void LoadTitle()
@@ -135,9 +159,9 @@ namespace Alika.UI
                 this.Title.Text = App.cache.GetName(this.conv.peer.id).Text;
             }
 
-            public async void LoadImage()
+            public async void LoadImage(string uri)
             {
-                this.Avatar.ProfilePicture = await ImageCache.Instance.GetFromCacheAsync(new Uri(App.cache.GetAvatar(this.conv.peer.id)));
+                this.Avatar.ProfilePicture = await ImageCache.Instance.GetFromCacheAsync(new Uri(uri));
             }
         }
 
@@ -350,8 +374,13 @@ namespace Alika.UI
 
         public class ConversationItems : StackPanel
         {
+            public delegate void Event(string str);
+            public event Event AvatarUpdated;
+            public event Event TitleUpdated;
+
             private Popup PermsPopup;
             private Popup MembersPopup;
+            private Popup SettingsPopup;
 
             public ConversationItems(GetConversationsResponse.ConversationResponse.ConversationInfo peer)
             {
@@ -362,6 +391,20 @@ namespace Alika.UI
                     FontWeight = FontWeights.SemiLight,
                     FontSize = 12.5
                 });
+                if (peer.settings.access.can_change_info)
+                {
+                    var settings = new Settings(peer);
+                    settings.AvatarUpdated += (s) => this.AvatarUpdated?.Invoke(s);
+                    settings.TitleUpdated += (s) => this.TitleUpdated?.Invoke(s);
+                    this.SettingsPopup = new Popup
+                    {
+                        Content = settings,
+                        Title = Utils.LocString("Settings")
+                    };
+                    var perms = new Element("Settings", "edit.svg");
+                    perms.Click += (a, b) => App.main_page.popup.Children.Add(this.SettingsPopup);
+                    this.Children.Add(perms);
+                }
                 if (peer.settings?.permissions != null && peer.settings?.owner_id == App.vk.user_id)
                 {
                     this.PermsPopup = new Popup
@@ -917,6 +960,161 @@ namespace Alika.UI
                         }
                     }
                 }
+            }
+
+            public class Settings : Grid
+            {
+                public delegate void Event(string str);
+                public event Event AvatarUpdated;
+                public event Event TitleUpdated;
+
+                public GetConversationsResponse.ConversationResponse.ConversationInfo peer;
+                public PersonPicture Avatar = new PersonPicture
+                {
+                    Height = 75,
+                    Width = 75,
+                    Margin = new Thickness(10),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                public TextBox Title = new TextBox
+                {
+                    AcceptsReturn = false,
+                    Height = 15,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    Margin = new Thickness(5, 0, 0, 0)
+                };
+                public Button RemovePhoto = new Button
+                {
+                    Background = Coloring.Transparent.Full,
+                    CornerRadius = new CornerRadius(10),
+                    Padding = new Thickness(5),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Content = new TextBlock
+                    {
+                        Text = Utils.LocString("Dialog/RemovePhoto"),
+                        FontWeight = FontWeights.SemiBold
+                    }
+                };
+
+                public Settings(GetConversationsResponse.ConversationResponse.ConversationInfo peer)
+                {
+                    this.peer = peer;
+                    this.Title.Text = this.peer.settings.title;
+                    this.Width = 450;
+                    this.Children.Add(new ProgressRing
+                    {
+                        Height = 50,
+                        Width = 50,
+                        IsActive = true,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        Margin = new Thickness(10)
+                    });
+                    this.LoadImage();
+                    this.Loaded += (a, b) => this.Load();
+                }
+
+                public async void Load()
+                {
+                    StackPanel panel = new StackPanel();
+                    Grid grid = new Grid();
+                    grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+                    grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+                    Grid.SetColumn(this.Avatar, 0);
+                    grid.Children.Add(this.Avatar);
+
+                    Grid titleGrid = new Grid();
+                    Grid.SetColumn(titleGrid, 1);
+                    grid.Children.Add(titleGrid);
+
+                    titleGrid.RowDefinitions.Add(new RowDefinition());
+                    titleGrid.RowDefinitions.Add(new RowDefinition());
+
+                    Grid.SetRow(this.Title, 0);
+                    titleGrid.Children.Add(this.Title);
+                    Grid.SetRow(this.RemovePhoto, 1);
+                    titleGrid.Children.Add(this.RemovePhoto);
+
+                    this.RemovePhoto.Click += async (a, b) =>
+                    {
+                        if (this.Avatar.ProfilePicture == null) return;
+                        try
+                        {
+                            App.vk.Messages.DeleteChatPhoto(this.peer.peer.id);
+                            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                            {
+                                this.Avatar.ProfilePicture = null;
+                                this.AvatarUpdated?.Invoke(null);
+                            });
+                        }
+                        catch (Exception exc)
+                        {
+                            await new MessageDialog(exc.Message, Utils.LocString("Error")).ShowAsync();
+                        }
+                    };
+                    this.Avatar.PointerPressed += async (a, b) =>
+                    {
+                        FileOpenPicker picker = new FileOpenPicker
+                        {
+                            SuggestedStartLocation = PickerLocationId.PicturesLibrary,
+                            ViewMode = PickerViewMode.Thumbnail,
+                            
+                        };
+                        picker.FileTypeFilter.Add(".png");
+                        picker.FileTypeFilter.Add(".jpg");
+                        var file = await picker.PickSingleFileAsync();
+                        if(file != null)
+                        {
+                            try
+                            {
+                                var response = await App.vk.Messages.SetChatPhoto(file, peer.peer.id);
+                                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                                {
+                                    this.Avatar.ProfilePicture = await ImageCache.Instance.GetFromCacheAsync(new Uri(response.chat.photo_200));
+                                    this.AvatarUpdated?.Invoke(response.chat.photo_200);
+                                });
+                            }
+                            catch (Exception exc)
+                            {
+                                await new MessageDialog(exc.Message, Utils.LocString("Error")).ShowAsync();
+                            }
+                        }
+                    };
+                    this.Title.PreviewKeyDown += async (a, b) =>
+                    {
+                        var box = a as TextBox;
+                        if (box.Text.Length == 0) return;
+                        if (b.Key == Windows.System.VirtualKey.Enter)
+                        {
+                            b.Handled = true;
+                            try
+                            {
+                                App.vk.Messages.EditTitle(this.peer.peer.id, box.Text);
+                                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                                {
+                                    this.TitleUpdated(box.Text);
+                                });
+                            }
+                            catch (Exception exc)
+                            {
+                                await new MessageDialog(exc.Message, Utils.LocString("Error")).ShowAsync();
+                            }
+                        }
+                        else b.Handled = false;
+                    };
+
+                    panel.Children.Add(grid);
+
+                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        this.Children.Clear();
+                        this.Children.Add(panel);
+                    });
+                }
+
+                public async void LoadImage() => this.Avatar.ProfilePicture = await ImageCache.Instance.GetFromCacheAsync(new Uri(App.cache.GetAvatar(this.peer.peer.id)));
             }
         }
     }

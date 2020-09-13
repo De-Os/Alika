@@ -20,7 +20,7 @@
 
                 </ScrollViewer>
             </Grid>
-            <Grid Grid.Column="1" x:Name="dialog"></Grid>
+            <Grid Grid.Column="1" x:FieldModifier="public" x:Name="dialog"></Grid>
         </Grid>
         <!--popup elements (костыль)-->
         <Grid x:Name="popup" x:FieldModifier="public"></Grid>

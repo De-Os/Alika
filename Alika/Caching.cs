@@ -165,20 +165,32 @@ namespace Alika
 
         public User GetUser(int user_id)
         {
-            if (!this.Users.Exists(u => u.user_id == user_id)) App.vk.Users.Get(new List<int> { user_id }, "photo_200,online_info");
+            if (!this.Users.Exists(u => u.user_id == user_id)) this.Update(user_id);
             return this.Users.Find(u => u.user_id == user_id);
         }
 
         public Group GetGroup(int group_id)
         {
-            if (!this.Groups.Exists(g => g.id == group_id)) App.vk.Groups.GetById(new List<int> { group_id }, "photo_200");
+            if (!this.Groups.Exists(g => g.id == group_id)) this.Update(group_id);
             return this.Groups.Find(g => g.id == group_id);
         }
 
         public ConversationResponse.ConversationInfo GetConversation(int peer_id)
         {
-            if (!this.Conversations.Exists(c => c.peer.id == peer_id)) App.vk.Messages.GetConversationsById(new List<int> { peer_id }, "photo_200, online_info");
+            if (!this.Conversations.Exists(c => c.peer.id == peer_id)) this.Update(peer_id);
             return this.Conversations.Find(c => c.peer.id == peer_id);
+        }
+
+        public void Update(int id)
+        {
+            if(id > 0)
+            {
+                if(id > Limits.Messages.PEERSTART)
+                {
+                    App.vk.Messages.GetConversationsById(new List<int> { id }, "photo_200,online_info");
+                }else App.vk.Users.Get(new List<int> { id }, "photo_200,online_info");
+            }
+            else App.vk.Groups.GetById(new List<int> { id }, "photo_200");
         }
     }
 }

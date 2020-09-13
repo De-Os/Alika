@@ -48,5 +48,11 @@ namespace Alika.Libs.VK.Responses
 
             }
         }
+
+        public class ChatPhoto
+        {
+            [JsonProperty("upload_url")]
+            public string upload_url { get; set; }
+        }
     }
 }

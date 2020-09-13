@@ -1,4 +1,5 @@
 ﻿using System;
+using Windows.UI;
 using Windows.UI.Xaml.Media;
 
 namespace Alika.UI
@@ -33,10 +34,7 @@ namespace Alika.UI
             /// Percent transparency
             /// </summary>
             /// <param name="percent">Opacity percents</param>
-            public static SolidColorBrush Percent(int percent)
-            {
-                return Coloring.Transparent.Percent((double)percent / 100);
-            }
+            public static SolidColorBrush Percent(int percent) => Coloring.Transparent.Percent((double)percent / 100);
         }
         public static class MessageBox
         {
@@ -96,8 +94,7 @@ namespace Alika.UI
                 }
             }
         }
-
-        public static Windows.UI.Color FromHash(string hash)
+        public static Color FromHash(string hash)
         {
             if (hash.StartsWith("#")) hash = hash.Substring(1);
             return new Windows.UI.Color
