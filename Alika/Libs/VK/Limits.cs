@@ -13,5 +13,7 @@
             public static string[] PHOTO_TYPES = new string[] { ".jpg", ".png", ".gif" };
             public static string[] VOICE_TYPES = new string[] { ".mp3", ".ogg" };
         }
+
+        public static string DefaultAvatar = "https://vk.com/images/camera_200.png?ava=1";
     }
 }

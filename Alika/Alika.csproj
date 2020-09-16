@@ -164,6 +164,7 @@
     <Compile Include="UI\Dialog\MessagesListEvents.cs" />
     <Compile Include="UI\Dialog\TopMenu.cs" />
     <Compile Include="UI\MediaViewer.cs" />
+    <Compile Include="UI\Misc.cs" />
     <Compile Include="UI\Popup.cs" />
     <Compile Include="UI\StickersSelector.cs" />
   </ItemGroup>

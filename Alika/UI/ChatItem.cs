@@ -1,4 +1,5 @@
 ﻿using Alika.Libs.VK.Responses;
+using Alika.UI.Misc;
 using Microsoft.Toolkit.Uwp.UI;
 using System;
 using System.Linq;
@@ -15,7 +16,6 @@ namespace Alika.UI
     /// </summary>
     class ChatItem : ListViewItem
     {
-        public string avatar;
         public string name;
         public int peer_id;
         public Message message;
@@ -31,25 +31,21 @@ namespace Alika.UI
         {
             TextTrimming = TextTrimming.CharacterEllipsis
         };
-        public Border image = new Border
-        {
-            BorderThickness = new Thickness(0),
-            CornerRadius = new CornerRadius(60, 60, 60, 60)
-        };
+        public Avatar image;
 
+        //TODO: Rewrite it.
         public ChatItem(int peer_id, string avatar, string name, Message last_msg)
         {
             this.peer_id = peer_id;
-            this.avatar = avatar;
             this.name = name;
             this.Height = 70;
 
-            this.grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80) }); // Avatar
-            this.LoadAvatar();
+            this.grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) }); // Avatar
             this.grid.ColumnDefinitions.Add(new ColumnDefinition()); // Text fields
             this.textGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(10) }); // Top margin
             this.textGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) }); // Chat name
-            this.textGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) }); // Message text
+            this.textGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) }); // Message x
+            this.LoadAvatar();
             if (this.name != null) this.nameBlock.Text = this.name;
             Grid.SetRow(this.nameBlock, 1);
             this.UpdateMsg(last_msg);
@@ -61,19 +57,18 @@ namespace Alika.UI
             this.Content = this.grid;
         }
 
-        public async void LoadAvatar()
+        public void LoadAvatar()
         {
-            if (this.avatar != null)
-            {
-                this.image.Height = 50;
-                this.image.Width = 50;
-                ImageBrush ava = new ImageBrush();
-                ava.ImageSource = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.avatar));
-                ava.Stretch = Stretch.Fill;
-                this.image.Background = ava;
-                Grid.SetColumn(this.image, 0);
-                this.grid.Children.Add(this.image);
-            }
+            this.image = new Avatar(this.peer_id) { 
+                Height = 50,
+                Width = 50,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(10),
+                OpenInfoOnClick = false
+            };
+            Grid.SetColumn(this.image, 0);
+            this.grid.Children.Add(this.image);
         }
 
         public void UpdateMsg(Message msg)

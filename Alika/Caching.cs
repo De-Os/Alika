@@ -177,7 +177,7 @@ namespace Alika
 
         public ConversationResponse.ConversationInfo GetConversation(int peer_id)
         {
-            if (!this.Conversations.Exists(c => c.peer.id == peer_id)) this.Update(peer_id);
+            if (!this.Conversations.Exists(c => c.peer.id == peer_id)) App.vk.Messages.GetConversationsById(new List<int> { peer_id }, "photo_200,online_info");
             return this.Conversations.Find(c => c.peer.id == peer_id);
         }
 

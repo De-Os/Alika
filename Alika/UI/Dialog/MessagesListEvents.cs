@@ -213,7 +213,6 @@ namespace Alika.UI.Dialog
                     while (text.Length > 0 || attachments.Count > 0)
                     {
                         temptext = text.Substring(0, text.Length > Limits.Messages.MAX_LENGTH ? Limits.Messages.MAX_LENGTH : text.Length);
-                        System.Diagnostics.Debug.WriteLine(temptext);
                         try { App.vk.Messages.Send(this.peer_id, text: temptext, attachments: attachments.Count > 0 ? attachments : null); } catch { break; }
                         text = text.Substring(temptext.Length);
                         attachments = new List<string>();

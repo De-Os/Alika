@@ -6,7 +6,6 @@ using Microsoft.Toolkit.Uwp.UI;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
 using Windows.Storage.Pickers;
 using Windows.UI.Core;
 using Windows.UI.Popups;
@@ -33,10 +32,12 @@ namespace Alika.UI
         {
             this.peer_id = peer_id;
 
+            if (peer_id == App.vk.user_id) return;
+
             this.Load();
         }
 
-        public async void Load()
+        public void Load()
         {
             this.conversation = App.cache.GetConversation(this.peer_id);
 
@@ -710,7 +711,7 @@ namespace Alika.UI
                     this.Loaded += (a, b) => this.Load();
                 }
 
-                public async void Load()
+                public void Load()
                 {
                     var users = App.vk.Messages.GetConversationMembers(this.peer_id, "photo_200,online_info");
 
@@ -1029,7 +1030,7 @@ namespace Alika.UI
                     this.Loaded += (a, b) => this.Load();
                 }
 
-                public async void Load()
+                public void Load()
                 {
                     StackPanel panel = new StackPanel();
                     Grid grid = new Grid();
@@ -1129,7 +1130,8 @@ namespace Alika.UI
 
                     App.UILoop.AddAction(new UITask
                     {
-                        Action = () => {
+                        Action = () =>
+                        {
                             this.Children.Clear();
                             this.Children.Add(panel);
                         }

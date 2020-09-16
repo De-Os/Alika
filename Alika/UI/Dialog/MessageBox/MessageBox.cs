@@ -1,7 +1,9 @@
 ﻿using Alika.Libs.VK.Responses;
+using Alika.UI.Misc;
 using Microsoft.Toolkit.Uwp.UI;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.UI.Text;
@@ -34,12 +36,7 @@ namespace Alika.UI
         public class MessageGrid : Grid
         {
             public TextBubble textBubble { get; set; }
-            public Border avatar { get; set; } = new Border
-            {
-                BorderThickness = new Thickness(0),
-                CornerRadius = new CornerRadius(60, 60, 60, 60),
-                VerticalAlignment = VerticalAlignment.Bottom
-            };
+            public Avatar avatar;
 
             public MessageGrid(Message msg, int peer_id)
             {
@@ -70,32 +67,14 @@ namespace Alika.UI
                 this.Children.Add(this.avatar);
             }
 
-            public async void LoadAvatar(int user_id)
+            public void LoadAvatar(int user_id)
             {
-                string url;
-                if (user_id > 0)
-                {
-                    if (!App.cache.Users.Exists(u => u.user_id == user_id)) App.vk.Users.Get(new List<int> { user_id }, fields: "photo_200");
-                    url = App.cache.Users.Find(u => u.user_id == user_id).photo_200;
-                }
-                else
-                {
-                    if (!App.cache.Groups.Exists(g => g.id == user_id)) App.vk.Groups.GetById(new List<int> { user_id }, fields: "photo_200");
-                    url = App.cache.Groups.Find(g => g.id == user_id).photo_200;
-                }
-
-                if (url != null)
-                {
-                    this.avatar.Height = 40;
-                    this.avatar.Width = 40;
-
-                    ImageBrush ava = new ImageBrush
-                    {
-                        ImageSource = await ImageCache.Instance.GetFromCacheAsync(new Uri(url)),
-                        Stretch = Stretch.Fill
-                    };
-                    this.avatar.Background = ava;
-                }
+                this.avatar = new Avatar(user_id) { 
+                    Height = 40,
+                    Width = 40,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                };
                 Thickness margin = this.avatar.Margin;
                 margin.Bottom = this.textBubble.border.Margin.Bottom + (this.textBubble.text.Margin.Bottom / 2);
                 this.avatar.Margin = margin;
