@@ -153,6 +153,7 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UIThread.cs" />
     <Compile Include="UI\ChatInformation.cs" />
     <Compile Include="UI\ChatItem.cs" />
     <Compile Include="UI\ChatsList.cs" />

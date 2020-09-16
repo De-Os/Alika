@@ -1,6 +1,7 @@
 ﻿using Alika.Libs;
 using Alika.Libs.VK;
 using Alika.Libs.VK.Longpoll;
+using Alika.UI;
 using Microsoft.Toolkit.Uwp.UI;
 using Newtonsoft.Json;
 using System;
@@ -24,6 +25,7 @@ namespace Alika
         public static Caching cache = new Caching(); // Global caching
         public static Config settings = JsonConvert.DeserializeObject<Config>(File.ReadAllText(Utils.AppPath("settings.json")));
         public static string appName = "alika.vk"; // Appname for password vault
+        public static UITasksLoop UILoop = new UITasksLoop();
         public static VK vk; // VK lib
         public static MainPage main_page; // Main page
         public LongPoll lp; // LongPoll

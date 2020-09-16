@@ -25,22 +25,22 @@ namespace Alika
             this.chats_scroll.ViewChanged += this.OnChatsScroll;
             this.chats_list.SelectionChanged += this.OnChatSelection;
 
-            Task.Factory.StartNew(async () =>
+            Task.Factory.StartNew(() =>
             {
-                // Updating cache stickers on app startup 
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
+                // Updating cache stickers on app startup
+                App.UILoop.AddAction(new UITask
                 {
-                    App.cache.Update(App.vk.GetStickers().items);
+                    Action = () => App.cache.Update(App.vk.GetStickers().items)
                 });
                 App.cache.Update(App.vk.GetStickersKeywords().dictionary);
             });
         }
 
-        private async void OnChatSelection(object sender, SelectionChangedEventArgs e)
+        private void OnChatSelection(object sender, SelectionChangedEventArgs e)
         {
-            await Task.Run(async () =>
+            App.UILoop.AddAction(new UITask
             {
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                Action = () =>
                 {
                     ChatItem selected = this.chats_list.SelectedItem as ChatItem;
                     if (this.dialog.Children.Count > 0)
@@ -54,7 +54,8 @@ namespace Alika
                     this.dialog.Children.Add(list);
                     this.dialog.Children.Add(list.stickers_suggestions);
                     this.peer_id = selected.peer_id;
-                });
+                },
+                Priority = CoreDispatcherPriority.High
             });
         }
 
@@ -62,11 +63,11 @@ namespace Alika
         /// LongPoll updates processing
         /// </summary>
         /// <param name="updates">Updates</param>
-        public async void OnLpUpdates(JToken updates)
+        public void OnLpUpdates(JToken updates)
         {
-            await Task.Run(async () =>
+            App.UILoop.AddAction(new UITask
             {
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                Action = () =>
                 {
                     this.chats_list.ProcessUpdates(updates);
                     if (this.chats_list.SelectedIndex != -1)
@@ -87,28 +88,31 @@ namespace Alika
                             }
                         }
                     }
-                });
+                },
+                Priority = CoreDispatcherPriority.Low
             });
         }
 
         /// <summary>
         /// Loading new chats when user scrolled to bottom
         /// </summary>
-        public async void OnChatsScroll(object sender, ScrollViewerViewChangedEventArgs e) // TODO: Fix scrolling
+        public void OnChatsScroll(object sender, ScrollViewerViewChangedEventArgs e) // TODO: Fix scrolling
         {
             if (e.IsIntermediate)
             {
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                App.UILoop.AddAction(new UITask
                 {
-                    if (this.chats_scroll.VerticalOffset == this.chats_scroll.ScrollableHeight)
-                    {
-                        double height = this.chats_scroll.ScrollableHeight;
-                        this.chats_scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
-                        this.chats_scroll.VerticalScrollMode = ScrollMode.Disabled;
-                        this.chats_list.LoadChats(offset: 1, count: 25, start_msg_id: this.chats_list.Items.Cast<ChatItem>().Select(item => item as ChatItem).ToList().Last().message.id);
-                        this.chats_scroll.ChangeView(null, height, null);
-                        this.chats_scroll.VerticalScrollMode = ScrollMode.Enabled;
-                        this.chats_scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+                    Action = () => {
+                        if (this.chats_scroll.VerticalOffset == this.chats_scroll.ScrollableHeight)
+                        {
+                            double height = this.chats_scroll.ScrollableHeight;
+                            this.chats_scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
+                            this.chats_scroll.VerticalScrollMode = ScrollMode.Disabled;
+                            this.chats_list.LoadChats(offset: 1, count: 25, start_msg_id: this.chats_list.Items.Cast<ChatItem>().Select(item => item as ChatItem).ToList().Last().message.id);
+                            this.chats_scroll.ChangeView(null, height, null);
+                            this.chats_scroll.VerticalScrollMode = ScrollMode.Enabled;
+                            this.chats_scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+                        }
                     }
                 });
             }

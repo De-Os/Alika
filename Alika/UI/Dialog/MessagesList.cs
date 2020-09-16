@@ -193,76 +193,79 @@ namespace Alika.UI.Dialog
             messages.ForEach((Message msg) => this.AddMessage(msg, true));
         }
 
-        public async void AddMessage(Message message, bool isNew = false)
+        public void AddMessage(Message message, bool isNew = false)
         {
-            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            App.UILoop.AddAction(new UITask
             {
-                MessageBox msg = new MessageBox(message, this.peer_id);
+                Action = () =>
+                {
+                    MessageBox msg = new MessageBox(message, this.peer_id);
 
-                if (isNew)
-                {
-                    if (this.messages.Items.Count > 0)
+                    if (isNew)
                     {
-                        MessageBox prev = this.messages.Items[this.messages.Items.Count - 1] as MessageBox;
-                        // Change corner radius on previous message and remove avatar if it is from same user
-                        if (prev.message.textBubble.message.from_id == message.from_id)
+                        if (this.messages.Items.Count > 0)
                         {
-                            prev.message.avatar.Visibility = Visibility.Collapsed;
-                            Thickness prevMargin = prev.message.textBubble.border.Margin;
-                            prevMargin.Bottom = 2.5;
-                            prev.message.textBubble.border.Margin = prevMargin;
-                            CornerRadius corners = prev.message.textBubble.border.CornerRadius;
-                            CornerRadius msg_corners = msg.message.textBubble.border.CornerRadius;
-                            if (prev.HorizontalContentAlignment == HorizontalAlignment.Left)
+                            MessageBox prev = this.messages.Items[this.messages.Items.Count - 1] as MessageBox;
+                            // Change corner radius on previous message and remove avatar if it is from same user
+                            if (prev.message.textBubble.message.from_id == message.from_id)
                             {
-                                corners.BottomLeft = 0;
-                                msg_corners.TopLeft = 0;
+                                prev.message.avatar.Visibility = Visibility.Collapsed;
+                                Thickness prevMargin = prev.message.textBubble.border.Margin;
+                                prevMargin.Bottom = 2.5;
+                                prev.message.textBubble.border.Margin = prevMargin;
+                                CornerRadius corners = prev.message.textBubble.border.CornerRadius;
+                                CornerRadius msg_corners = msg.message.textBubble.border.CornerRadius;
+                                if (prev.HorizontalContentAlignment == HorizontalAlignment.Left)
+                                {
+                                    corners.BottomLeft = 0;
+                                    msg_corners.TopLeft = 0;
+                                }
+                                else
+                                {
+                                    corners.BottomRight = 0;
+                                    msg_corners.TopRight = 0;
+                                }
+                                msg.message.textBubble.border.CornerRadius = msg_corners;
+                                prev.message.textBubble.border.CornerRadius = corners;
+                                msg.message.textBubble.name.Visibility = Visibility.Collapsed;
+                                msg.message.textBubble.border.Margin = new Thickness(10, 2.5, 10, 5);
                             }
-                            else
-                            {
-                                corners.BottomRight = 0;
-                                msg_corners.TopRight = 0;
-                            }
-                            msg.message.textBubble.border.CornerRadius = msg_corners;
-                            prev.message.textBubble.border.CornerRadius = corners;
-                            msg.message.textBubble.name.Visibility = Visibility.Collapsed;
-                            msg.message.textBubble.border.Margin = new Thickness(10, 2.5, 10, 5);
                         }
+                        this.messages.Items.Add(msg);
                     }
-                    this.messages.Items.Add(msg);
-                }
-                else
-                {
-                    if (this.messages.Items.Count > 0)
+                    else
                     {
-                        MessageBox next = this.messages.Items[0] as MessageBox;
-                        // Change corner radius on next message and remove avatar if it is from same user
-                        if (next.message.textBubble.message.from_id == message.from_id)
+                        if (this.messages.Items.Count > 0)
                         {
-                            next.message.avatar.Visibility = Visibility.Visible;
-                            next.message.textBubble.name.Visibility = Visibility.Collapsed;
-                            msg.message.avatar.Visibility = Visibility.Collapsed;
-                            Thickness prevMargin = next.message.textBubble.border.Margin;
-                            prevMargin.Top = 2.5;
-                            next.message.textBubble.border.Margin = prevMargin;
-                            CornerRadius corners = next.message.textBubble.border.CornerRadius;
-                            CornerRadius msg_corner = msg.message.textBubble.border.CornerRadius;
-                            if (next.HorizontalContentAlignment == HorizontalAlignment.Left)
+                            MessageBox next = this.messages.Items[0] as MessageBox;
+                            // Change corner radius on next message and remove avatar if it is from same user
+                            if (next.message.textBubble.message.from_id == message.from_id)
                             {
-                                corners.TopLeft = 0;
-                                msg_corner.BottomLeft = 0;
+                                next.message.avatar.Visibility = Visibility.Visible;
+                                next.message.textBubble.name.Visibility = Visibility.Collapsed;
+                                msg.message.avatar.Visibility = Visibility.Collapsed;
+                                Thickness prevMargin = next.message.textBubble.border.Margin;
+                                prevMargin.Top = 2.5;
+                                next.message.textBubble.border.Margin = prevMargin;
+                                CornerRadius corners = next.message.textBubble.border.CornerRadius;
+                                CornerRadius msg_corner = msg.message.textBubble.border.CornerRadius;
+                                if (next.HorizontalContentAlignment == HorizontalAlignment.Left)
+                                {
+                                    corners.TopLeft = 0;
+                                    msg_corner.BottomLeft = 0;
+                                }
+                                else
+                                {
+                                    corners.TopRight = 0;
+                                    msg_corner.BottomRight = 0;
+                                }
+                                msg.message.textBubble.border.CornerRadius = msg_corner;
+                                next.message.textBubble.border.CornerRadius = corners;
+                                msg.message.textBubble.border.Margin = new Thickness(10, 5, 10, 2.5);
                             }
-                            else
-                            {
-                                corners.TopRight = 0;
-                                msg_corner.BottomRight = 0;
-                            }
-                            msg.message.textBubble.border.CornerRadius = msg_corner;
-                            next.message.textBubble.border.CornerRadius = corners;
-                            msg.message.textBubble.border.Margin = new Thickness(10, 5, 10, 2.5);
                         }
+                        this.messages.Items.Insert(0, msg);
                     }
-                    this.messages.Items.Insert(0, msg);
                 }
             });
         }

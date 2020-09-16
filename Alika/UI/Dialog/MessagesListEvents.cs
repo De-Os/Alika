@@ -305,7 +305,7 @@ namespace Alika.UI.Dialog
         }
 
         // Sticker suggestion by word
-        public async void StickerSuggestion(object sender, TextChangedEventArgs e)
+        public void StickerSuggestion(object sender, TextChangedEventArgs e)
         {
             if (App.cache.StickerDictionary == null) return;
             string text = this.send_text.Text;
@@ -324,13 +324,17 @@ namespace Alika.UI.Dialog
                         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                         grid.Children.Add(holder);
                     });
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
+                    App.UILoop.AddAction(new UITask
                     {
-                        (this.stickers_suggestions.Children[0] as ScrollViewer).Content = grid;
-                        (this.stickers_suggestions.Children[0] as ScrollViewer).ChangeView(0, null, null, true);
-                        this.stickers_suggestions.Margin = new Thickness(this.attach_button.ActualWidth + this.attach_button.Margin.Left + this.attach_button.Margin.Right + this.send_text.Margin.Left, 0, 0, this.bottom_menu.ActualHeight);
-                        this.stickers_suggestions.Width = this.send_text.ActualWidth;
-                        this.stickers_suggestions.Visibility = Visibility.Visible;
+                        Action = () =>
+                        {
+                            (this.stickers_suggestions.Children[0] as ScrollViewer).Content = grid;
+                            (this.stickers_suggestions.Children[0] as ScrollViewer).ChangeView(0, null, null, true);
+                            this.stickers_suggestions.Margin = new Thickness(this.attach_button.ActualWidth + this.attach_button.Margin.Left + this.attach_button.Margin.Right + this.send_text.Margin.Left, 0, 0, this.bottom_menu.ActualHeight);
+                            this.stickers_suggestions.Width = this.send_text.ActualWidth;
+                            this.stickers_suggestions.Visibility = Visibility.Visible;
+                        },
+                        Priority = CoreDispatcherPriority.High
                     });
                 }
                 catch (Exception err)
@@ -340,9 +344,9 @@ namespace Alika.UI.Dialog
             }
             else
             {
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                App.UILoop.AddAction(new UITask
                 {
-                    this.stickers_suggestions.Visibility = Visibility.Collapsed; // Hide if word suggestions not found
+                    Action = () => this.stickers_suggestions.Visibility = Visibility.Collapsed // Hide if word suggestions not found
                 });
             }
         }

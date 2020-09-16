@@ -260,26 +260,30 @@ namespace Alika.UI
                 this.wave.PointerEntered += (a, b) => this._onWaves = true;
                 this.wave.PointerExited += (a, b) => this._onWaves = false;
                 this.PointerPressed += this.OnClick;
-                this.media.MediaEnded += async (a, b) => await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.Playing = false);
+                this.media.MediaEnded += (a, b) => App.UILoop.AddAction(new UITask
+                {
+                    Action = () => this.Playing = false
+                });
                 this.media.PlaybackSession.PositionChanged += this.PlayStateChanged;
                 this.PointerEntered += (a, b) => this.Background = Coloring.Transparent.Percent(50);
                 this.PointerExited += (a, b) => this.Background = Coloring.Transparent.Full;
             }
 
-            private async void OnClick(object sender, RoutedEventArgs e)
+            private void OnClick(object sender, RoutedEventArgs e)
             {
                 if (this._onWaves && this.Playing) return;
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                App.UILoop.AddAction(new UITask
                 {
-                    this.Playing = !this.Playing;
+                    Action = () => this.Playing = !this.Playing
                 });
             }
 
-            private async void PlayStateChanged(MediaPlaybackSession sender, object args)
+            private void PlayStateChanged(MediaPlaybackSession sender, object args)
             {
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                App.UILoop.AddAction(new UITask
                 {
-                    this.time.Text = sender.Position.ToString(@"m\:ss");
+                    Action = () => this.time.Text = sender.Position.ToString(@"m\:ss"),
+                    Priority = CoreDispatcherPriority.Low
                 });
             }
 
@@ -320,19 +324,19 @@ namespace Alika.UI
                     this.Rectangle.Height = 10 * (wave / 10);
                 }
 
-                public async void ChangeFill(TimeSpan time)
+                public void ChangeFill(TimeSpan time)
                 {
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    App.UILoop.AddAction(new UITask
                     {
-                        this.Rectangle.Fill = (time >= this.Time) ? this.NoFillColor : this.FillColor;
+                        Action = () => this.Rectangle.Fill = (time >= this.Time) ? this.NoFillColor : this.FillColor
                     });
                 }
 
-                public async void ResetFill()
+                public void ResetFill()
                 {
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    App.UILoop.AddAction(new UITask
                     {
-                        this.Rectangle.Fill = this.FillColor;
+                        Action = () => this.Rectangle.Fill = this.FillColor
                     });
                 }
             }

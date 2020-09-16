@@ -1,6 +1,8 @@
 ﻿using Alika.Libs.VK.Responses;
+using Microsoft.Toolkit.Uwp.UI.Triggers;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
@@ -18,46 +20,49 @@ namespace Alika.UI
 
         public async void LoadChats(int offset, int count = 50, int start_msg_id = 0)
         {
-            _ = await Task.Factory.StartNew(async () =>
+            await Task.Factory.StartNew(() =>
               {
-                  var conversations = App.vk.Messages.GetConversations(count: count, offset: offset, fields: "photo_200,online_info", start_message_id: start_msg_id);
-                  await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                  var conversations = App.vk.Messages.GetConversations(count: count, offset: offset, fields: "photo_200,online_info", start_message_id: start_msg_id).conversations;
+                  List<ListViewItem> items = new List<ListViewItem>();
+                  foreach(GetConversationsResponse.ConversationResponse conv in conversations)
                   {
-                      conversations.conversations.ForEach((GetConversationsResponse.ConversationResponse conv) =>
+                      App.UILoop.AddAction(new UITask
                       {
-                          if (conv.conversation.peer.id > 2000000000)
-                          {
-                              this.Items.Add(new ChatItem(
-                                  peer_id: conv.conversation.peer.id,
-                                  avatar: conv.conversation.settings.photos?.photo_200,
-                                  name: conv.conversation.settings.title,
-                                  last_msg: conv.last_message
-                              ));
-                          }
-                          else if (conv.conversation.peer.id < 0)
-                          {
-                              Group group = App.cache.Groups.Find(g => g.id == conv.conversation.peer.id);
-                              this.Items.Add(new ChatItem(
-                                   peer_id: conv.conversation.peer.id,
-                                   avatar: group.photo_200,
-                                   name: group.name,
-                                   last_msg: conv.last_message
-                               ));
+                          Action = () => {
+                              if (conv.conversation.peer.id > 2000000000)
+                              {
+                                  this.Items.Add(new ChatItem(
+                                      peer_id: conv.conversation.peer.id,
+                                      avatar: conv.conversation.settings.photos?.photo_200,
+                                      name: conv.conversation.settings.title,
+                                      last_msg: conv.last_message
+                                  ));
+                              }
+                              else if (conv.conversation.peer.id < 0)
+                              {
+                                  var group = App.cache.GetGroup(conv.conversation.peer.id);
+                                  this.Items.Add(new ChatItem(
+                                       peer_id: conv.conversation.peer.id,
+                                       avatar: group.photo_200,
+                                       name: group.name,
+                                       last_msg: conv.last_message
+                                   ));
 
-                          }
-                          else
-                          {
-
-                              User user = App.cache.Users.Find(u => u.user_id == conv.conversation.peer.id);
-                              this.Items.Add(new ChatItem(
-                                   peer_id: conv.conversation.peer.id,
-                                   avatar: user.photo_200,
-                                   name: user.first_name + " " + user.last_name,
-                                   last_msg: conv.last_message
-                               ));
-                          }
+                              }
+                              else
+                              {
+                                  var user = App.cache.GetUser(conv.conversation.peer.id);
+                                  this.Items.Add(new ChatItem(
+                                       peer_id: conv.conversation.peer.id,
+                                       avatar: user.photo_200,
+                                       name: user.first_name + " " + user.last_name,
+                                       last_msg: conv.last_message
+                                   ));
+                              }
+                          },
+                          Priority = CoreDispatcherPriority.High
                       });
-                  });
+                  }
               });
         }
 

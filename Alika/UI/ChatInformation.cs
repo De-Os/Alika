@@ -53,7 +53,8 @@ namespace Alika.UI
             if (this.peer_id > Limits.Messages.PEERSTART)
             {
                 var convMenu = new ConversationItems(this.conversation);
-                convMenu.AvatarUpdated += (av) => {
+                convMenu.AvatarUpdated += (av) =>
+                {
                     if (av == null)
                     {
                         this.avatarAndName.Avatar.ProfilePicture = null;
@@ -79,9 +80,9 @@ namespace Alika.UI
                 Content = this
             };
 
-            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            App.UILoop.AddAction(new UITask
             {
-                App.main_page.popup.Children.Add(this.popup);
+                Action = () => { App.main_page.popup.Children.Add(this.popup); }
             });
         }
 
@@ -290,7 +291,14 @@ namespace Alika.UI
 
                 public async void Load()
                 {
-                    if (this.Loading) return; else await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.Loading = true);
+                    if (!this.Loading)
+                    {
+                        App.UILoop.AddAction(new UITask
+                        {
+                            Action = () => this.Loading = true
+                        });
+                    }
+                    else return;
                     var response = App.vk.Messages.GetHistoryAttachments(peer_id: this.peer_id, type: this.type, start_from: this.offset, count: 40);
                     if (response.items.Count > 0)
                     {
@@ -361,11 +369,14 @@ namespace Alika.UI
                         });
                         final.Loaded += (a, b) => this.Loading = false;
 
-                        await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                        App.UILoop.AddAction(new UITask
                         {
-                            Grid.SetRow(final, this.content.RowDefinitions.Count);
-                            this.content.RowDefinitions.Add(new RowDefinition());
-                            this.content.Children.Add(final);
+                            Action = () =>
+                            {
+                                Grid.SetRow(final, this.content.RowDefinitions.Count);
+                                this.content.RowDefinitions.Add(new RowDefinition());
+                                this.content.Children.Add(final);
+                            }
                         });
                     }
                 }
@@ -711,16 +722,19 @@ namespace Alika.UI
                         menu.Children.Add(member);
                     });
 
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    App.UILoop.AddAction(new UITask
                     {
-                        this.Children.Clear();
-                        this.Children.Add(new ScrollViewer
+                        Action = () =>
                         {
-                            HorizontalScrollMode = ScrollMode.Disabled,
-                            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                            VerticalScrollMode = ScrollMode.Auto,
-                            Content = menu
-                        });
+                            this.Children.Clear();
+                            this.Children.Add(new ScrollViewer
+                            {
+                                HorizontalScrollMode = ScrollMode.Disabled,
+                                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                                VerticalScrollMode = ScrollMode.Auto,
+                                Content = menu
+                            });
+                        }
                     });
                 }
 
@@ -1043,10 +1057,13 @@ namespace Alika.UI
                         try
                         {
                             App.vk.Messages.DeleteChatPhoto(this.peer.peer.id);
-                            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                            App.UILoop.AddAction(new UITask
                             {
-                                this.Avatar.ProfilePicture = null;
-                                this.AvatarUpdated?.Invoke(null);
+                                Action = () =>
+                                {
+                                    this.Avatar.ProfilePicture = null;
+                                    this.AvatarUpdated?.Invoke(null);
+                                }
                             });
                         }
                         catch (Exception exc)
@@ -1060,20 +1077,23 @@ namespace Alika.UI
                         {
                             SuggestedStartLocation = PickerLocationId.PicturesLibrary,
                             ViewMode = PickerViewMode.Thumbnail,
-                            
+
                         };
                         picker.FileTypeFilter.Add(".png");
                         picker.FileTypeFilter.Add(".jpg");
                         var file = await picker.PickSingleFileAsync();
-                        if(file != null)
+                        if (file != null)
                         {
                             try
                             {
                                 var response = await App.vk.Messages.SetChatPhoto(file, peer.peer.id);
-                                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                                App.UILoop.AddAction(new UITask
                                 {
-                                    this.Avatar.ProfilePicture = await ImageCache.Instance.GetFromCacheAsync(new Uri(response.chat.photo_200));
-                                    this.AvatarUpdated?.Invoke(response.chat.photo_200);
+                                    Action = async () =>
+                                    {
+                                        this.Avatar.ProfilePicture = await ImageCache.Instance.GetFromCacheAsync(new Uri(response.chat.photo_200));
+                                        this.AvatarUpdated?.Invoke(response.chat.photo_200);
+                                    }
                                 });
                             }
                             catch (Exception exc)
@@ -1092,9 +1112,9 @@ namespace Alika.UI
                             try
                             {
                                 App.vk.Messages.EditTitle(this.peer.peer.id, box.Text);
-                                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                                App.UILoop.AddAction(new UITask
                                 {
-                                    this.TitleUpdated(box.Text);
+                                    Action = () => this.TitleUpdated(box.Text)
                                 });
                             }
                             catch (Exception exc)
@@ -1107,10 +1127,12 @@ namespace Alika.UI
 
                     panel.Children.Add(grid);
 
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    App.UILoop.AddAction(new UITask
                     {
-                        this.Children.Clear();
-                        this.Children.Add(panel);
+                        Action = () => {
+                            this.Children.Clear();
+                            this.Children.Add(panel);
+                        }
                     });
                 }
 

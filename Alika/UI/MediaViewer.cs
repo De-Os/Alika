@@ -136,10 +136,12 @@ namespace Alika.UI
                 }
             });
 
-            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            App.UILoop.AddAction(new UITask
             {
-                this.grid.Children.Add(grid);
-                this.grid.Children.Add(this.menu);
+                Action = () => {
+                    this.grid.Children.Add(grid);
+                    this.grid.Children.Add(this.menu);
+                }
             });
         }
 
