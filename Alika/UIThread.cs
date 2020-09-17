@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
-using Windows.Foundation;
 using Windows.UI.Core;
 
 namespace Alika.UI
@@ -25,9 +24,10 @@ namespace Alika.UI
         {
             while (true)
             {
-                if(this.Actions.Count > 0) {
+                if (this.Actions.Count > 0)
+                {
                     var sortedActions = Actions.OrderByDescending(x => (int)x.Priority).ToList();
-                    for(int x = 0; x < sortedActions.Count; x++)
+                    for (int x = 0; x < sortedActions.Count; x++)
                     {
                         var task = sortedActions[x];
                         await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(task.Priority, task.Action);

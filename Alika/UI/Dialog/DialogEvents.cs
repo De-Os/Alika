@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -18,12 +17,12 @@ using Windows.UI.Xaml.Controls;
 
 namespace Alika.UI.Dialog
 {
-    public partial class MessagesList
+    public partial class Dialog
     {
         public void RegisterEvents()
         {
-            this.msg_scroll.ViewChanged += this.OnScroll;
-            this.messages.SizeChanged += this.FirstScroll;
+            /*this.msg_scroll.ViewChanged += this.OnScroll;
+            this.messages.SizeChanged += this.FirstScroll;*/
             this.send_button.Click += this.Send;
             this.send_text.PreviewKeyDown += this.TextBoxPreviewKeyDown;
             this.send_text.PreviewKeyDown += this.TextPaste;
@@ -189,23 +188,19 @@ namespace Alika.UI.Dialog
         // Send message
         public void Send(object sender, RoutedEventArgs e)
         {
-            Task.Factory.StartNew(async () =>
+            string text = this.send_text.Text.Replace("\r\n", "\n").Replace("\r", "\n"); // i hate \r\n
+            this.send_text.Text = "";
+            List<string> attachments = new List<String>();
+            if (this.attach_grid.Children.Count > 0)
             {
-                string text = "";
-                List<string> attachments = new List<String>();
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                for (int x = 0; x < this.attach_grid.Children.Count; x++)
                 {
-                    text = this.send_text.Text.Replace("\r\n", "\n").Replace("\r", "\n"); // i hate \r\n
-                    if (this.attach_grid.Children.Count > 0)
-                    {
-                        for (int x = 0; x < this.attach_grid.Children.Count; x++)
-                        {
-                            attachments.Add((this.attach_grid.Children[x] as MessageAttachment.Uploaded).Attach);
-                        }
-                        this.attach_grid.Children.Clear();
-                    }
-                    this.send_text.Text = "";
-                });
+                    attachments.Add((this.attach_grid.Children[x] as MessageAttachment.Uploaded).Attach);
+                }
+                this.attach_grid.Children.Clear();
+            }
+            Task.Factory.StartNew(() =>
+            {
                 if (text.Length > 0 || attachments.Count > 0)
                 {
                     string temptext;
@@ -225,7 +220,7 @@ namespace Alika.UI.Dialog
         // Load new messages when user scrolled to top
         public void OnScroll(object s, ScrollViewerViewChangedEventArgs e) // TODO: Fix it
         {
-            if (e.IsIntermediate)
+            /*if (e.IsIntermediate)
             {
                 if (this.msg_scroll.VerticalOffset == 0)
                 {
@@ -233,7 +228,7 @@ namespace Alika.UI.Dialog
                     messages.ForEach((Message msg) => this.AddMessage(msg, false));
                     this.msg_scroll.ChangeView(null, 0, null, true);
                 }
-            }
+            }*/
         }
 
         // Attachment button selection

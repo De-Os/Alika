@@ -14,6 +14,6 @@
             public static string[] VOICE_TYPES = new string[] { ".mp3", ".ogg" };
         }
 
-        public static string DefaultAvatar = "https://vk.com/images/camera_200.png?ava=1";
+        public static string DefaultAvatar = "https://vk.com/images/camera";
     }
 }

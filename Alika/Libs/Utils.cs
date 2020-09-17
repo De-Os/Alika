@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Resources;
+using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.System;
@@ -173,6 +174,21 @@ namespace Alika.Libs
             {
                 c.Content = null;
             }
+        }
+
+        /// <summary>
+        /// Is element visible on screen
+        /// <see href="https://docs.microsoft.com/en-us/archive/blogs/llobo/determining-the-visibility-of-elements-inside-scrollviewer"/>
+        /// </summary>
+        /// <param name="control">Parent element (ScrollViewer, for example)</param>
+        /// <param name="element">Element</param>
+        /// <returns></returns>
+        public static bool IsElementVisible(this ContentControl control, UIElement element)
+        {
+            var childTransform = element.TransformToVisual(control);
+            var rect = childTransform.TransformBounds(new Rect(new Point { X = 0, Y = 0 }, control.RenderSize));
+            var result = RectHelper.Intersect(new Rect(new Point { X = 0, Y = 0 }, control.RenderSize), rect);
+            return result != Rect.Empty;
         }
     }
 }

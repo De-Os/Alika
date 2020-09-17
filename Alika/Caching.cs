@@ -183,12 +183,13 @@ namespace Alika
 
         public void Update(int id)
         {
-            if(id > 0)
+            if (id > 0)
             {
-                if(id > Limits.Messages.PEERSTART)
+                if (id > Limits.Messages.PEERSTART)
                 {
                     App.vk.Messages.GetConversationsById(new List<int> { id }, "photo_200,online_info");
-                }else App.vk.Users.Get(new List<int> { id }, "photo_200,online_info");
+                }
+                else App.vk.Users.Get(new List<int> { id }, "photo_200,online_info");
             }
             else App.vk.Groups.GetById(new List<int> { id }, "photo_200");
         }

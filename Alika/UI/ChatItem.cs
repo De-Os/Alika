@@ -1,13 +1,10 @@
 ﻿using Alika.Libs.VK.Responses;
 using Alika.UI.Misc;
-using Microsoft.Toolkit.Uwp.UI;
-using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
 
 namespace Alika.UI
 {
@@ -59,7 +56,8 @@ namespace Alika.UI
 
         public void LoadAvatar()
         {
-            this.image = new Avatar(this.peer_id) { 
+            this.image = new Avatar(this.peer_id)
+            {
                 Height = 50,
                 Width = 50,
                 HorizontalAlignment = HorizontalAlignment.Center,

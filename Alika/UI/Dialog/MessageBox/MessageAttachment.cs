@@ -6,7 +6,6 @@ using Microsoft.UI.Xaml.Controls;
 using RestSharp;
 using System;
 using System.Collections.Generic;
-using Windows.ApplicationModel.Core;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;

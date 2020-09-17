@@ -4,9 +4,7 @@ using Microsoft.Toolkit.Uwp.UI;
 using RestSharp;
 using System;
 using System.Collections.Generic;
-using Windows.ApplicationModel.Core;
 using Windows.Storage;
-using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -138,7 +136,8 @@ namespace Alika.UI
 
             App.UILoop.AddAction(new UITask
             {
-                Action = () => {
+                Action = () =>
+                {
                     this.grid.Children.Add(grid);
                     this.grid.Children.Add(this.menu);
                 }

@@ -3,7 +3,6 @@ using Alika.UI.Misc;
 using Microsoft.Toolkit.Uwp.UI;
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.UI.Text;
@@ -69,7 +68,8 @@ namespace Alika.UI
 
             public void LoadAvatar(int user_id)
             {
-                this.avatar = new Avatar(user_id) { 
+                this.avatar = new Avatar(user_id)
+                {
                     Height = 40,
                     Width = 40,
                     VerticalAlignment = VerticalAlignment.Bottom,
@@ -231,45 +231,42 @@ namespace Alika.UI
                 {
                     this.message.attachments.ForEach(async (Attachment att) =>
                     {
-                        this.attachGrid.RowDefinitions.Add(new RowDefinition());
-                        if (att.type == "photo")
+                        FrameworkElement attach = null;
+                        switch (att.type)
                         {
-                            MessageAttachment.Photo photo = new MessageAttachment.Photo(att.photo);
-                            photo.Preview.Width = this.Width;
-                            Grid.SetRow(photo, this.attachGrid.RowDefinitions.Count - 1);
-                            this.attachGrid.Children.Add(photo);
+                            case "photo":
+                                attach = new MessageAttachment.Photo(att.photo)
+                                {
+                                    Width = this.Width
+                                };
+                                break;
+                            case "sticker":
+                                attach = new MessageAttachment.Sticker(att.sticker);
+                                this.border.Background = Coloring.Transparent.Full;
+                                break;
+                            case "doc":
+                                attach = new MessageAttachment.Document(att.document);
+                                break;
+                            case "audio_message":
+                                attach = new MessageAttachment.AudioMessage(att.audio_message);
+                                break;
+                            case "graffiti":
+                                attach = new Image
+                                {
+                                    Height = att.graffiti.height / 2,
+                                    Width = att.graffiti.width / 2,
+                                    Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(att.graffiti.url)),
+                                    Margin = new Thickness(5)
+                                };
+                                this.border.Background = Coloring.Transparent.Full;
+                                break;
                         }
-                        else if (att.type == "sticker")
+                        if (attach != null)
                         {
-                            MessageAttachment.Sticker sticker = new MessageAttachment.Sticker(att.sticker);
-                            Grid.SetRow(sticker, this.attachGrid.RowDefinitions.Count - 1);
-                            this.attachGrid.Children.Add(sticker);
-                            this.border.Background = Coloring.Transparent.Full;
-                        }
-                        else if (att.type == "audio_message")
-                        {
-                            var audio = new MessageAttachment.AudioMessage(att.audio_message);
-                            Grid.SetRow(audio, this.attachGrid.RowDefinitions.Count - 1);
-                            this.attachGrid.Children.Add(audio);
-                        }
-                        else if (att.type == "graffiti")
-                        {
-                            Image img = new Image
-                            {
-                                Height = att.graffiti.height / 2,
-                                Width = att.graffiti.width / 2,
-                                Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(att.graffiti.url)),
-                                Margin = new Thickness(5)
-                            };
-                            Grid.SetRow(img, this.attachGrid.RowDefinitions.Count - 1);
-                            this.attachGrid.Children.Add(img);
-                            this.border.Background = Coloring.Transparent.Full;
-                        }
-                        else if (att.type == "doc")
-                        {
-                            Button doc = new MessageAttachment.Document(att.document);
-                            Grid.SetRow(doc, this.attachGrid.RowDefinitions.Count - 1);
-                            this.attachGrid.Children.Add(doc);
+                            attach.Loaded += (a, b) => this.Height += attach.Height;
+                            Grid.SetRow(attach, this.attachGrid.RowDefinitions.Count);
+                            this.attachGrid.RowDefinitions.Add(new RowDefinition());
+                            this.attachGrid.Children.Add(attach);
                         }
                     });
                 }

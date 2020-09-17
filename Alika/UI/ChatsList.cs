@@ -1,5 +1,4 @@
 ﻿using Alika.Libs.VK.Responses;
-using Microsoft.Toolkit.Uwp.UI.Triggers;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -24,11 +23,12 @@ namespace Alika.UI
               {
                   var conversations = App.vk.Messages.GetConversations(count: count, offset: offset, fields: "photo_200,online_info", start_message_id: start_msg_id).conversations;
                   List<ListViewItem> items = new List<ListViewItem>();
-                  foreach(GetConversationsResponse.ConversationResponse conv in conversations)
+                  foreach (GetConversationsResponse.ConversationResponse conv in conversations)
                   {
                       App.UILoop.AddAction(new UITask
                       {
-                          Action = () => {
+                          Action = () =>
+                          {
                               if (conv.conversation.peer.id > 2000000000)
                               {
                                   this.Items.Add(new ChatItem(

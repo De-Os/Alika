@@ -23,7 +23,7 @@ namespace Alika.UI.Misc
 
         private async void LoadAvatar(string url)
         {
-            if (url == Limits.DefaultAvatar && this.NoDefaultPhoto)
+            if (this.NoDefaultPhoto && url.StartsWith(Limits.DefaultAvatar))
             {
                 this.ProfilePicture = null;
             }

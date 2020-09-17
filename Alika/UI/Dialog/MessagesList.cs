@@ -1,213 +1,102 @@
 ﻿using Alika.Libs;
 using Alika.Libs.VK.Responses;
-using System;
-using System.Collections.Generic;
-using Windows.ApplicationModel.Core;
-using Windows.UI.Core;
+using System.Linq;
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI.Dialog
 {
-
-    /// <summary>
-    /// Dialog grid
-    /// </summary>
-    public partial class MessagesList : Grid
+    public class MessagesList : Grid
     {
-        public int peer_id { get; set; }
-        public TopMenu top_menu;
-        public ListView messages = new ListView
-        {
-            SelectionMode = ListViewSelectionMode.None
-        };
-        public ScrollViewer msg_scroll = new ScrollViewer
+        public int peer_id;
+
+        public ScrollViewer Scroll = new ScrollViewer
         {
             HorizontalScrollMode = ScrollMode.Disabled,
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled
+            VerticalScrollMode = ScrollMode.Auto,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto
         };
-        public Grid bottom_menu = new Grid();
-        public Grid attach_grid = new Grid
-        {
-            MaxHeight = 100,
-            HorizontalAlignment = HorizontalAlignment.Left
-        };
-        public Grid stickers_suggestions = new Grid
-        {
-            Height = 100,
-            Background = Coloring.Transparent.Percent(25),
-            VerticalAlignment = VerticalAlignment.Bottom,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            Visibility = Visibility.Collapsed,
-            CornerRadius = new CornerRadius(10)
-        };
-        public Grid bottom_buttons_grid = new Grid();
-        public Button send_button = new Button
-        {
-            Content = new Image
-            {
-                Source = new SvgImageSource(new Uri(Utils.AssetTheme("send.svg"))),
-                Height = 20
-            },
-            Width = 50,
-            Margin = new Thickness(5, 10, 20, 10),
-            HorizontalAlignment = HorizontalAlignment.Right,
-            Background = Coloring.Transparent.Full
-        };
-        public Button stickers = new Button
-        {
-            Content = new Image
-            {
-                Source = new SvgImageSource(new Uri(Utils.AssetTheme("sticker.svg"))),
-                Height = 20
-            },
-            Width = 50,
-            Margin = new Thickness(5, 10, 5, 10),
-            HorizontalAlignment = HorizontalAlignment.Right,
-            Background = Coloring.Transparent.Full
-        };
-        public TextBox send_text = new TextBox
-        {
-            PlaceholderText = Utils.LocString("Dialog/TextBoxPlaceholder"),
-            AcceptsReturn = true,
-            MaxHeight = 150,
-            Margin = new Thickness(5, 10, 5, 10),
-            TextWrapping = TextWrapping.Wrap,
-            HorizontalAlignment = HorizontalAlignment.Stretch
-        };
-        public Button attach_button = new Button
-        {
-            Content = new Image
-            {
-                Source = new SvgImageSource(new Uri(Utils.AssetTheme("clip.svg"))),
-                Width = 20,
-                Height = 20
-            },
-            Width = 50,
-            Margin = new Thickness(20, 10, 5, 10),
-            HorizontalAlignment = HorizontalAlignment.Left,
-            Background = Coloring.Transparent.Full
-        };
+        public MessagesListView Messages;
 
         public MessagesList(int peer_id)
         {
             this.peer_id = peer_id;
-            App.cache.StickersSelector.peer_id = this.peer_id;
-
-            this.Render();
-
-            this.LoadMessages();
-            this.RegisterEvents();
+            this.Children.Add(new ProgressRing
+            {
+                Height = 50,
+                Width = 50,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                IsActive = true
+            });
+            this.Loaded += (a, b) => this.Load();
         }
 
-        public void Render()
+        private void Load()
         {
-            this.top_menu = new UI.Dialog.TopMenu(this.peer_id);
-
-            this.RowDefinitions.Add(new RowDefinition { Height = new GridLength(60) });
-            this.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-            this.RowDefinitions.Add(new RowDefinition { Height = new GridLength(60, GridUnitType.Auto) });
-
-            Grid.SetRow(this.top_menu, 0);
-            Grid.SetRow(this.msg_scroll, 1);
-            Grid.SetRow(this.bottom_menu, 2);
-
-            this.Children.Add(this.top_menu);
-            this.Children.Add(this.msg_scroll);
-            this.Children.Add(this.bottom_menu);
-
-            this.msg_scroll.Content = this.messages;
-
-            this.send_text.SetValue(ScrollViewer.HorizontalScrollBarVisibilityProperty, ScrollBarVisibility.Disabled);
-            this.send_text.SetValue(ScrollViewer.VerticalScrollBarVisibilityProperty, ScrollBarVisibility.Disabled);
-
-            this.bottom_menu.RowDefinitions.Add(new RowDefinition());
-            this.bottom_menu.RowDefinitions.Add(new RowDefinition());
-            this.bottom_menu.RowDefinitions.Add(new RowDefinition());
-
-            ScrollViewer scroll = new ScrollViewer
+            Task.Run(() =>
             {
-                Content = attach_grid,
-                VerticalScrollMode = ScrollMode.Disabled,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
-                HorizontalScrollMode = ScrollMode.Auto,
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Auto
-            };
+                App.UILoop.AddAction(new UITask
+                {
+                    Action = () =>
+                    {
+                        this.Messages = new MessagesListView(this.peer_id)
+                        {
+                            SelectionMode = ListViewSelectionMode.None
+                        };
+                        this.Children.Clear();
+                        this.Children.Add(this.Scroll);
+                        this.Scroll.Content = this.Messages;
 
-            Grid.SetRow(scroll, 0);
-            Grid.SetRow(this.bottom_buttons_grid, 2);
-
-            this.bottom_menu.Children.Add(scroll);
-            this.bottom_menu.Children.Add(this.bottom_buttons_grid);
-
-            this.bottom_buttons_grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
-            this.bottom_buttons_grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            this.bottom_buttons_grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
-            this.bottom_buttons_grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
-
-            Grid.SetColumn(this.attach_button, 0);
-            Grid.SetColumn(this.send_text, 1);
-            Grid.SetColumn(this.stickers, 2);
-            Grid.SetColumn(this.send_button, 3);
-
-            this.bottom_buttons_grid.Children.Add(this.attach_button);
-            this.bottom_buttons_grid.Children.Add(this.send_text);
-            this.bottom_buttons_grid.Children.Add(this.send_button);
-            this.bottom_buttons_grid.Children.Add(this.stickers);
-
-            this.stickers_suggestions.Children.Add(new ScrollViewer
-            {
-                VerticalScrollMode = ScrollMode.Disabled,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
-                HorizontalScrollMode = ScrollMode.Auto,
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+                        this.Messages.Loaded += (a, b) =>
+                        {
+                            this.Scroll.ChangeView(null, double.MaxValue, null);
+                            this.Messages.SizeChanged += (c, d) => this.NewMessageScroll();
+                        };
+                    }
+                });
             });
         }
 
-        // Scroll after loaded messages list (костыль)
-        public void FirstScroll(object s, SizeChangedEventArgs e)
+        private void NewMessageScroll()
         {
-            if ((s as ListView).IsLoaded)
+            if (this.Messages.Items.LastOrDefault(l => l != this.Messages.Items.LastOrDefault() as MessageBox) is MessageBox msg)
             {
-                this.ScrollToDown();
-                this.messages.SizeChanged -= this.FirstScroll;
-                this.bottom_menu.SizeChanged += this.MsgScroll;
-                this.messages.SizeChanged += this.MsgScroll;
+                if (this.Scroll.IsElementVisible(msg))
+                {
+                    this.Scroll.ChangeView(null, double.MaxValue, null);
+                }
             }
         }
 
-        // Scroll on new message (костыль)
-        // TODO: Fix it
-        public void MsgScroll(object s, SizeChangedEventArgs e)
+        public class MessagesListView : ListView
         {
-            if (this.msg_scroll.VerticalOffset >= this.msg_scroll.ScrollableHeight * 0.9) this.ScrollToDown();
-        }
+            public int peer_id;
 
-        public void ScrollToDown() => this.msg_scroll.ChangeView(null, double.MaxValue, null);
+            public delegate void MessageAdded(bool isNew);
+            public event MessageAdded OnNewMessage;
 
-        public void LoadMessages()
-        {
-            List<Message> messages = App.vk.Messages.GetHistory(this.peer_id).messages;
-            messages.Reverse();
-            messages.ForEach((Message msg) => this.AddMessage(msg, true));
-        }
-
-        public void AddMessage(Message message, bool isNew = false)
-        {
-            App.UILoop.AddAction(new UITask
+            public MessagesListView(int peer_id)
             {
-                Action = () =>
-                {
-                    MessageBox msg = new MessageBox(message, this.peer_id);
+                this.peer_id = peer_id;
 
-                    if (isNew)
+                var messages = App.vk.Messages.GetHistory(this.peer_id).messages;
+                messages.Reverse();
+                messages.ForEach((Message msg) => this.AddNewMessage(msg));
+            }
+
+            public void AddNewMessage(Message message)
+            {
+                var msg = new MessageBox(message, this.peer_id);
+                App.UILoop.AddAction(new UITask
+                {
+                    Action = () =>
                     {
-                        if (this.messages.Items.Count > 0)
+                        msg.Loaded += (a, b) => this.OnNewMessage?.Invoke(true);
+                        if (this.Items.Count > 0)
                         {
-                            MessageBox prev = this.messages.Items[this.messages.Items.Count - 1] as MessageBox;
-                            // Change corner radius on previous message and remove avatar if it is from same user
-                            if (prev.message.textBubble.message.from_id == message.from_id)
+                            if (this.Items.LastOrDefault() is MessageBox prev && prev.message.textBubble.message.from_id == message.from_id)
                             {
                                 prev.message.avatar.Visibility = Visibility.Collapsed;
                                 Thickness prevMargin = prev.message.textBubble.border.Margin;
@@ -225,21 +114,27 @@ namespace Alika.UI.Dialog
                                     corners.BottomRight = 0;
                                     msg_corners.TopRight = 0;
                                 }
-                                msg.message.textBubble.border.CornerRadius = msg_corners;
                                 prev.message.textBubble.border.CornerRadius = corners;
+                                msg.message.textBubble.border.CornerRadius = msg_corners;
                                 msg.message.textBubble.name.Visibility = Visibility.Collapsed;
                                 msg.message.textBubble.border.Margin = new Thickness(10, 2.5, 10, 5);
                             }
                         }
-                        this.messages.Items.Add(msg);
+                        this.Items.Add(msg);
                     }
-                    else
+                });
+            }
+
+            public void AddOldMessage(Message message)
+            {
+                var msg = new MessageBox(message, this.peer_id);
+                App.UILoop.AddAction(new UITask
+                {
+                    Action = () =>
                     {
-                        if (this.messages.Items.Count > 0)
+                        if (this.Items.Count > 0)
                         {
-                            MessageBox next = this.messages.Items[0] as MessageBox;
-                            // Change corner radius on next message and remove avatar if it is from same user
-                            if (next.message.textBubble.message.from_id == message.from_id)
+                            if (this.Items.FirstOrDefault() is MessageBox next && next.message.textBubble.message.from_id == message.from_id)
                             {
                                 next.message.avatar.Visibility = Visibility.Visible;
                                 next.message.textBubble.name.Visibility = Visibility.Collapsed;
@@ -264,10 +159,11 @@ namespace Alika.UI.Dialog
                                 msg.message.textBubble.border.Margin = new Thickness(10, 5, 10, 2.5);
                             }
                         }
-                        this.messages.Items.Insert(0, msg);
+                        msg.Loaded += (a, b) => this.OnNewMessage?.Invoke(false);
+                        this.Items.Add(msg);
                     }
-                }
-            });
+                });
+            }
         }
     }
 }

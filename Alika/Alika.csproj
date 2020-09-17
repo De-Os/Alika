@@ -160,8 +160,9 @@
     <Compile Include="UI\Coloring.cs" />
     <Compile Include="UI\Dialog\MessageBox\MessageAttachment.cs" />
     <Compile Include="UI\Dialog\MessageBox\MessageBox.cs" />
+    <Compile Include="UI\Dialog\Dialog.cs" />
+    <Compile Include="UI\Dialog\DialogEvents.cs" />
     <Compile Include="UI\Dialog\MessagesList.cs" />
-    <Compile Include="UI\Dialog\MessagesListEvents.cs" />
     <Compile Include="UI\Dialog\TopMenu.cs" />
     <Compile Include="UI\MediaViewer.cs" />
     <Compile Include="UI\Misc.cs" />

@@ -1,7 +1,6 @@
 ﻿using Alika.Libs;
 using Alika.Libs.VK;
 using Alika.Libs.VK.Responses;
-using Alika.UI.Dialog;
 using Microsoft.Toolkit.Uwp.UI;
 using System;
 using System.Collections.Generic;
@@ -68,7 +67,7 @@ namespace Alika.UI
                 {
                     this.avatarAndName.Title.Text = name;
                     this.conversation.settings.title = name;
-                    (App.main_page.dialog.Children[0] as MessagesList).top_menu.name.Text = name;
+                    (App.main_page.dialog.Children[0] as Dialog.Dialog).top_menu.name.Text = name;
                     Task.Factory.StartNew(() => App.cache.Update(this.peer_id));
                 };
                 this.Children.Add(convMenu);

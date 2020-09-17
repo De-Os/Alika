@@ -2,11 +2,9 @@
 using Alika.UI;
 using Alika.UI.Dialog;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 
@@ -45,12 +43,12 @@ namespace Alika
                     ChatItem selected = this.chats_list.SelectedItem as ChatItem;
                     if (this.dialog.Children.Count > 0)
                     {
-                        MessagesList old = this.dialog.Children[0] as MessagesList;
+                        Dialog old = this.dialog.Children[0] as Dialog;
                         if (old.peer_id == selected.peer_id) return;
                         (old.stickers.Flyout as Flyout).Content = null; // Remove previous flyout to prevent crash on stickers opening
                     }
                     this.dialog.Children.Clear();
-                    var list = new MessagesList(selected.peer_id);
+                    var list = new Dialog(selected.peer_id);
                     this.dialog.Children.Add(list);
                     this.dialog.Children.Add(list.stickers_suggestions);
                     this.peer_id = selected.peer_id;
@@ -81,8 +79,8 @@ namespace Alika
                                 if (update[7] != null) msg = App.vk.Messages.GetById(new List<int> { msg.id }).messages[0];
                                 if (selected.peer_id == msg.peer_id)
                                 {
-                                    MessagesList list = this.dialog.Children[0] as MessagesList;
-                                    list.AddMessage(msg, true);
+                                    Dialog list = this.dialog.Children[0] as Dialog;
+                                    list.MessagesList.Messages.AddNewMessage(msg);
                                     this.chats_scroll.ChangeView(null, 0, null);
                                 }
                             }
@@ -102,7 +100,8 @@ namespace Alika
             {
                 App.UILoop.AddAction(new UITask
                 {
-                    Action = () => {
+                    Action = () =>
+                    {
                         if (this.chats_scroll.VerticalOffset == this.chats_scroll.ScrollableHeight)
                         {
                             double height = this.chats_scroll.ScrollableHeight;
