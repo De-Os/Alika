@@ -190,5 +190,20 @@ namespace Alika.Libs
             var result = RectHelper.Intersect(new Rect(new Point { X = 0, Y = 0 }, control.RenderSize), rect);
             return result != Rect.Empty;
         }
+
+        /// <summary>
+        /// Short name
+        /// </summary>
+        /// <example>
+        /// Sasha Vinogradov => Sasha V.
+        /// </example>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public static string ShortName(this string user)
+        {
+            if (user.Count(c => c == ' ') != 1) return user;
+            var split = user.Split(" ");
+            return split[0] + " " + split[1].Substring(0, 1) + ".";
+        }
     }
 }

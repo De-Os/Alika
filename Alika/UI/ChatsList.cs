@@ -1,4 +1,5 @@
-﻿using Alika.Libs.VK.Responses;
+﻿using Alika.Libs;
+using Alika.Libs.VK.Responses;
 using Alika.UI.Misc;
 using System.Collections.Generic;
 using System.Linq;
@@ -79,11 +80,13 @@ namespace Alika.UI
             {
                 FontSize = 15,
                 FontWeight = FontWeights.Bold,
-                TextTrimming = TextTrimming.CharacterEllipsis
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                VerticalAlignment = VerticalAlignment.Bottom
             };
             public TextBlock textBlock = new TextBlock
             {
-                TextTrimming = TextTrimming.CharacterEllipsis
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                VerticalAlignment = VerticalAlignment.Top
             };
             public Avatar image;
             public ChatItem(int peer_id, Message last_msg)
@@ -93,14 +96,13 @@ namespace Alika.UI
 
                 this.grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) }); // Avatar
                 this.grid.ColumnDefinitions.Add(new ColumnDefinition()); // Text fields
-                this.textGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(10) }); // Top margin
-                this.textGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) }); // Chat name
-                this.textGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) }); // Message x
+                this.textGrid.RowDefinitions.Add(new RowDefinition()); // Chat name
+                this.textGrid.RowDefinitions.Add(new RowDefinition()); // Message x
                 this.LoadAvatar();
                 this.nameBlock.Text = App.cache.GetName(this.peer_id).Text;
-                Grid.SetRow(this.nameBlock, 1);
+                Grid.SetRow(this.nameBlock, 0);
                 this.UpdateMsg(last_msg);
-                Grid.SetRow(this.textBlock, 2);
+                Grid.SetRow(this.textBlock, 1);
                 this.textGrid.Children.Add(this.nameBlock);
                 this.textGrid.Children.Add(this.textBlock);
                 Grid.SetColumn(this.textGrid, 1);
@@ -139,24 +141,63 @@ namespace Alika.UI
 
             public void UpdateMsg(Message msg)
             {
-                if (msg != null)
+                this.message = msg;
+                string text = this.FormatName(msg.from_id) + ": ";
+                if (msg.text.Length > 0)
                 {
-                    if (msg.text.Length > 0)
+                    string temptext = msg.text.Replace("\n", " ");
+                    MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(msg.text);
+                    if (pushes.Count > 0)
                     {
-                        msg.text = msg.text.Replace("\n", " ");
-                        MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(msg.text);
-                        if (pushes.Count > 0)
+                        foreach (Match push in pushes)
                         {
-                            foreach (Match push in pushes)
-                            {
-                                msg.text = msg.text.Replace(push.Value, push.Value.Split("|").Last().Replace("]", ""));
-                            }
+                            temptext = temptext.Replace(push.Value, push.Value.Split("|").Last().Replace("]", ""));
                         }
                     }
-                    else msg.text = "📁 Вложение";
-                    this.message = msg;
-                    this.textBlock.Text = this.message.text;
+                    text += temptext;
                 }
+                else
+                {
+                    if (msg.attachments != null && msg.attachments.Count > 0)
+                    {
+                        switch (msg.attachments[0].type)
+                        {
+                            case "photo":
+                                text += "📷 " + Utils.LocString("Attachments/Photo");
+                                break;
+                            case "video":
+                                text += "📽 " + Utils.LocString("Attachments/Video");
+                                break;
+                            case "audio_message":
+                                text += "🎤 " + Utils.LocString("Attachments/VoiceMessage");
+                                break;
+                            case "link":
+                                text += "🔗 " + Utils.LocString("Attachments/Link");
+                                break;
+                            case "sticker":
+                                text += "😀 " + Utils.LocString("Attachments/Sticker");
+                                break;
+                            case "gift":
+                                text += "🎁 " + Utils.LocString("Attachments/Gift");
+                                break;
+                            case "doc":
+                                text += "📂 " + Utils.LocString("Attachments/Document");
+                                break;
+                            case "graffiti":
+                                text += "🖌 " + Utils.LocString("Attachments/Graffiti");
+                                break;
+                        }
+                    }
+                }
+                this.textBlock.Text = text;
+            }
+
+            private string FormatName(int id)
+            {
+                if (id == App.vk.user_id) return Utils.LocString("Dialog/You");
+                var name = App.cache.GetName(id).Text;
+                if (name.Count(c => c == ' ') != 1 || this.peer_id > Libs.VK.Limits.Messages.PEERSTART) return name;
+                return name.Split(" ")[0];
             }
         }
     }

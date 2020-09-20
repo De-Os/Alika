@@ -120,17 +120,41 @@
   <data name="Attachments" xml:space="preserve">
     <value>Вложения</value>
   </data>
+  <data name="Document" xml:space="preserve">
+    <value>Документ</value>
+  </data>
   <data name="Documents" xml:space="preserve">
     <value>Документы</value>
+  </data>
+  <data name="Gift" xml:space="preserve">
+    <value>Подарок</value>
+  </data>
+  <data name="Graffiti" xml:space="preserve">
+    <value>Граффити</value>
+  </data>
+  <data name="Link" xml:space="preserve">
+    <value>Ссылка</value>
   </data>
   <data name="Links" xml:space="preserve">
     <value>Ссылки</value>
   </data>
+  <data name="Photo" xml:space="preserve">
+    <value>Фотография</value>
+  </data>
   <data name="Photos" xml:space="preserve">
     <value>Фотографии</value>
   </data>
+  <data name="Sticker" xml:space="preserve">
+    <value>Стикер</value>
+  </data>
+  <data name="Video" xml:space="preserve">
+    <value>Видео</value>
+  </data>
   <data name="Videos" xml:space="preserve">
     <value>Видео</value>
+  </data>
+  <data name="VoiceMessage" xml:space="preserve">
+    <value>Голосовое сообщение</value>
   </data>
   <data name="VoiceMessages" xml:space="preserve">
     <value>Голосовые сообщения</value>
