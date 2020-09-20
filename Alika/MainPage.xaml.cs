@@ -1,11 +1,7 @@
-﻿using Alika.Libs.VK.Responses;
-using Alika.UI;
+﻿using Alika.UI;
 using Alika.UI.Dialog;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 
 namespace Alika
@@ -13,7 +9,27 @@ namespace Alika
     public sealed partial class MainPage : Page
     {
         public ChatsList chats_list = new ChatsList();
-        public int peer_id;
+        private int _peer_id;
+        public int peer_id
+        {
+            get
+            {
+                return this._peer_id;
+            }
+            set
+            {
+                this._peer_id = value;
+                if (this.dialog.Children.Count > 0 && this.dialog.Children[0] is Dialog old)
+                {
+                    if (old.peer_id == value) return;
+                    (old.stickers.Flyout as Flyout).Content = null; // Remove previous flyout to prevent crash on stickers opening
+                    this.dialog.Children.Clear();
+                }
+                var list = new Dialog(value);
+                this.dialog.Children.Add(list);
+                this.dialog.Children.Add(list.stickers_suggestions);
+            }
+        }
 
         public MainPage()
         {
@@ -21,7 +37,17 @@ namespace Alika
 
             this.chats_scroll.Content = this.chats_list;
             this.chats_scroll.ViewChanged += this.OnChatsScroll;
-            this.chats_list.SelectionChanged += this.OnChatSelection;
+
+            App.lp.OnNewMessage += (msg) =>
+            {
+                if (msg.peer_id == this.peer_id)
+                {
+                    App.UILoop.AddAction(new UITask
+                    {
+                        Action = () => this.chats_scroll.ChangeView(null, 0, null)
+                    });
+                }
+            };
 
             Task.Factory.StartNew(() =>
             {
@@ -31,63 +57,6 @@ namespace Alika
                     Action = () => App.cache.Update(App.vk.GetStickers().items)
                 });
                 App.cache.Update(App.vk.GetStickersKeywords().dictionary);
-            });
-        }
-
-        private void OnChatSelection(object sender, SelectionChangedEventArgs e)
-        {
-            App.UILoop.AddAction(new UITask
-            {
-                Action = () =>
-                {
-                    ChatItem selected = this.chats_list.SelectedItem as ChatItem;
-                    if (this.dialog.Children.Count > 0)
-                    {
-                        Dialog old = this.dialog.Children[0] as Dialog;
-                        if (old.peer_id == selected.peer_id) return;
-                        (old.stickers.Flyout as Flyout).Content = null; // Remove previous flyout to prevent crash on stickers opening
-                    }
-                    this.dialog.Children.Clear();
-                    var list = new Dialog(selected.peer_id);
-                    this.dialog.Children.Add(list);
-                    this.dialog.Children.Add(list.stickers_suggestions);
-                    this.peer_id = selected.peer_id;
-                },
-                Priority = CoreDispatcherPriority.High
-            });
-        }
-
-        /// <summary>
-        /// LongPoll updates processing
-        /// </summary>
-        /// <param name="updates">Updates</param>
-        public void OnLpUpdates(JToken updates)
-        {
-            App.UILoop.AddAction(new UITask
-            {
-                Action = () =>
-                {
-                    this.chats_list.ProcessUpdates(updates);
-                    if (this.chats_list.SelectedIndex != -1)
-                    {
-                        ChatItem selected = this.chats_list.SelectedItem as ChatItem;
-                        foreach (JToken update in updates)
-                        {
-                            if ((int)update[0] == 4)
-                            {
-                                Message msg = new Message(update);
-                                if (update[7] != null) msg = App.vk.Messages.GetById(new List<int> { msg.id }).messages[0];
-                                if (selected.peer_id == msg.peer_id)
-                                {
-                                    Dialog list = this.dialog.Children[0] as Dialog;
-                                    list.MessagesList.Messages.AddNewMessage(msg);
-                                    this.chats_scroll.ChangeView(null, 0, null);
-                                }
-                            }
-                        }
-                    }
-                },
-                Priority = CoreDispatcherPriority.Low
             });
         }
 
@@ -107,7 +76,7 @@ namespace Alika
                             double height = this.chats_scroll.ScrollableHeight;
                             this.chats_scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
                             this.chats_scroll.VerticalScrollMode = ScrollMode.Disabled;
-                            this.chats_list.LoadChats(offset: 1, count: 25, start_msg_id: this.chats_list.Items.Cast<ChatItem>().Select(item => item as ChatItem).ToList().Last().message.id);
+                            this.chats_list.LoadChats(offset: 1, count: 25, start_msg_id: this.chats_list.Items.Cast<ChatsList.ChatItem>().Select(item => item as ChatsList.ChatItem).ToList().Last().message.id);
                             this.chats_scroll.ChangeView(null, height, null);
                             this.chats_scroll.VerticalScrollMode = ScrollMode.Enabled;
                             this.chats_scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;

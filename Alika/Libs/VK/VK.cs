@@ -25,10 +25,7 @@ namespace Alika.Libs.VK
             this.user_id = this.Users.Get(new List<int>(), "photo_200")[0].user_id; // Getting current user's user_id & adding it's photo to cache
         }
 
-        public LongPoll GetLP()
-        {
-            return new LongPoll(this);
-        }
+        public LongPoll GetLP() => new LongPoll(this);
 
         /// <summary>
         /// Main method to call & deserialize api methods

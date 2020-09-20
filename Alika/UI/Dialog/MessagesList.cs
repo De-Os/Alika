@@ -84,6 +84,14 @@ namespace Alika.UI.Dialog
                 var messages = App.vk.Messages.GetHistory(this.peer_id).messages;
                 messages.Reverse();
                 messages.ForEach((Message msg) => this.AddNewMessage(msg));
+
+                App.lp.OnNewMessage += (msg) =>
+                {
+                    if (msg.peer_id == this.peer_id) App.UILoop.RunAction(new UITask
+                    {
+                        Action = () => this.AddNewMessage(msg)
+                    });
+                };
             }
 
             public void AddNewMessage(Message message)

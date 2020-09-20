@@ -1,7 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using Alika.Libs.VK.Responses;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Alika.Libs.VK.Longpoll
@@ -17,12 +19,15 @@ namespace Alika.Libs.VK.Longpoll
 
         public delegate void LPHandler(JToken lpevent);
         public event LPHandler Event;
+        public delegate void NewMessage(Message message);
+        public event NewMessage OnNewMessage;
 
         public LongPoll(VK vk)
         {
             this.vk = vk;
             this.stop = true;
             this.Generate();
+            this.Event += this.CustomEventProcessing;
             _ = this.StartListening();
         }
 
@@ -78,6 +83,20 @@ namespace Alika.Libs.VK.Longpoll
                     }
                     catch { }
                 }
+            });
+        }
+
+        private void CustomEventProcessing(JToken updates)
+        {
+            if (updates.Count() == 0) return;
+            Task.Factory.StartNew(() =>
+            {
+                List<int> msg_ids = new List<int>();
+                foreach (JToken update in updates)
+                {
+                    if ((int)update[0] == 4) msg_ids.Add((int)update[1]);
+                }
+                if (msg_ids.Count > 0) foreach (Message msg in this.vk.Messages.GetById(msg_ids).messages) this.OnNewMessage?.Invoke(msg);
             });
         }
     }

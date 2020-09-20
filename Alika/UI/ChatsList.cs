@@ -1,10 +1,12 @@
 ﻿using Alika.Libs.VK.Responses;
-using Newtonsoft.Json.Linq;
-using System;
+using Alika.UI.Misc;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
+using Windows.UI.Text;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
 namespace Alika.UI
@@ -14,95 +16,148 @@ namespace Alika.UI
         public ListView chats = new ListView();
         public ChatsList()
         {
+            this.SelectionChanged += (a, b) =>
+            {
+                if (this.SelectedItem is ChatItem i)
+                {
+                    if (i.peer_id != App.main_page.peer_id) App.main_page.peer_id = i.peer_id;
+                }
+            };
             this.LoadChats(0);
+            App.lp.OnNewMessage += this.ProcessMessage;
         }
 
-        public async void LoadChats(int offset, int count = 50, int start_msg_id = 0)
+        public void LoadChats(int offset, int count = 50, int start_msg_id = 0)
         {
-            await Task.Factory.StartNew(() =>
+            Task.Factory.StartNew(() =>
               {
                   var conversations = App.vk.Messages.GetConversations(count: count, offset: offset, fields: "photo_200,online_info", start_message_id: start_msg_id).conversations;
                   List<ListViewItem> items = new List<ListViewItem>();
                   foreach (GetConversationsResponse.ConversationResponse conv in conversations)
                   {
-                      App.UILoop.AddAction(new UITask
+                      App.UILoop.RunAction(new UITask
                       {
-                          Action = () =>
-                          {
-                              if (conv.conversation.peer.id > 2000000000)
-                              {
-                                  this.Items.Add(new ChatItem(
-                                      peer_id: conv.conversation.peer.id,
-                                      avatar: conv.conversation.settings.photos?.photo_200,
-                                      name: conv.conversation.settings.title,
-                                      last_msg: conv.last_message
-                                  ));
-                              }
-                              else if (conv.conversation.peer.id < 0)
-                              {
-                                  var group = App.cache.GetGroup(conv.conversation.peer.id);
-                                  this.Items.Add(new ChatItem(
-                                       peer_id: conv.conversation.peer.id,
-                                       avatar: group.photo_200,
-                                       name: group.name,
-                                       last_msg: conv.last_message
-                                   ));
-
-                              }
-                              else
-                              {
-                                  var user = App.cache.GetUser(conv.conversation.peer.id);
-                                  this.Items.Add(new ChatItem(
-                                       peer_id: conv.conversation.peer.id,
-                                       avatar: user.photo_200,
-                                       name: user.first_name + " " + user.last_name,
-                                       last_msg: conv.last_message
-                                   ));
-                              }
-                          },
+                          Action = () => this.Items.Add(new ChatItem(conv.conversation.peer.id, conv.last_message)),
                           Priority = CoreDispatcherPriority.High
                       });
                   }
               });
         }
 
-        public async void ProcessUpdates(JToken updates)
+        public void ProcessMessage(Message msg)
         {
-            await Task.Factory.StartNew(async () =>
-              {
-                  await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                  {
-                      foreach (JToken update in updates)
-                      {
-                          if ((int)update[0] == 4)
-                          {
-                              Message msg = new Message(update);
-                              foreach (var item in this.Items)
-                              {
-                                  if (item as ChatItem != null)
-                                  {
-                                      ChatItem chat = item as ChatItem;
-                                      if (chat.peer_id == msg.peer_id)
-                                      {
-                                          bool first = (this.Items[0] as ChatItem).peer_id == msg.peer_id;
-                                          if (!first) try { this.Items.Remove(chat); } catch { }
-                                          chat.UpdateMsg(msg);
-                                          if (!first) this.Items.Insert(0, chat);
-                                          if (this.SelectedIndex != -1)
-                                          {
-                                              if ((this.SelectedItem as ChatItem).peer_id == msg.peer_id)
-                                              {
-                                                  // TODO: Scroll to top?
-                                              }
-                                          }
-                                          return;
-                                      }
-                                  }
-                              }
-                          };
-                      }
-                  });
-              });
+            App.UILoop.AddAction(new UITask
+            {
+                Action = () =>
+                {
+                    foreach (var item in this.Items)
+                    {
+                        if (item is ChatItem chat)
+                        {
+                            if (msg.peer_id == chat.peer_id && this.Items.IndexOf(chat) != 0)
+                            {
+                                this.Items.Remove(chat);
+                                this.Items.Insert(0, chat);
+                                break;
+                            }
+                        }
+                    }
+                },
+                Priority = CoreDispatcherPriority.Low
+            });
+        }
+
+
+
+        public class ChatItem : ListViewItem
+        {
+            public int peer_id;
+            public Message message;
+            public Grid grid = new Grid();
+            public Grid textGrid = new Grid();
+            public TextBlock nameBlock = new TextBlock
+            {
+                FontSize = 15,
+                FontWeight = FontWeights.Bold,
+                TextTrimming = TextTrimming.CharacterEllipsis
+            };
+            public TextBlock textBlock = new TextBlock
+            {
+                TextTrimming = TextTrimming.CharacterEllipsis
+            };
+            public Avatar image;
+            public ChatItem(int peer_id, Message last_msg)
+            {
+                this.peer_id = peer_id;
+                this.Height = 70;
+
+                this.grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) }); // Avatar
+                this.grid.ColumnDefinitions.Add(new ColumnDefinition()); // Text fields
+                this.textGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(10) }); // Top margin
+                this.textGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) }); // Chat name
+                this.textGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) }); // Message x
+                this.LoadAvatar();
+                this.nameBlock.Text = App.cache.GetName(this.peer_id).Text;
+                Grid.SetRow(this.nameBlock, 1);
+                this.UpdateMsg(last_msg);
+                Grid.SetRow(this.textBlock, 2);
+                this.textGrid.Children.Add(this.nameBlock);
+                this.textGrid.Children.Add(this.textBlock);
+                Grid.SetColumn(this.textGrid, 1);
+                this.grid.Children.Add(this.textGrid);
+                this.Content = this.grid;
+
+                App.lp.OnNewMessage += this.OnNewMessage;
+            }
+
+            private void OnNewMessage(Message msg)
+            {
+                if (msg.peer_id == this.peer_id)
+                {
+                    App.UILoop.AddAction(new UITask
+                    {
+                        Action = () => this.UpdateMsg(msg),
+                        Priority = CoreDispatcherPriority.Low
+                    });
+                }
+            }
+
+            public void LoadAvatar()
+            {
+                this.image = new Avatar(this.peer_id)
+                {
+                    Height = 50,
+                    Width = 50,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(10),
+                    OpenInfoOnClick = false
+                };
+                Grid.SetColumn(this.image, 0);
+                this.grid.Children.Add(this.image);
+            }
+
+            public void UpdateMsg(Message msg)
+            {
+                if (msg != null)
+                {
+                    if (msg.text.Length > 0)
+                    {
+                        msg.text = msg.text.Replace("\n", " ");
+                        MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(msg.text);
+                        if (pushes.Count > 0)
+                        {
+                            foreach (Match push in pushes)
+                            {
+                                msg.text = msg.text.Replace(push.Value, push.Value.Split("|").Last().Replace("]", ""));
+                            }
+                        }
+                    }
+                    else msg.text = "📁 Вложение";
+                    this.message = msg;
+                    this.textBlock.Text = this.message.text;
+                }
+            }
         }
     }
 }

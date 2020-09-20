@@ -28,8 +28,8 @@ namespace Alika
         public static UITasksLoop UILoop = new UITasksLoop();
         public static VK vk; // VK lib
         public static MainPage main_page; // Main page
-        public LongPoll lp; // LongPoll
-        public LoginPage login_page; // Login page
+        public static LongPoll lp; // LongPoll
+        private LoginPage login_page; // Login page
 
         public App()
         {
@@ -94,11 +94,10 @@ namespace Alika
                 Placeholder = Utils.LocString("Login/CaptchaPlaceholder"),
                 Button = new TextBlock { Text = Utils.LocString("Login/OkButton") }
             });
+            App.lp = vk.GetLP();
 
             App.main_page = new MainPage();
 
-            this.lp = vk.GetLP();
-            this.lp.Event += App.main_page.OnLpUpdates;
             (Window.Current.Content as Frame).Content = App.main_page;
         }
         void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
