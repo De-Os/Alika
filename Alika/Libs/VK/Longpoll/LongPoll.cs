@@ -57,7 +57,7 @@ namespace Alika.Libs.VK.Longpoll
                 {
                     try
                     {
-                        this.request.AddParameter("ts", this.ts);
+                        this.request.AddOrUpdateParameter("ts", this.ts);
                         string data = this.http.Get(this.request).Content;
                         if (data == null || data.Length == 0)
                         {

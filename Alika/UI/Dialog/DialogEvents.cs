@@ -21,8 +21,6 @@ namespace Alika.UI.Dialog
     {
         public void RegisterEvents()
         {
-            /*this.msg_scroll.ViewChanged += this.OnScroll;
-            this.messages.SizeChanged += this.FirstScroll;*/
             this.send_button.Click += this.Send;
             this.send_text.PreviewKeyDown += this.TextBoxPreviewKeyDown;
             this.send_text.PreviewKeyDown += this.TextPaste;

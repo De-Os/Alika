@@ -68,8 +68,6 @@ namespace Alika.UI
             });
         }
 
-
-
         public class ChatItem : ListViewItem
         {
             public int peer_id;

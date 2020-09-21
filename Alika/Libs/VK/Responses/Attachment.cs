@@ -220,6 +220,13 @@ namespace Alika.Libs.VK.Responses
             public int width { get; set; }
             [JsonProperty("height")]
             public int height { get; set; }
+            [JsonProperty("access_key", NullValueHandling = NullValueHandling.Ignore)]
+            public string access_key { get; set; }
+
+            public string ToAttachFormat()
+            {
+                return "doc" + this.owner_id.ToString() + "_" + this.id.ToString() + (this.access_key != null ? "_" + this.access_key : "");
+            }
         }
         public class AudioMessage
         {

@@ -1,8 +1,6 @@
 ﻿using Alika.Libs;
-using System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI.Dialog
 {
@@ -31,30 +29,8 @@ namespace Alika.UI.Dialog
             CornerRadius = new CornerRadius(10)
         };
         public Grid bottom_buttons_grid = new Grid();
-        public Button send_button = new Button
-        {
-            Content = new Image
-            {
-                Source = new SvgImageSource(new Uri(Utils.AssetTheme("send.svg"))),
-                Height = 20
-            },
-            Width = 50,
-            Margin = new Thickness(5, 10, 20, 10),
-            HorizontalAlignment = HorizontalAlignment.Right,
-            Background = Coloring.Transparent.Full
-        };
-        public Button stickers = new Button
-        {
-            Content = new Image
-            {
-                Source = new SvgImageSource(new Uri(Utils.AssetTheme("sticker.svg"))),
-                Height = 20
-            },
-            Width = 50,
-            Margin = new Thickness(5, 10, 5, 10),
-            HorizontalAlignment = HorizontalAlignment.Right,
-            Background = Coloring.Transparent.Full
-        };
+        public Button send_button = new Buttons.Send();
+        public Button stickers = new Buttons.Stickers();
         public TextBox send_text = new TextBox
         {
             PlaceholderText = Utils.LocString("Dialog/TextBoxPlaceholder"),
@@ -64,24 +40,12 @@ namespace Alika.UI.Dialog
             TextWrapping = TextWrapping.Wrap,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
-        public Button attach_button = new Button
-        {
-            Content = new Image
-            {
-                Source = new SvgImageSource(new Uri(Utils.AssetTheme("clip.svg"))),
-                Width = 20,
-                Height = 20
-            },
-            Width = 50,
-            Margin = new Thickness(20, 10, 5, 10),
-            HorizontalAlignment = HorizontalAlignment.Left,
-            Background = Coloring.Transparent.Full
-        };
+        public Button attach_button = new Buttons.Attachment();
 
         public Dialog(int peer_id)
         {
             this.peer_id = peer_id;
-            App.cache.StickersSelector.peer_id = this.peer_id;
+            if (App.cache.StickersSelector != null) App.cache.StickersSelector.peer_id = this.peer_id;
 
             this.Render();
 

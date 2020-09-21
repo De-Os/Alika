@@ -204,6 +204,9 @@
     <value>Save</value>
     <comment>Save button text</comment>
   </data>
+  <data name="Send" xml:space="preserve">
+    <value>Send</value>
+  </data>
   <data name="TextBoxPlaceholder" xml:space="preserve">
     <value>Message...</value>
     <comment>Message TextBox placeholder</comment>

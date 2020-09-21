@@ -119,8 +119,10 @@ namespace Alika.Libs.VK.Methods
 
         public GetConversationMembersResponse GetConversationMembers(int peer_id, string fields = null)
         {
-            var request = new Dictionary<string, dynamic>();
-            request.Add("peer_id", peer_id);
+            var request = new Dictionary<string, dynamic>
+            {
+                { "peer_id", peer_id }
+            };
             if (fields != null) request.Add("fields", fields);
             var response = this._vk.Call<GetConversationMembersResponse>("messages.getConversationMembers", request);
             App.cache.Update(response.profiles);
@@ -163,12 +165,20 @@ namespace Alika.Libs.VK.Methods
         }
 
         /// <summary>
-        /// Uploading document from bytes (for uploading from Clipboard)
+        /// Uploading document from bytes (for uploading from Clipboard/graffiti)
         /// </summary>
         public object UploadDocument(byte[] bytes, int peer_id, string type = "doc")
         {
             RestRequest request = new RestRequest();
-            request.AddFile("file", bytes, "file.da");
+            switch (type)
+            {
+                case "doc":
+                    request.AddFile("file", bytes, "file.da");
+                    break;
+                case "graffiti":
+                    request.AddFile("file", bytes, "file.png");
+                    break;
+            }
             return this.UploadDocument(request, type, peer_id);
         }
         /// <summary>

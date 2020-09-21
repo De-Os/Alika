@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Graphics.Canvas;
+using Microsoft.Toolkit.Uwp.Helpers;
+using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -204,6 +206,28 @@ namespace Alika.Libs
             if (user.Count(c => c == ' ') != 1) return user;
             var split = user.Split(" ");
             return split[0] + " " + split[1].Substring(0, 1) + ".";
+        }
+
+        public async static Task<byte[]> ToByteArray(this InkCanvas canvas)
+        {
+            var strokes = canvas.InkPresenter.StrokeContainer;
+            if (strokes.GetStrokes().Count == 0) return null;
+            var file = await ApplicationData.Current.TemporaryFolder.CreateFileAsync("canvas.png", CreationCollisionOption.ReplaceExisting);
+            if (file != null)
+            {
+                CanvasDevice device = CanvasDevice.GetSharedDevice();
+                CanvasRenderTarget renderTarget = new CanvasRenderTarget(device, (int)canvas.ActualWidth, (int)canvas.ActualHeight, 96);
+                using (var ds = renderTarget.CreateDrawingSession())
+                {
+                    ds.DrawInk(canvas.InkPresenter.StrokeContainer.GetStrokes());
+                }
+                using (var fileStream = await file.OpenAsync(FileAccessMode.ReadWrite))
+                {
+                    await renderTarget.SaveAsync(fileStream, CanvasBitmapFileFormat.Png, 1f);
+                }
+                return await ApplicationData.Current.TemporaryFolder.ReadBytesFromFileAsync("canvas.png");
+            }
+            else return null;
         }
     }
 }

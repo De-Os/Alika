@@ -198,6 +198,9 @@
   <data name="Save" xml:space="preserve">
     <value>Сохранить</value>
   </data>
+  <data name="Send" xml:space="preserve">
+    <value>Отправить</value>
+  </data>
   <data name="TextBoxPlaceholder" xml:space="preserve">
     <value>Сообщение...</value>
   </data>
