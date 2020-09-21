@@ -251,13 +251,7 @@ namespace Alika.UI
                                 attach = new MessageAttachment.AudioMessage(att.audio_message);
                                 break;
                             case "graffiti":
-                                attach = new Image
-                                {
-                                    Height = att.graffiti.height / 2,
-                                    Width = att.graffiti.width / 2,
-                                    Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(att.graffiti.url)),
-                                    Margin = new Thickness(5)
-                                };
+                                attach = new MessageAttachment.Graffiti(att.graffiti);
                                 this.border.Background = Coloring.Transparent.Full;
                                 break;
                         }

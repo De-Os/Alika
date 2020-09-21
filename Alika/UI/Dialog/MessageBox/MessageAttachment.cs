@@ -341,6 +341,26 @@ namespace Alika.UI
             }
         }
 
+        public class Graffiti : Grid
+        {
+            public Image Image = new Image { 
+                Margin = new Thickness(5)
+            };
+            public Attachment.Graffiti Attachment;
+            public Graffiti(Attachment.Graffiti att)
+            {
+                this.Attachment = att;
+                this.Children.Add(this.Image);
+
+                this.LoadImage();
+            }
+
+            public async void LoadImage()
+            {
+                this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.Attachment.url));
+            }
+        }
+
         /// <summary>
         /// Uploaded file holder
         /// </summary>
