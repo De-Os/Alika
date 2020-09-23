@@ -8,6 +8,7 @@ namespace Alika.UI.Dialog
     /// <summary>
     /// Dialog grid
     /// </summary>
+    [Windows.UI.Xaml.Data.Bindable]
     public partial class Dialog : Grid
     {
         public int peer_id { get; set; }
@@ -54,7 +55,7 @@ namespace Alika.UI.Dialog
 
         public void Render()
         {
-            this.top_menu = new UI.Dialog.TopMenu(this.peer_id);
+            this.top_menu = new TopMenu(this.peer_id);
             this.MessagesList = new MessagesList(this.peer_id);
 
             this.RowDefinitions.Add(new RowDefinition { Height = new GridLength(60) });

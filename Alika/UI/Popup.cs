@@ -7,6 +7,7 @@ using Windows.UI.Xaml.Media;
 
 namespace Alika.UI
 {
+    [Windows.UI.Xaml.Data.Bindable]
     public class Popup : Grid
     {
         private Grid _content = new Grid
@@ -128,15 +129,6 @@ namespace Alika.UI
 
             Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
             // TODO: Other...
-        }
-
-        public class Separator : Grid
-        {
-            public Separator()
-            {
-                this.HorizontalAlignment = HorizontalAlignment.Stretch;
-                this.Height = 10;
-            }
         }
     }
 }

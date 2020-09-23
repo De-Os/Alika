@@ -24,6 +24,7 @@ namespace Alika.UI
         /// <summary>
         /// Photo holder
         /// </summary>
+        [Windows.UI.Xaml.Data.Bindable]
         public class Photo : Grid
         {
             public Attachment.Photo Picture { get; set; }
@@ -53,6 +54,7 @@ namespace Alika.UI
         /// <summary>
         /// Document holder
         /// </summary>
+        [Windows.UI.Xaml.Data.Bindable]
         public class Document : Button
         {
             public Attachment.Document document { get; set; }
@@ -133,6 +135,7 @@ namespace Alika.UI
         /// <summary>
         /// Sticker holder
         /// </summary>
+        [Windows.UI.Xaml.Data.Bindable]
         public class Sticker : Grid
         {
             public Attachment.Sticker StickerSource;
@@ -176,6 +179,7 @@ namespace Alika.UI
         /// <summary>
         /// Voice message holder
         /// </summary>
+        [Windows.UI.Xaml.Data.Bindable]
         public class AudioMessage : Grid
         {
             public MediaPlayer media = new MediaPlayer
@@ -341,6 +345,7 @@ namespace Alika.UI
             }
         }
 
+        [Windows.UI.Xaml.Data.Bindable]
         public class Graffiti : Grid
         {
             public Image Image = new Image { 
@@ -364,6 +369,7 @@ namespace Alika.UI
         /// <summary>
         /// Uploaded file holder
         /// </summary>
+        [Windows.UI.Xaml.Data.Bindable]
         public class Uploaded : Grid
         {
             public Button Remove = new Button

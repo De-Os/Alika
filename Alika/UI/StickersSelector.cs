@@ -16,6 +16,7 @@ namespace Alika.UI
     /// <summary>
     /// Main selector
     /// </summary>
+    [Windows.UI.Xaml.Data.Bindable]
     public class StickersSelector : Grid
     {
         public int peer_id { get; set; }
@@ -119,6 +120,7 @@ namespace Alika.UI
         /// <summary>
         /// Pack name with thumbnail
         /// </summary>
+        [Windows.UI.Xaml.Data.Bindable]
         public class StickerName : ListViewItem
         {
             public GetStickersResponse.StickerPackInfo Pack { get; set; }
@@ -163,6 +165,7 @@ namespace Alika.UI
         /// <summary>
         /// Pack stickers 
         /// </summary>
+        [Windows.UI.Xaml.Data.Bindable]
         public class StickerSet : Grid
         {
             public GetStickersResponse.StickerPackInfo PackInfo;
@@ -196,6 +199,7 @@ namespace Alika.UI
                 });
             }
 
+            [Windows.UI.Xaml.Data.Bindable]
             public class StickerHolder : Grid
             {
                 public Attachment.Sticker Sticker;
@@ -210,7 +214,7 @@ namespace Alika.UI
                 public StickerHolder(Attachment.Sticker sticker)
                 {
                     this.Sticker = sticker;
-                    this.CornerRadius = new Windows.UI.Xaml.CornerRadius(10);
+                    this.CornerRadius = new CornerRadius(10);
                     this.PointerPressed += (a, b) => Task.Factory.StartNew(() => App.vk.Messages.Send(App.cache.StickersSelector.peer_id, sticker_id: this.Sticker.sticker_id));
                     this.PointerEntered += (a, b) => this.Background = Coloring.Transparent.Percent(50); // Sticker "selection" by background color
                     this.PointerExited += (a, b) => this.Background = Coloring.Transparent.Full; // Remove selection

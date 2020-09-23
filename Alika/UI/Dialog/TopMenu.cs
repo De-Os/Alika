@@ -9,6 +9,7 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI.Dialog
 {
+    [Windows.UI.Xaml.Data.Bindable]
     public class TopMenu : Grid
     {
         public int peer_id;
@@ -99,7 +100,7 @@ namespace Alika.UI.Dialog
         public class FlyoutMenu : Flyout
         {
             public int peer_id;
-            public Grid content = new Grid();
+            public StackPanel content = new StackPanel();
 
             public FlyoutMenu(int peer_id)
             {
@@ -113,10 +114,9 @@ namespace Alika.UI.Dialog
                     this.Hide();
                 };
 
+                System.Diagnostics.Debug.WriteLine("Adding Information element");
                 Element info = new Element("Dialog/TopMenuInformation", "info.svg");
                 info.PointerPressed += (a, b) => new ChatInformation(App.main_page.peer_id);
-                Grid.SetRow(info, this.content.RowDefinitions.Count);
-                this.content.RowDefinitions.Add(new RowDefinition());
                 this.content.Children.Add(info);
 
                 Element attachs = new Element("Dialog/TopMenuAttachments", "album.svg");
@@ -128,8 +128,6 @@ namespace Alika.UI.Dialog
                         Title = Utils.LocString("Attachments/Attachments")
                     });
                 }; ;
-                Grid.SetRow(attachs, this.content.RowDefinitions.Count);
-                this.content.RowDefinitions.Add(new RowDefinition());
                 this.content.Children.Add(attachs);
 
                 /*if (this.peer_id > Limits.Messages.PEERSTART)

@@ -5,10 +5,7 @@ using System;
 
 namespace Alika.UI.Misc
 {
-    /*
-     Doesn't work in Release!
-     https://github.com/microsoft/microsoft-ui-xaml/issues/3300
-     */
+    [Windows.UI.Xaml.Data.Bindable]
     public class Avatar : PersonPicture
     {
         public bool NoDefaultPhoto { get; set; } = true; // Set to false if you need default camera avatar

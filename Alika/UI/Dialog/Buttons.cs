@@ -8,6 +8,7 @@ namespace Alika.UI.Dialog
 {
     public class Buttons
     {
+        [Windows.UI.Xaml.Data.Bindable]
         public class Send : Button
         {
             public Send()
@@ -25,6 +26,7 @@ namespace Alika.UI.Dialog
             }
         }
 
+        [Windows.UI.Xaml.Data.Bindable]
         public class Attachment : Button
         {
             public Attachment()
@@ -58,6 +60,7 @@ namespace Alika.UI.Dialog
             }
         }
 
+        [Windows.UI.Xaml.Data.Bindable]
         public class Stickers : Button
         {
             public Stickers()

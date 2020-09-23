@@ -3,7 +3,6 @@ using Alika.Libs.VK.Responses;
 using Microsoft.Toolkit.Uwp.Helpers;
 using System;
 using System.Collections.Generic;
-using Windows.Devices.AllJoyn;
 using Windows.Storage.Pickers;
 using Windows.UI.Core;
 using Windows.UI.Popups;
@@ -13,6 +12,7 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI.Dialog
 {
+    [Windows.UI.Xaml.Data.Bindable]
     public class GraffitiWindow : Grid
     {
         public delegate void CloseEvent();
@@ -95,7 +95,8 @@ namespace Alika.UI.Dialog
 
         private async void UsePhoto(object sender, RoutedEventArgs e)
         {
-            var picker = new FileOpenPicker { 
+            var picker = new FileOpenPicker
+            {
                 SuggestedStartLocation = PickerLocationId.PicturesLibrary
             };
             picker.FileTypeFilter.Add(".png");

@@ -7,6 +7,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace Alika.UI.Dialog
 {
+    [Windows.UI.Xaml.Data.Bindable]
     public class MessagesList : Grid
     {
         public int peer_id;
@@ -70,6 +71,7 @@ namespace Alika.UI.Dialog
             }
         }
 
+        [Windows.UI.Xaml.Data.Bindable]
         public class MessagesListView : ListView
         {
             public int peer_id;

@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI
 {
+    [Windows.UI.Xaml.Data.Bindable]
     public class ChatInformation : StackPanel
     {
         public int peer_id;
@@ -28,7 +29,7 @@ namespace Alika.UI
         };
 
         public ChatInformation(int peer_id)
-        {
+        {   
             this.peer_id = peer_id;
 
             if (peer_id == App.vk.user_id) return;
@@ -80,10 +81,12 @@ namespace Alika.UI
                 Content = this
             };
 
+
             App.UILoop.AddAction(new UITask
             {
                 Action = () => { App.main_page.popup.Children.Add(this.popup); }
             });
+
         }
 
         private void AddSeparator(double height = 30)
@@ -91,6 +94,7 @@ namespace Alika.UI
             this.Children.Add(new Grid { Height = height });
         }
 
+        [Windows.UI.Xaml.Data.Bindable]
         public class AvatarAndName : Grid
         {
             public PersonPicture Avatar = new PersonPicture
@@ -166,6 +170,7 @@ namespace Alika.UI
             }
         }
 
+        [Windows.UI.Xaml.Data.Bindable]
         public class AttachmentsList : StackPanel
         {
 
@@ -185,6 +190,7 @@ namespace Alika.UI
                 this.Children.Add(new Element("Attachments/VoiceMessages", "microphone.svg", "audio_message", peer_id));
             }
 
+            [Windows.UI.Xaml.Data.Bindable]
             public class Element : Button
             {
                 public Image Icon = new Image
@@ -438,6 +444,7 @@ namespace Alika.UI
                 this.Children.Add(members);
             }
 
+            [Windows.UI.Xaml.Data.Bindable]
             public class Element : Button
             {
                 public Image Icon = new Image
@@ -483,6 +490,7 @@ namespace Alika.UI
                 }
             }
 
+            [Windows.UI.Xaml.Data.Bindable]
             public class Permissions : StackPanel
             {
                 public static Dictionary<string, Type> Types = new Dictionary<string, Type> {
@@ -541,6 +549,7 @@ namespace Alika.UI
                     this.Children.Add(new Element("change_admins", permissions.change_admins));
                 }
 
+                [Windows.UI.Xaml.Data.Bindable]
                 public class Element : Grid
                 {
                     public Image Icon = new Image
@@ -584,6 +593,7 @@ namespace Alika.UI
                         this.Children.Add(button);
                     }
 
+                    [Windows.UI.Xaml.Data.Bindable]
                     public class ChangeButton : Button
                     {
                         private readonly Grid _content = new Grid();
@@ -626,6 +636,7 @@ namespace Alika.UI
                             fl.StateChanged += (s) => this.state.Text = StateNamings[s];
                         }
 
+                        [Windows.UI.Xaml.Data.Bindable]
                         public class FlyOut : Flyout
                         {
                             public delegate void Changed(string newtype);
@@ -691,6 +702,7 @@ namespace Alika.UI
                 }
             }
 
+            [Windows.UI.Xaml.Data.Bindable]
             public class Members : Grid
             {
                 private int peer_id;
@@ -738,6 +750,7 @@ namespace Alika.UI
                     });
                 }
 
+                [Windows.UI.Xaml.Data.Bindable]
                 public class Member : Grid
                 {
                     public PersonPicture Avatar = new PersonPicture
@@ -847,7 +860,7 @@ namespace Alika.UI
                         this.Avatar.ProfilePicture = await ImageCache.Instance.GetFromCacheAsync(new Uri(App.cache.GetAvatar(this.member.member_id)));
                     }
 
-
+                    [Windows.UI.Xaml.Data.Bindable]
                     public class Actions : Flyout
                     {
                         public delegate void Event(GetConversationMembersResponse.Member member);
@@ -949,6 +962,7 @@ namespace Alika.UI
                         }
                     }
 
+                    [Windows.UI.Xaml.Data.Bindable]
                     public class Information : Flyout
                     {
                         public Information(GetConversationMembersResponse.Member member)
@@ -976,6 +990,7 @@ namespace Alika.UI
                 }
             }
 
+            [Windows.UI.Xaml.Data.Bindable]
             public class Settings : Grid
             {
                 public delegate void Event(string str);

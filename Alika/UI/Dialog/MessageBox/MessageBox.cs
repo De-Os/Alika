@@ -16,6 +16,7 @@ namespace Alika.UI
     /// <summary>
     /// Message box which holds MessageGrid (needed for future features)
     /// </summary>
+    [Windows.UI.Xaml.Data.Bindable]
     class MessageBox : ListViewItem
     {
         public MessageGrid message { get; set; }
@@ -32,6 +33,7 @@ namespace Alika.UI
         /// <summary>
         /// Grid with avatar & text
         /// </summary>
+        [Windows.UI.Xaml.Data.Bindable]
         public class MessageGrid : Grid
         {
             public TextBubble textBubble { get; set; }
@@ -84,6 +86,7 @@ namespace Alika.UI
         /// <summary>
         /// Name,text, attachments & buttons holder
         /// </summary>
+        [Windows.UI.Xaml.Data.Bindable]
         public class TextBubble : Grid
         {
             public Message message { get; set; }

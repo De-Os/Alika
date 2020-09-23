@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace Alika.UI
 {
+    [Windows.UI.Xaml.Data.Bindable]
     public class ChatsList : ListView
     {
         public ListView chats = new ListView();
@@ -68,6 +69,7 @@ namespace Alika.UI
             });
         }
 
+        [Windows.UI.Xaml.Data.Bindable]
         public class ChatItem : ListViewItem
         {
             public int peer_id;
