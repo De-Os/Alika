@@ -1,6 +1,5 @@
 ﻿using Alika.Libs.VK.Responses;
 using Alika.UI.Misc;
-using Microsoft.Toolkit.Uwp.UI;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -17,7 +16,7 @@ namespace Alika.UI
     /// Message box which holds MessageGrid (needed for future features)
     /// </summary>
     [Windows.UI.Xaml.Data.Bindable]
-    class MessageBox : ListViewItem
+    public class MessageBox : ContentControl
     {
         public MessageGrid message { get; set; }
 
@@ -232,7 +231,7 @@ namespace Alika.UI
             {
                 if (this.message.attachments != null && this.message.attachments.Count > 0)
                 {
-                    this.message.attachments.ForEach(async (Attachment att) =>
+                    this.message.attachments.ForEach((Attachment att) =>
                     {
                         FrameworkElement attach = null;
                         switch (att.type)

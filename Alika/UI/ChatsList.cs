@@ -3,7 +3,6 @@ using Alika.Libs.VK.Responses;
 using Alika.UI.Misc;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.UI.Core;
 using Windows.UI.Text;
@@ -60,10 +59,11 @@ namespace Alika.UI
                             {
                                 this.Items.Remove(chat);
                                 this.Items.Insert(0, chat);
-                                break;
+                                return;
                             }
                         }
                     }
+                    //this.Items.Insert(0, new ChatItem(msg.peer_id, msg));
                 },
                 Priority = CoreDispatcherPriority.Low
             });
@@ -99,7 +99,7 @@ namespace Alika.UI
                 this.textGrid.RowDefinitions.Add(new RowDefinition()); // Chat name
                 this.textGrid.RowDefinitions.Add(new RowDefinition()); // Message x
                 this.LoadAvatar();
-                this.nameBlock.Text = App.cache.GetName(this.peer_id).Text;
+                this.nameBlock.Text = App.cache.GetName(this.peer_id);
                 Grid.SetRow(this.nameBlock, 0);
                 this.UpdateMsg(last_msg);
                 Grid.SetRow(this.textBlock, 1);
@@ -143,59 +143,13 @@ namespace Alika.UI
             {
                 this.message = msg;
                 string text = this.FormatName(msg.from_id) + ": ";
-                if (msg.text.Length > 0)
-                {
-                    string temptext = msg.text.Replace("\n", " ");
-                    MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(msg.text);
-                    if (pushes.Count > 0)
-                    {
-                        foreach (Match push in pushes)
-                        {
-                            temptext = temptext.Replace(push.Value, push.Value.Split("|").Last().Replace("]", ""));
-                        }
-                    }
-                    text += temptext;
-                }
-                else
-                {
-                    if (msg.attachments != null && msg.attachments.Count > 0)
-                    {
-                        switch (msg.attachments[0].type)
-                        {
-                            case "photo":
-                                text += "📷 " + Utils.LocString("Attachments/Photo");
-                                break;
-                            case "video":
-                                text += "📽 " + Utils.LocString("Attachments/Video");
-                                break;
-                            case "audio_message":
-                                text += "🎤 " + Utils.LocString("Attachments/VoiceMessage");
-                                break;
-                            case "link":
-                                text += "🔗 " + Utils.LocString("Attachments/Link");
-                                break;
-                            case "sticker":
-                                text += "😀 " + Utils.LocString("Attachments/Sticker");
-                                break;
-                            case "gift":
-                                text += "🎁 " + Utils.LocString("Attachments/Gift");
-                                break;
-                            case "doc":
-                                text += "📂 " + Utils.LocString("Attachments/Document");
-                                break;
-                            case "graffiti":
-                                text += "🖌 " + Utils.LocString("Attachments/Graffiti");
-                                break;
-                        }
-                    }
-                }
-                this.textBlock.Text = text;
+                this.textBlock.Text = text + this.message.ToCompactText();
             }
 
             private string FormatName(int id)
             {
                 if (id == App.vk.user_id) return Utils.LocString("Dialog/You");
-                var name = App.cache.GetName(id).Text;
+                var name = App.cache.GetName(id);
                 if (name.Count(c => c == ' ') != 1 || this.peer_id > Libs.VK.Limits.Messages.PEERSTART) return name;
                 return name.Split(" ")[0];
             }

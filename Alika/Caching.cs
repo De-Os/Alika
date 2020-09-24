@@ -3,7 +3,6 @@ using Alika.Libs.VK;
 using Alika.Libs.VK.Responses;
 using Alika.UI;
 using System.Collections.Generic;
-using Windows.UI.Xaml.Controls;
 using static Alika.Libs.VK.Responses.GetConversationsResponse;
 
 namespace Alika
@@ -141,26 +140,24 @@ namespace Alika
             }
         }
 
-        public TextBlock GetName(int id)
+        public string GetName(int id)
         {
-            TextBlock text = new TextBlock();
             if (id > Limits.Messages.PEERSTART)
             {
-                text.Text = this.GetConversation(id).settings.title;
+                return this.GetConversation(id).settings.title;
             }
             else
             {
                 if (id < 0)
                 {
-                    text.Text = this.GetGroup(id).name;
+                    return this.GetGroup(id).name;
                 }
                 else
                 {
                     var user = this.GetUser(id);
-                    text.Text = user.first_name + " " + user.last_name;
+                    return user.first_name + " " + user.last_name;
                 }
             }
-            return text;
         }
 
         public User GetUser(int user_id)

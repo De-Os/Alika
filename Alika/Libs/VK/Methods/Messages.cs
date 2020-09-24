@@ -18,13 +18,14 @@ namespace Alika.Libs.VK.Methods
         /// <summary>
         /// messages.send
         /// </summary>
-        public int Send(int peer_id, string text = null, string payload = null, List<string> attachments = null, int? sticker_id = null)
+        public int Send(int peer_id, string text = null, string payload = null, List<string> attachments = null, int? sticker_id = null, int reply_to = 0)
         {
             var request = new Dictionary<string, dynamic>
             {
                 { "random_id", 0 },
                 { "peer_id", peer_id }
             };
+            if (reply_to != 0) request.Add("reply_to", reply_to);
             if (sticker_id != null) request.Add("sticker_id", sticker_id);
             if (text != null) request.Add("message", text);
             if (payload != null) request.Add("payload", payload);

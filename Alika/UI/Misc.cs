@@ -13,7 +13,7 @@ namespace Alika.UI.Misc
 
         public Avatar(int id)
         {
-            this.DisplayName = App.cache.GetName(id).Text;
+            this.DisplayName = App.cache.GetName(id);
             this.LoadAvatar(App.cache.GetAvatar(id));
 
             this.PointerPressed += (a, b) =>

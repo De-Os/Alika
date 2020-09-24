@@ -29,7 +29,7 @@ namespace Alika.UI
         };
 
         public ChatInformation(int peer_id)
-        {   
+        {
             this.peer_id = peer_id;
 
             if (peer_id == App.vk.user_id) return;
@@ -161,7 +161,7 @@ namespace Alika.UI
 
             public void LoadTitle()
             {
-                this.Title.Text = App.cache.GetName(this.conv.peer.id).Text;
+                this.Title.Text = App.cache.GetName(this.conv.peer.id);
             }
 
             public async void LoadImage(string uri)
@@ -851,7 +851,7 @@ namespace Alika.UI
 
                     public void GenerateName()
                     {
-                        this.name.Text = App.cache.GetName(this.member.member_id).Text;
+                        this.name.Text = App.cache.GetName(this.member.member_id);
                         if (member.is_admin) this.name.Text += " ⭐";
                     }
 
@@ -979,7 +979,7 @@ namespace Alika.UI
                             {
                                 stack.Children.Add(new TextBlock
                                 {
-                                    Text = Utils.LocString("Dialog/JoinedInfo").Replace("%user%", App.cache.GetName(member.invited_by).Text),
+                                    Text = Utils.LocString("Dialog/JoinedInfo").Replace("%user%", App.cache.GetName(member.invited_by)),
                                     VerticalAlignment = VerticalAlignment.Center
                                 });
                             }

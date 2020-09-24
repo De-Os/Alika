@@ -348,7 +348,8 @@ namespace Alika.UI
         [Windows.UI.Xaml.Data.Bindable]
         public class Graffiti : Grid
         {
-            public Image Image = new Image { 
+            public Image Image = new Image
+            {
                 Margin = new Thickness(5)
             };
             public Attachment.Graffiti Attachment;

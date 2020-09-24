@@ -1,10 +1,12 @@
-﻿using Microsoft.Graphics.Canvas;
+﻿using Alika.Libs.VK.Responses;
+using Microsoft.Graphics.Canvas;
 using Microsoft.Toolkit.Uwp.Helpers;
 using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Resources;
@@ -228,6 +230,58 @@ namespace Alika.Libs
                 return await ApplicationData.Current.TemporaryFolder.ReadBytesFromFileAsync("canvas.png");
             }
             else return null;
+        }
+
+        public static string ToCompactText(this Message msg)
+        {
+            string text = "";
+            if (msg.text.Length > 0)
+            {
+                string temptext = msg.text.Replace("\n", " ");
+                MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(msg.text);
+                if (pushes.Count > 0)
+                {
+                    foreach (Match push in pushes)
+                    {
+                        temptext = temptext.Replace(push.Value, push.Value.Split("|").Last().Replace("]", ""));
+                    }
+                }
+                text += temptext;
+            }
+            else
+            {
+                if (msg.attachments != null && msg.attachments.Count > 0)
+                {
+                    switch (msg.attachments[0].type)
+                    {
+                        case "photo":
+                            text += "📷 " + Utils.LocString("Attachments/Photo");
+                            break;
+                        case "video":
+                            text += "📽 " + Utils.LocString("Attachments/Video");
+                            break;
+                        case "audio_message":
+                            text += "🎤 " + Utils.LocString("Attachments/VoiceMessage");
+                            break;
+                        case "link":
+                            text += "🔗 " + Utils.LocString("Attachments/Link");
+                            break;
+                        case "sticker":
+                            text += "😀 " + Utils.LocString("Attachments/Sticker");
+                            break;
+                        case "gift":
+                            text += "🎁 " + Utils.LocString("Attachments/Gift");
+                            break;
+                        case "doc":
+                            text += "📂 " + Utils.LocString("Attachments/Document");
+                            break;
+                        case "graffiti":
+                            text += "🖌 " + Utils.LocString("Attachments/Graffiti");
+                            break;
+                    }
+                }
+            }
+            return text;
         }
     }
 }

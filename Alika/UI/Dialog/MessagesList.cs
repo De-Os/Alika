@@ -62,7 +62,7 @@ namespace Alika.UI.Dialog
 
         private void NewMessageScroll()
         {
-            if (this.Messages.Items.LastOrDefault(l => l != this.Messages.Items.LastOrDefault() as MessageBox) is MessageBox msg)
+            if (this.Messages.Items.LastOrDefault(l => l != this.Messages.Items.LastOrDefault() as UIElement) is UIElement msg)
             {
                 if (this.Scroll.IsElementVisible(msg))
                 {
@@ -106,7 +106,7 @@ namespace Alika.UI.Dialog
                         msg.Loaded += (a, b) => this.OnNewMessage?.Invoke(true);
                         if (this.Items.Count > 0)
                         {
-                            if (this.Items.LastOrDefault() is MessageBox prev && prev.message.textBubble.message.from_id == message.from_id)
+                            if (this.Items.LastOrDefault() is SwipeMessage s && s.Message is MessageBox prev && prev.message.textBubble.message.from_id == message.from_id)
                             {
                                 prev.message.avatar.Visibility = Visibility.Collapsed;
                                 Thickness prevMargin = prev.message.textBubble.border.Margin;
@@ -130,7 +130,7 @@ namespace Alika.UI.Dialog
                                 msg.message.textBubble.border.Margin = new Thickness(10, 2.5, 10, 5);
                             }
                         }
-                        this.Items.Add(msg);
+                        this.Items.Add(new SwipeMessage(msg));
                     }
                 });
             }
@@ -144,7 +144,7 @@ namespace Alika.UI.Dialog
                     {
                         if (this.Items.Count > 0)
                         {
-                            if (this.Items.FirstOrDefault() is MessageBox next && next.message.textBubble.message.from_id == message.from_id)
+                            if (this.Items.FirstOrDefault() is SwipeMessage s && s.Message is MessageBox next && next.message.textBubble.message.from_id == message.from_id)
                             {
                                 next.message.avatar.Visibility = Visibility.Visible;
                                 next.message.textBubble.name.Visibility = Visibility.Collapsed;
@@ -170,9 +170,48 @@ namespace Alika.UI.Dialog
                             }
                         }
                         msg.Loaded += (a, b) => this.OnNewMessage?.Invoke(false);
-                        this.Items.Add(msg);
+                        this.Items.Add(new SwipeMessage(msg));
                     }
                 });
+            }
+
+            public class SwipeMessage : SwipeControl
+            {
+                public MessageBox Message;
+
+                public SwipeMessage(MessageBox message)
+                {
+                    this.Message = message;
+                    this.Content = this.Message;
+
+                    this.GenerateItems();
+                }
+
+                public void GenerateItems()
+                {
+                    var leftItems = new SwipeItems
+                    {
+                        Mode = SwipeMode.Execute
+                    };
+                    var item = new SwipeItem
+                    {
+                        IconSource = new FontIconSource
+                        {
+                            Glyph = "\uE8CA"
+                        },
+                        Text = Utils.LocString("Dialog/Reply")
+                    };
+                    item.Invoked += (a, b) =>
+                    {
+                        var reply = (App.main_page.dialog.Children[0] as Dialog).reply_grid;
+                        var msg = this.Message.message.textBubble.message;
+                        if (reply.Content is Dialog.ReplyMessage prev && prev.Message.id == msg.id) return;
+                        reply.Content = new Dialog.ReplyMessage(msg);
+                    };
+                    leftItems.Add(item);
+
+                    this.LeftItems = leftItems;
+                }
             }
         }
     }

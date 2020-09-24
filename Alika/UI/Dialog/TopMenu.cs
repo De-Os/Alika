@@ -34,7 +34,7 @@ namespace Alika.UI.Dialog
 
         public void LoadTitles()
         {
-            string title = App.cache.GetName(this.peer_id).Text;
+            string title = App.cache.GetName(this.peer_id);
             string desc;
             if (this.peer_id > 0)
             {
@@ -114,7 +114,6 @@ namespace Alika.UI.Dialog
                     this.Hide();
                 };
 
-                System.Diagnostics.Debug.WriteLine("Adding Information element");
                 Element info = new Element("Dialog/TopMenuInformation", "info.svg");
                 info.PointerPressed += (a, b) => new ChatInformation(App.main_page.peer_id);
                 this.content.Children.Add(info);

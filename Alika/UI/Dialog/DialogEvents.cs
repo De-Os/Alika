@@ -14,6 +14,7 @@ using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media.Animation;
 
 namespace Alika.UI.Dialog
 {
@@ -187,7 +188,10 @@ namespace Alika.UI.Dialog
         public void Send(object sender, RoutedEventArgs e)
         {
             string text = this.send_text.Text.Replace("\r\n", "\n").Replace("\r", "\n"); // i hate \r\n
+            int reply = 0;
+            if (this.reply_grid.Content is ReplyMessage rep) reply = rep.Message.id;
             this.send_text.Text = "";
+            this.reply_grid.Content = null;
             List<string> attachments = new List<String>();
             if (this.attach_grid.Children.Count > 0)
             {
@@ -206,7 +210,7 @@ namespace Alika.UI.Dialog
                     while (text.Length > 0 || attachments.Count > 0)
                     {
                         temptext = text.Substring(0, text.Length > Limits.Messages.MAX_LENGTH ? Limits.Messages.MAX_LENGTH : text.Length);
-                        try { App.vk.Messages.Send(this.peer_id, text: temptext, attachments: attachments.Count > 0 ? attachments : null); } catch { break; }
+                        try { App.vk.Messages.Send(this.peer_id, text: temptext, attachments: attachments.Count > 0 ? attachments : null, reply_to: reply); } catch { break; }
                         text = text.Substring(temptext.Length);
                         attachments = new List<string>();
                     }
@@ -307,6 +311,7 @@ namespace Alika.UI.Dialog
                 try
                 {
                     Grid grid = new Grid();
+                    grid.Transitions.Add(new EntranceThemeTransition { IsStaggeringEnabled = true });
                     App.cache.StickerDictionary[text].ForEach((sticker) =>
                     {
                         var holder = new StickerSuggestionHolder(sticker);

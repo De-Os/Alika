@@ -1,6 +1,12 @@
 ﻿using Alika.Libs;
+using Alika.Libs.VK.Responses;
+using System;
+using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI.Dialog
 {
@@ -20,10 +26,17 @@ namespace Alika.UI.Dialog
             MaxHeight = 100,
             HorizontalAlignment = HorizontalAlignment.Left
         };
+        public ContentControl reply_grid = new ContentControl
+        {
+            HorizontalContentAlignment = HorizontalAlignment.Stretch
+        };
         public Grid stickers_suggestions = new Grid
         {
             Height = 100,
-            Background = Coloring.Transparent.Percent(25),
+            Background = new AcrylicBrush { 
+                TintColor = Coloring.Transparent.Percent(25).Color,
+                TintOpacity = 0.7
+            },
             VerticalAlignment = VerticalAlignment.Bottom,
             HorizontalAlignment = HorizontalAlignment.Left,
             Visibility = Visibility.Collapsed,
@@ -87,9 +100,11 @@ namespace Alika.UI.Dialog
             };
 
             Grid.SetRow(scroll, 0);
+            Grid.SetRow(this.reply_grid, 1);
             Grid.SetRow(this.bottom_buttons_grid, 2);
 
             this.bottom_menu.Children.Add(scroll);
+            this.bottom_menu.Children.Add(this.reply_grid);
             this.bottom_menu.Children.Add(this.bottom_buttons_grid);
 
             this.bottom_buttons_grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
@@ -114,6 +129,86 @@ namespace Alika.UI.Dialog
                 HorizontalScrollMode = ScrollMode.Auto,
                 HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
             });
+        }
+
+        public class ReplyMessage : Grid
+        {
+            public Message Message;
+            public ReplyMessage(Message msg)
+            {
+                this.Message = msg;
+
+                this.Margin = new Thickness(10, 5, 10, 5);
+                this.Transitions.Add(new EntranceThemeTransition { IsStaggeringEnabled = true });
+
+                this.Load();
+            }
+
+            private void Load()
+            {
+                this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+                this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+
+                var rect = new Windows.UI.Xaml.Shapes.Rectangle
+                {
+                    Fill = new SolidColorBrush(new Windows.UI.Color
+                    {
+                        A = 255,
+                        R = 75,
+                        G = 119,
+                        B = 168
+                    }),
+                    Width = 5,
+                    Margin = new Thickness(0, 0, 10, 0)
+                };
+                Grid.SetColumn(rect, 0);
+                this.Children.Add(rect);
+
+                var text = new Grid();
+                text.RowDefinitions.Add(new RowDefinition());
+                text.RowDefinitions.Add(new RowDefinition());
+                Grid.SetColumn(text, 1);
+
+                var name = new TextBlock
+                {
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    TextTrimming = TextTrimming.CharacterEllipsis,
+                    Text = App.cache.GetName(this.Message.from_id),
+                    FontWeight = FontWeights.Bold
+                };
+                Grid.SetRow(name, 0);
+                var msg = new TextBlock
+                {
+                    VerticalAlignment = VerticalAlignment.Top,
+                    TextTrimming = TextTrimming.CharacterEllipsis,
+                    Text = this.Message.ToCompactText()
+                };
+                Grid.SetRow(msg, 1);
+
+                text.Children.Add(msg);
+                text.Children.Add(name);
+
+                var cross = new Button
+                {
+                    Background = Coloring.Transparent.Full,
+                    Content = new Image
+                    {
+                        Source = new SvgImageSource(new Uri(Utils.AssetTheme("close.svg"))),
+                        Height = 20,
+                        Width = 20,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center
+                    },
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                cross.Click += (a, b) => (this.Parent as ContentControl).Content = null;
+                Grid.SetColumn(cross, 2);
+
+                this.Children.Add(cross);
+                this.Children.Add(text);
+            }
         }
     }
 }

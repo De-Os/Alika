@@ -4,6 +4,7 @@ using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 
 namespace Alika.UI
 {
@@ -96,6 +97,9 @@ namespace Alika.UI
                 G = (byte)0,
                 B = (byte)0
             });
+
+            this.Transitions.Add(new PopupThemeTransition());
+
             this._content.PointerEntered += (a, b) => this.IsPointerOnContent = true;
             this._content.PointerExited += (a, b) => this.IsPointerOnContent = false;
 

@@ -200,6 +200,9 @@
   <data name="RemovePhoto" xml:space="preserve">
     <value>Remove  photo</value>
   </data>
+  <data name="Reply" xml:space="preserve">
+    <value>Reply</value>
+  </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
     <comment>Save button text</comment>
