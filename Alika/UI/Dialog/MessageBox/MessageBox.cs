@@ -38,6 +38,11 @@ namespace Alika.UI
         {
             public TextBubble textBubble { get; set; }
             public Avatar avatar;
+            public TextBlock time = new TextBlock { 
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Margin = new Thickness(0, 0, 0, 10),
+                Foreground = Coloring.InvertedTransparent.Percent(50)
+            };
 
             public MessageGrid(Message msg, int peer_id)
             {
@@ -47,25 +52,31 @@ namespace Alika.UI
                 this.textBubble = new TextBubble(msg, peer_id);
 
                 this.LoadAvatar(msg.from_id);
+                this.time.Text = msg.date.ToDateTime().ToString("HH:mm");
 
                 // Changing avatar position if message from current user
                 if (msg.from_id == App.vk.user_id)
                 {
+                    this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                     this.ColumnDefinitions.Add(new ColumnDefinition());
                     this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(50) });
-                    Grid.SetColumn(this.textBubble, 0);
-                    Grid.SetColumn(this.avatar, 1);
+                    Grid.SetColumn(this.time, 0);
+                    Grid.SetColumn(this.textBubble, 1);
+                    Grid.SetColumn(this.avatar, 2);
                 }
                 else
                 {
                     this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(50) });
                     this.ColumnDefinitions.Add(new ColumnDefinition());
+                    this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                     Grid.SetColumn(this.avatar, 0);
                     Grid.SetColumn(this.textBubble, 1);
+                    Grid.SetColumn(this.time, 2);
                 }
 
                 this.Children.Add(this.textBubble);
                 this.Children.Add(this.avatar);
+                this.Children.Add(this.time);
 
                 this.RightTapped += (a, b) => new MessageFlyout(msg).ShowAt(this, b.GetPosition(b.OriginalSource as UIElement));
             }

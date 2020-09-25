@@ -36,6 +36,36 @@ namespace Alika.UI
             /// <param name="percent">Opacity percents</param>
             public static SolidColorBrush Percent(int percent) => Coloring.Transparent.Percent((double)percent / 100);
         }
+        public static class InvertedTransparent
+        {
+            /// <summary>
+            /// Fully transparent
+            /// </summary>
+            public static SolidColorBrush Full = new SolidColorBrush(new Color
+            {
+                A = 0,
+                R = 0,
+                G = 0,
+                B = 0
+            });
+
+            public static SolidColorBrush Percent(double percent)
+            {
+                return new SolidColorBrush(new Color
+                {
+                    A = Convert.ToByte(Math.Round(255 * percent)),
+                    R = (byte)(App.systemDarkTheme ? 255 : 0),
+                    G = (byte)(App.systemDarkTheme ? 255 : 0),
+                    B = (byte)(App.systemDarkTheme ? 255 :0)
+                });
+            }
+
+            /// <summary>
+            /// Percent transparency
+            /// </summary>
+            /// <param name="percent">Opacity percents</param>
+            public static SolidColorBrush Percent(int percent) => Coloring.InvertedTransparent.Percent((double)percent / 100);
+        }
         public static class MessageBox
         {
             public static class TextBubble
