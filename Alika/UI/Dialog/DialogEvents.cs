@@ -82,7 +82,13 @@ namespace Alika.UI.Dialog
                     {
                         if (holder.Selected)
                         {
-                            Task.Factory.StartNew(() => App.vk.Messages.Send(this.peer_id, sticker_id: holder.Sticker.sticker_id));
+                            var reply_id = 0;
+                            if (this.reply_grid.Content is ReplyMessage reply)
+                            {
+                                this.reply_grid.Content = null;
+                                reply_id = reply.Message.id;
+                            }
+                            Task.Factory.StartNew(() => App.vk.Messages.Send(this.peer_id, sticker_id: holder.Sticker.sticker_id, reply_to: reply_id));
                             this.send_text.Text = "";
                             return;
                         }

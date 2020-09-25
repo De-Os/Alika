@@ -1,4 +1,5 @@
-﻿using Alika.Libs.VK.Responses;
+﻿using Alika.Libs;
+using Alika.Libs.VK.Responses;
 using Alika.UI.Misc;
 using System;
 using System.Collections.Generic;
@@ -65,6 +66,8 @@ namespace Alika.UI
 
                 this.Children.Add(this.textBubble);
                 this.Children.Add(this.avatar);
+
+                this.RightTapped += (a, b) => new MessageFlyout(msg).ShowAt(this, b.GetPosition(b.OriginalSource as UIElement));
             }
 
             public void LoadAvatar(int user_id)
@@ -86,7 +89,7 @@ namespace Alika.UI
         /// Name,text, attachments & buttons holder
         /// </summary>
         [Windows.UI.Xaml.Data.Bindable]
-        public class TextBubble : Grid
+        public class TextBubble : StackPanel
         {
             public Message message { get; set; }
             public Border border = new Border
@@ -103,7 +106,8 @@ namespace Alika.UI
                 VerticalAlignment = VerticalAlignment.Center,
                 TextWrapping = TextWrapping.Wrap,
                 Margin = new Thickness(5),
-                Padding = new Thickness(5)
+                Padding = new Thickness(5),
+                ContextFlyout = null
             };
             public TextBlock name = new TextBlock
             {
@@ -113,7 +117,10 @@ namespace Alika.UI
             public Grid textGrid = new Grid();
             public Grid attachGrid = new Grid();
             public Grid keyboardGrid = new Grid();
-            public Grid borderGrid = new Grid();
+            public StackPanel borderContent = new StackPanel
+            {
+                VerticalAlignment = VerticalAlignment.Center
+            };
             public int peer_id;
 
             public TextBubble(Message msg, int peer_id)
@@ -124,33 +131,26 @@ namespace Alika.UI
                 this.LoadName();
                 this.textGrid.Children.Add(this.text);
 
-                this.borderGrid.RowDefinitions.Add(new RowDefinition());
-                Grid.SetRow(this.textGrid, 0);
-                if (this.message.text.Length > 0 || this.message.attachments.Count == 0) this.borderGrid.Children.Add(this.textGrid); // TODO: Remove (this.message.attachments.Count == 0) and make service messages support
+                if (this.message.reply_message != null) this.borderContent.Children.Add(new Dialog.Dialog.ReplyMessage(this.message.reply_message)
+                {
+                    CrossEnabled = false,
+                    LineWidth = 1
+                });
+                if (this.message.text != null && this.message.text.Length > 0) this.borderContent.Children.Add(this.textGrid); // TODO: make service messages support
                 if (this.message.attachments.Count > 0)
                 {
-                    this.borderGrid.RowDefinitions.Add(new RowDefinition());
-                    Grid.SetRow(this.attachGrid, 1);
-                    this.borderGrid.Children.Add(this.attachGrid);
+                    this.borderContent.Children.Add(this.attachGrid);
                     this.LoadAttachments();
                 }
-                if (this.message.keyboard != null)
+                if (this.message.keyboard != null && this.message.keyboard.buttons.Count > 0)
                 {
-                    this.borderGrid.RowDefinitions.Add(new RowDefinition());
-                    Grid.SetRow(this.keyboardGrid, 2);
-                    this.borderGrid.Children.Add(this.keyboardGrid);
+                    this.borderContent.Children.Add(this.keyboardGrid);
                     this.LoadButtons();
                 }
-                this.border.Child = this.borderGrid;
-
-                this.RowDefinitions.Add(new RowDefinition());
-                this.RowDefinitions.Add(new RowDefinition());
-
-                Grid.SetRow(this.name, 0);
-                Grid.SetRow(this.border, 1);
+                this.border.Child = this.borderContent;
 
                 this.Children.Add(this.name);
-                this.Children.Add(border);
+                this.Children.Add(this.border);
             }
 
             public void LoadText()
@@ -301,6 +301,28 @@ namespace Alika.UI
                         this.keyboardGrid.Children.Add(grid);
                     });
                 }
+            }
+        }
+
+        public class MessageFlyout : MenuFlyout
+        {
+            public MessageFlyout(Message msg)
+            {
+                var reply = new MenuFlyoutItem
+                {
+                    Icon = new FontIcon
+                    {
+                        Glyph = "\uE8CA"
+                    },
+                    Text = Utils.LocString("Dialog/Reply")
+                };
+                reply.Click += (a, b) =>
+                {
+                    var r = (App.main_page.dialog.Children[0] as Dialog.Dialog).reply_grid;
+                    if (r.Content is Dialog.Dialog.ReplyMessage prev && prev.Message.id == msg.id) return;
+                    r.Content = new Dialog.Dialog.ReplyMessage(msg);
+                };
+                this.Items.Add(reply);
             }
         }
     }

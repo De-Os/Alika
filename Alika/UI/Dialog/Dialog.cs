@@ -33,7 +33,8 @@ namespace Alika.UI.Dialog
         public Grid stickers_suggestions = new Grid
         {
             Height = 100,
-            Background = new AcrylicBrush { 
+            Background = new AcrylicBrush
+            {
                 TintColor = Coloring.Transparent.Percent(25).Color,
                 TintOpacity = 0.7
             },
@@ -134,6 +135,8 @@ namespace Alika.UI.Dialog
         public class ReplyMessage : Grid
         {
             public Message Message;
+            public bool CrossEnabled { get; set; } = true;
+            public double LineWidth { get; set; } = 5;
             public ReplyMessage(Message msg)
             {
                 this.Message = msg;
@@ -141,7 +144,7 @@ namespace Alika.UI.Dialog
                 this.Margin = new Thickness(10, 5, 10, 5);
                 this.Transitions.Add(new EntranceThemeTransition { IsStaggeringEnabled = true });
 
-                this.Load();
+                this.Loaded += (a, b) => this.Load();
             }
 
             private void Load()
@@ -159,7 +162,7 @@ namespace Alika.UI.Dialog
                         G = 119,
                         B = 168
                     }),
-                    Width = 5,
+                    Width = this.LineWidth,
                     Margin = new Thickness(0, 0, 10, 0)
                 };
                 Grid.SetColumn(rect, 0);
@@ -189,24 +192,27 @@ namespace Alika.UI.Dialog
                 text.Children.Add(msg);
                 text.Children.Add(name);
 
-                var cross = new Button
+                if (this.CrossEnabled)
                 {
-                    Background = Coloring.Transparent.Full,
-                    Content = new Image
+                    var cross = new Button
                     {
-                        Source = new SvgImageSource(new Uri(Utils.AssetTheme("close.svg"))),
-                        Height = 20,
-                        Width = 20,
-                        HorizontalAlignment = HorizontalAlignment.Center,
+                        Background = Coloring.Transparent.Full,
+                        Content = new Image
+                        {
+                            Source = new SvgImageSource(new Uri(Utils.AssetTheme("close.svg"))),
+                            Height = 20,
+                            Width = 20,
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            VerticalAlignment = VerticalAlignment.Center
+                        },
+                        HorizontalAlignment = HorizontalAlignment.Right,
                         VerticalAlignment = VerticalAlignment.Center
-                    },
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                cross.Click += (a, b) => (this.Parent as ContentControl).Content = null;
-                Grid.SetColumn(cross, 2);
+                    };
+                    cross.Click += (a, b) => (this.Parent as ContentControl).Content = null;
+                    Grid.SetColumn(cross, 2);
+                    this.Children.Add(cross);
+                }
 
-                this.Children.Add(cross);
                 this.Children.Add(text);
             }
         }
