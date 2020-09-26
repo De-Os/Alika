@@ -129,6 +129,9 @@
   <data name="Demote" xml:space="preserve">
     <value>Разжаловать администратора</value>
   </data>
+  <data name="EditHistory" xml:space="preserve">
+    <value>История редактирования</value>
+  </data>
   <data name="Group" xml:space="preserve">
     <value>Группа</value>
   </data>

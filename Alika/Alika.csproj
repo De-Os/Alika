@@ -163,6 +163,7 @@
     <Compile Include="UI\Dialog\MessageBox\MessageBox.cs" />
     <Compile Include="UI\Dialog\Dialog.cs" />
     <Compile Include="UI\Dialog\DialogEvents.cs" />
+    <Compile Include="UI\Dialog\MessageBox\MessageEditHistory.cs" />
     <Compile Include="UI\Dialog\MessagesList.cs" />
     <Compile Include="UI\Dialog\TopMenu.cs" />
     <Compile Include="UI\MediaViewer.cs" />
@@ -194,6 +195,7 @@
     <Content Include="Assets\UI\Dark\link.svg" />
     <Content Include="Assets\UI\Dark\mention.svg" />
     <Content Include="Assets\UI\Dark\pause.svg" />
+    <Content Include="Assets\UI\Dark\pen.svg" />
     <Content Include="Assets\UI\Dark\person.svg" />
     <Content Include="Assets\UI\Dark\pin.svg" />
     <Content Include="Assets\UI\Dark\play.svg" />
@@ -223,6 +225,7 @@
     <Content Include="Assets\UI\Light\mention.svg" />
     <Content Include="Assets\UI\Light\microphone.svg" />
     <Content Include="Assets\UI\Light\pause.svg" />
+    <Content Include="Assets\UI\Light\pen.svg" />
     <Content Include="Assets\UI\Light\person.svg" />
     <Content Include="Assets\UI\Light\pin.svg" />
     <Content Include="Assets\UI\Light\play.svg" />

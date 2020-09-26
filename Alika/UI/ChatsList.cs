@@ -110,6 +110,17 @@ namespace Alika.UI
                 this.Content = this.grid;
 
                 App.lp.OnNewMessage += this.OnNewMessage;
+                App.lp.OnMessageEdition += (m) =>
+                {
+                    if (m.id == this.message.id)
+                    {
+                        App.UILoop.AddAction(new UITask
+                        {
+                            Action = () => this.UpdateMsg(m),
+                            Priority = CoreDispatcherPriority.Low
+                        });
+                    }
+                };
             }
 
             private void OnNewMessage(Message msg)

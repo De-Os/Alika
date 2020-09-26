@@ -131,6 +131,9 @@
   <data name="Demote" xml:space="preserve">
     <value>Demote user</value>
   </data>
+  <data name="EditHistory" xml:space="preserve">
+    <value>Editions history</value>
+  </data>
   <data name="Group" xml:space="preserve">
     <value>Group</value>
     <comment>Group title in top menu</comment>

@@ -20,7 +20,10 @@ namespace Alika.Libs.VK.Longpoll
         public delegate void LPHandler(JToken lpevent);
         public event LPHandler Event;
         public delegate void NewMessage(Message message);
+        public delegate void ReadMessage(LPEvents.ReadState readState);
         public event NewMessage OnNewMessage;
+        public event NewMessage OnMessageEdition;
+        public event ReadMessage OnReadMessage;
 
         public LongPoll(VK vk)
         {
@@ -89,6 +92,7 @@ namespace Alika.Libs.VK.Longpoll
         private void CustomEventProcessing(JToken updates)
         {
             if (updates.Count() == 0) return;
+
             Task.Factory.StartNew(() =>
             {
                 List<int> msg_ids = new List<int>();
@@ -97,6 +101,27 @@ namespace Alika.Libs.VK.Longpoll
                     if ((int)update[0] == 4) msg_ids.Add((int)update[1]);
                 }
                 if (msg_ids.Count > 0) foreach (Message msg in this.vk.Messages.GetById(msg_ids).messages) this.OnNewMessage?.Invoke(msg);
+            });
+
+            Task.Factory.StartNew(() => {
+                var readStates = new List<LPEvents.ReadState>();
+                foreach (JToken update in updates)
+                {
+                    if ((int)update[0] == 6 || (int) update[0] == 7) readStates.Add(new LPEvents.ReadState { 
+                        peer_id = (int) update[1],
+                        msg_id = (int) update[2]
+                    });
+                }
+                if (readStates.Count > 0) foreach (var rs in readStates) this.OnReadMessage?.Invoke(rs);
+            });
+
+            Task.Factory.StartNew(() => {
+                var msg_ids = new List<int>();
+                foreach (JToken update in updates)
+                {
+                    if ((int)update[0] == 5) msg_ids.Add((int) update[1]);
+                }
+                if (msg_ids.Count > 0) foreach (Message msg in this.vk.Messages.GetById(msg_ids).messages) this.OnMessageEdition?.Invoke(msg);
             });
         }
     }
@@ -109,5 +134,14 @@ namespace Alika.Libs.VK.Longpoll
         public string server { get; set; }
         [JsonProperty("ts")]
         public int ts { get; set; }
+    }
+
+    public class LPEvents
+    {
+        public class ReadState
+        {
+            public int peer_id { get; set; }
+            public int msg_id { get; set; }
+        }
     }
 }

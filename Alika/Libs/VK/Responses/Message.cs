@@ -35,6 +35,8 @@ namespace Alika.Libs.VK.Responses
         public Keyboard keyboard { get; set; }
         [JsonProperty("action", NullValueHandling = NullValueHandling.Ignore)]
         public Action action { get; set; }
+        [JsonProperty("update_time", NullValueHandling = NullValueHandling.Ignore)]
+        public int update_time { get; set; }
 
         public Message() { }
         public Message(JToken message)

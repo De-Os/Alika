@@ -1,5 +1,6 @@
 ﻿using Alika.Libs;
 using Alika.Libs.VK.Responses;
+using Alika.UI.Dialog;
 using Alika.UI.Misc;
 using System;
 using System.Collections.Generic;
@@ -39,29 +40,61 @@ namespace Alika.UI
         {
             public TextBubble textBubble { get; set; }
             public Avatar avatar;
-            public TextBlock time = new TextBlock { 
+            public TextBlock time = new TextBlock
+            {
                 VerticalAlignment = VerticalAlignment.Bottom,
                 Margin = new Thickness(0, 0, 0, 10),
                 Foreground = Coloring.InvertedTransparent.Percent(50)
             };
+            public StackPanel states = new StackPanel
+            {
+                Orientation = Orientation.Horizontal
+            };
+            private bool _edited = false;
+            private bool Edited
+            {
+                set
+                {
+                    if (this._edited) return;
+                    App.UILoop.AddAction(new UITask
+                    {
+                        Action = () => this.states.Children.Insert(0, new Image
+                        {
+                            Width = 15,
+                            Height = 15,
+                            HorizontalAlignment = HorizontalAlignment.Right,
+                            VerticalAlignment = VerticalAlignment.Bottom,
+                            Source = new SvgImageSource(new Uri(Utils.AssetTheme("pen.svg")))
+                        })
+                    });
+                    this._edited = true;
+                }
+            }
+            private List<Message> _editions = new List<Message>();
 
-            public MessageGrid(Message msg, int peer_id)
+            public MessageGrid(Message msg, int peer_id, bool isStatic = false)
             {
                 this.MinWidth = 200;
                 this.MaxWidth = 700;
 
-                this.textBubble = new TextBubble(msg, peer_id);
+                this.textBubble = new TextBubble(msg, peer_id, isStatic);
 
                 this.LoadAvatar(msg.from_id);
                 var date = msg.date.ToDateTime();
-                if(date.Date != DateTime.Today.Date)
+                if (date.Date != DateTime.Today.Date)
                 {
-                    if(date.Year != DateTime.Today.Year)
+                    if (date.Year != DateTime.Today.Year)
                     {
                         this.time.Text = date.ToString("HH:mm, dd.MM.yy");
-                    } else this.time.Text = date.ToString("HH:mm, dd.MM");
+                    }
+                    else this.time.Text = date.ToString("HH:mm, dd.MM");
                 }
                 else this.time.Text = date.ToString("HH:mm");
+
+                var stateHolder = new StackPanel
+                {
+                    VerticalAlignment = VerticalAlignment.Bottom
+                };
 
                 // Changing avatar position if message from current user
                 if (msg.from_id == App.vk.user_id)
@@ -70,24 +103,30 @@ namespace Alika.UI
                     this.ColumnDefinitions.Add(new ColumnDefinition());
                     this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(50) });
 
-                    var state = new StackPanel { 
-                        VerticalAlignment = VerticalAlignment.Bottom
-                    };
-                    state.Children.Add(new Image
+                    if (!isStatic)
                     {
-                        Width = 15,
-                        Height = 15,
-                        HorizontalAlignment = HorizontalAlignment.Right,
-                        VerticalAlignment = VerticalAlignment.Bottom,
-                        Source = new SvgImageSource(new Uri(Utils.AssetTheme(msg.id <= App.cache.GetConversation(msg.peer_id).out_read ? "double_check.svg" : "check.svg")))
-                    }); ;
-                    state.Children.Add(this.time);
+                        var readState = new Image
+                        {
+                            Width = 15,
+                            Height = 15,
+                            HorizontalAlignment = HorizontalAlignment.Right,
+                            VerticalAlignment = VerticalAlignment.Bottom,
+                            Source = new SvgImageSource(new Uri(Utils.AssetTheme(msg.id <= App.cache.GetConversation(msg.peer_id).out_read ? "double_check.svg" : "check.svg")))
+                        };
+                        App.lp.OnReadMessage += (rs) =>
+                        {
+                            if (rs.peer_id == msg.peer_id && rs.msg_id >= msg.id) App.UILoop.AddAction(new UITask
+                            {
+                                Priority = Windows.UI.Core.CoreDispatcherPriority.Low,
+                                Action = () => readState.Source = new SvgImageSource(new Uri(Utils.AssetTheme("double_check.svg")))
+                            });
+                        };
+                        this.states.Children.Add(readState);
+                    }
 
-                    Grid.SetColumn(state, 0);
+                    Grid.SetColumn(stateHolder, 0);
                     Grid.SetColumn(this.textBubble, 1);
                     Grid.SetColumn(this.avatar, 2);
-
-                    this.Children.Add(state);
                 }
                 else
                 {
@@ -96,14 +135,29 @@ namespace Alika.UI
                     this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                     Grid.SetColumn(this.avatar, 0);
                     Grid.SetColumn(this.textBubble, 1);
-                    Grid.SetColumn(this.time, 2);
-                    this.Children.Add(this.time);
+                    Grid.SetColumn(stateHolder, 2);
                 }
 
+                if (!isStatic)
+                {
+                    if (msg.update_time > 0) this.Edited = true;
+                    App.lp.OnMessageEdition += (m) =>
+                    {
+                        if (msg.id == m.id)
+                        {
+                            this.Edited = true;
+                            this._editions.Add(m);
+                        }
+                    };
+                }
+
+                stateHolder.Children.Add(this.states);
+                stateHolder.Children.Add(this.time);
                 this.Children.Add(this.textBubble);
                 this.Children.Add(this.avatar);
+                this.Children.Add(stateHolder);
 
-                this.RightTapped += (a, b) => new MessageFlyout(msg).ShowAt(this, b.GetPosition(b.OriginalSource as UIElement));
+                this.RightTapped += (a, b) => new MessageFlyout(msg, this._editions).ShowAt(this, b.GetPosition(b.OriginalSource as UIElement));
             }
 
             public void LoadAvatar(int user_id)
@@ -159,7 +213,7 @@ namespace Alika.UI
             };
             public int peer_id;
 
-            public TextBubble(Message msg, int peer_id)
+            public TextBubble(Message msg, int peer_id, bool isStatic = false)
             {
                 this.message = msg;
                 this.peer_id = peer_id;
@@ -187,6 +241,25 @@ namespace Alika.UI
 
                 this.Children.Add(this.name);
                 this.Children.Add(this.border);
+
+                if (!isStatic)
+                {
+                    App.lp.OnMessageEdition += (m) =>
+                    {
+                        if (m.id == this.message.id)
+                        {
+                            this.message = m;
+                            App.UILoop.AddAction(new UITask
+                            {
+                                Action = () =>
+                                {
+                                    this.LoadText();
+                                    this.LoadAttachments();
+                                }
+                            });
+                        }
+                    };
+                }
             }
 
             public void LoadText()
@@ -265,6 +338,7 @@ namespace Alika.UI
 
             public void LoadAttachments()
             {
+                this.attachGrid.Children.Clear();
                 if (this.message.attachments != null && this.message.attachments.Count > 0)
                 {
                     this.message.attachments.ForEach((Attachment att) =>
@@ -342,7 +416,7 @@ namespace Alika.UI
 
         public class MessageFlyout : MenuFlyout
         {
-            public MessageFlyout(Message msg)
+            public MessageFlyout(Message msg, List<Message> editions = null)
             {
                 var reply = new MenuFlyoutItem
                 {
@@ -359,6 +433,23 @@ namespace Alika.UI
                     r.Content = new Dialog.Dialog.ReplyMessage(msg);
                 };
                 this.Items.Add(reply);
+
+                if(editions != null && editions.Count > 0)
+                {
+                    var edHistory = new MenuFlyoutItem
+                    {
+                        Icon = new FontIcon
+                        {
+                            Glyph = "\uEC92"
+                        },
+                        Text = Utils.LocString("Dialog/EditHistory")
+                    };
+                    edHistory.Click += (a, b) => App.main_page.popup.Children.Add(new Popup { 
+                        Content = new MessageEditHistory(editions),
+                        Title = Utils.LocString("Dialog/EditHistory")
+                    });
+                    this.Items.Add(edHistory);
+                }
             }
         }
     }
