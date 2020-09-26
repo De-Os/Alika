@@ -15,6 +15,8 @@ namespace Alika.Libs.VK.Responses
         public int from_id { get; set; }
         [JsonProperty("date")]
         public int date { get; set; }
+        [JsonProperty("read_state")]
+        public int read_state { get; set; }
         [JsonProperty("text")]
         public string text { get; set; }
         [JsonProperty("fwd_messages", NullValueHandling = NullValueHandling.Ignore)]

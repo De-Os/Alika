@@ -181,9 +181,11 @@
     <Content Include="Assets\UI\Dark\back.svg" />
     <Content Include="Assets\UI\Dark\call.svg" />
     <Content Include="Assets\UI\Dark\camera.svg" />
+    <Content Include="Assets\UI\Dark\check.svg" />
     <Content Include="Assets\UI\Dark\clip.svg" />
     <Content Include="Assets\UI\Dark\close.svg" />
     <Content Include="Assets\UI\Dark\document.svg" />
+    <Content Include="Assets\UI\Dark\double_check.svg" />
     <Content Include="Assets\UI\Dark\download.svg" />
     <Content Include="Assets\UI\Dark\edit.svg" />
     <Content Include="Assets\UI\Dark\fly_menu.svg" />
@@ -206,9 +208,11 @@
     <Content Include="Assets\UI\Light\back.svg" />
     <Content Include="Assets\UI\Light\call.svg" />
     <Content Include="Assets\UI\Light\camera.svg" />
+    <Content Include="Assets\UI\Light\check.svg" />
     <Content Include="Assets\UI\Light\clip.svg" />
     <Content Include="Assets\UI\Light\close.svg" />
     <Content Include="Assets\UI\Light\document.svg" />
+    <Content Include="Assets\UI\Light\double_check.svg" />
     <Content Include="Assets\UI\Light\download.svg" />
     <Content Include="Assets\UI\Light\edit.svg" />
     <Content Include="Assets\UI\Light\eye.svg" />

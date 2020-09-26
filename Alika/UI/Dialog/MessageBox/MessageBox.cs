@@ -10,6 +10,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI
 {
@@ -52,7 +53,15 @@ namespace Alika.UI
                 this.textBubble = new TextBubble(msg, peer_id);
 
                 this.LoadAvatar(msg.from_id);
-                this.time.Text = msg.date.ToDateTime().ToString("HH:mm");
+                var date = msg.date.ToDateTime();
+                if(date.Date != DateTime.Today.Date)
+                {
+                    if(date.Year != DateTime.Today.Year)
+                    {
+                        this.time.Text = date.ToString("HH:mm, dd.MM.yy");
+                    } else this.time.Text = date.ToString("HH:mm, dd.MM");
+                }
+                else this.time.Text = date.ToString("HH:mm");
 
                 // Changing avatar position if message from current user
                 if (msg.from_id == App.vk.user_id)
@@ -60,9 +69,25 @@ namespace Alika.UI
                     this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                     this.ColumnDefinitions.Add(new ColumnDefinition());
                     this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(50) });
-                    Grid.SetColumn(this.time, 0);
+
+                    var state = new StackPanel { 
+                        VerticalAlignment = VerticalAlignment.Bottom
+                    };
+                    state.Children.Add(new Image
+                    {
+                        Width = 15,
+                        Height = 15,
+                        HorizontalAlignment = HorizontalAlignment.Right,
+                        VerticalAlignment = VerticalAlignment.Bottom,
+                        Source = new SvgImageSource(new Uri(Utils.AssetTheme(msg.id <= App.cache.GetConversation(msg.peer_id).out_read ? "double_check.svg" : "check.svg")))
+                    }); ;
+                    state.Children.Add(this.time);
+
+                    Grid.SetColumn(state, 0);
                     Grid.SetColumn(this.textBubble, 1);
                     Grid.SetColumn(this.avatar, 2);
+
+                    this.Children.Add(state);
                 }
                 else
                 {
@@ -72,11 +97,11 @@ namespace Alika.UI
                     Grid.SetColumn(this.avatar, 0);
                     Grid.SetColumn(this.textBubble, 1);
                     Grid.SetColumn(this.time, 2);
+                    this.Children.Add(this.time);
                 }
 
                 this.Children.Add(this.textBubble);
                 this.Children.Add(this.avatar);
-                this.Children.Add(this.time);
 
                 this.RightTapped += (a, b) => new MessageFlyout(msg).ShowAt(this, b.GetPosition(b.OriginalSource as UIElement));
             }

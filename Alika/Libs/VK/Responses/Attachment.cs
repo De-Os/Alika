@@ -239,6 +239,10 @@ namespace Alika.Libs.VK.Responses
             public string link_ogg { get; set; }
             [JsonProperty("link_mp3")]
             public string link_mp3 { get; set; }
+            [JsonProperty("transcript")]
+            public string transcript { get; set; }
+            [JsonProperty("transcript_state")]
+            public string transcript_state { get; set; }
         }
         public class Link
         {

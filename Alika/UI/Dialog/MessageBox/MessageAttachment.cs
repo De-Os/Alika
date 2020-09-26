@@ -180,7 +180,7 @@ namespace Alika.UI
         /// Voice message holder
         /// </summary>
         [Windows.UI.Xaml.Data.Bindable]
-        public class AudioMessage : Grid
+        public class AudioMessage : StackPanel
         {
             public MediaPlayer media = new MediaPlayer
             {
@@ -234,25 +234,53 @@ namespace Alika.UI
 
             public AudioMessage(Attachment.AudioMessage audio)
             {
+                System.Diagnostics.Debug.WriteLine(ObjectDumper.Dump(audio));
+
                 while (audio.waveform.Count < 128) audio.waveform.Add(0);
                 this.audio = audio;
 
                 this.media.Source = MediaSource.CreateFromUri(new Uri(this.audio.link_mp3));
 
-                Grid grid = new Grid();
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
-                grid.ColumnDefinitions.Add(new ColumnDefinition());
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+                var TopPanel = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    HorizontalAlignment = HorizontalAlignment.Stretch
+                };
 
-                Grid.SetColumn(this.image, 0);
-                Grid.SetColumn(this.wave, 1);
-                Grid.SetColumn(this.time, 2);
+                TopPanel.Children.Add(this.image);
+                TopPanel.Children.Add(this.wave);
+                TopPanel.Children.Add(this.time);
 
-                grid.Children.Add(this.image);
-                grid.Children.Add(this.wave);
-                grid.Children.Add(this.time);
+                this.Children.Add(TopPanel);
 
-                this.Children.Add(grid);
+                if (this.audio.transcript_state != null && this.audio.transcript_state == "done")
+                {
+                    var trans_btn = new Button
+                    {
+                        Content = new Image
+                        {
+                            Source = new SvgImageSource(new Uri(Utils.AssetTheme("fly_menu.svg"))),
+                            Height = 10,
+                            Width = 10,
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            VerticalAlignment = VerticalAlignment.Center
+                        },
+                        CornerRadius = new CornerRadius(10),
+                        Background = Coloring.Transparent.Full,
+                        HorizontalAlignment = HorizontalAlignment.Right
+                    };
+                    var trans_text = new TextBlock
+                    {
+                        Text = this.audio.transcript,
+                        Visibility = Visibility.Collapsed,
+                        TextWrapping = TextWrapping.Wrap
+                    };
+                    trans_btn.Click += (a, b) => trans_text.Visibility = trans_text.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+
+                    TopPanel.Children.Add(trans_btn);
+                    this.Children.Add(trans_text);
+                }
+
                 this.Margin = new Thickness(5);
                 this.Padding = new Thickness(5);
                 this.CornerRadius = new CornerRadius(10);
@@ -270,6 +298,8 @@ namespace Alika.UI
                 this.media.PlaybackSession.PositionChanged += this.PlayStateChanged;
                 this.PointerEntered += (a, b) => this.Background = Coloring.Transparent.Percent(50);
                 this.PointerExited += (a, b) => this.Background = Coloring.Transparent.Full;
+
+                this.Loaded += (a, b) => this.MaxWidth = this.ActualWidth;
             }
 
             private void OnClick(object sender, RoutedEventArgs e)
