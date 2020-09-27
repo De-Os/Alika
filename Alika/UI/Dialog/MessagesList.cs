@@ -1,7 +1,6 @@
 ﻿using Alika.Libs;
 using Alika.Libs.VK.Responses;
 using System.Linq;
-using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -36,28 +35,19 @@ namespace Alika.UI.Dialog
 
         private void Load()
         {
-            Task.Run(() =>
+            this.Messages = new MessagesListView(this.peer_id)
             {
-                App.UILoop.AddAction(new UITask
-                {
-                    Action = () =>
-                    {
-                        this.Messages = new MessagesListView(this.peer_id)
-                        {
-                            SelectionMode = ListViewSelectionMode.None
-                        };
-                        this.Children.Clear();
-                        this.Children.Add(this.Scroll);
-                        this.Scroll.Content = this.Messages;
+                SelectionMode = ListViewSelectionMode.None
+            };
+            this.Children.Clear();
+            this.Children.Add(this.Scroll);
+            this.Scroll.Content = this.Messages;
 
-                        this.Messages.Loaded += (a, b) =>
-                        {
-                            this.Scroll.ChangeView(null, double.MaxValue, null);
-                            this.Messages.SizeChanged += (c, d) => this.NewMessageScroll();
-                        };
-                    }
-                });
-            });
+            this.Messages.Loaded += (a, b) =>
+            {
+                this.Scroll.ChangeView(null, double.MaxValue, null);
+                this.Messages.SizeChanged += (c, d) => this.NewMessageScroll();
+            };
         }
 
         private void NewMessageScroll()
@@ -85,28 +75,25 @@ namespace Alika.UI.Dialog
 
                 var messages = App.vk.Messages.GetHistory(this.peer_id).messages;
                 messages.Reverse();
-                messages.ForEach((Message msg) => this.AddNewMessage(msg));
+                foreach (Message msg in messages) this.AddNewMessage(msg);
 
                 App.lp.OnNewMessage += (msg) =>
                 {
-                    if (msg.peer_id == this.peer_id) App.UILoop.RunAction(new UITask
-                    {
-                        Action = () => this.AddNewMessage(msg)
-                    });
+                    if (msg.peer_id == this.peer_id) this.AddNewMessage(msg);
                 };
             }
 
             public void AddNewMessage(Message message)
             {
-                var msg = new MessageBox(message, this.peer_id);
                 App.UILoop.AddAction(new UITask
                 {
                     Action = () =>
                     {
+                        var msg = new MessageBox(message, this.peer_id);
                         msg.Loaded += (a, b) => this.OnNewMessage?.Invoke(true);
                         if (this.Items.Count > 0)
                         {
-                            if (this.Items.LastOrDefault() is SwipeMessage s && s.Message is MessageBox prev && prev.message.textBubble.message.from_id == message.from_id)
+                            if (this.Items.LastOrDefault() is SwipeControl s && s.Content is MessageBox prev && prev.message.textBubble.message.from_id == message.from_id)
                             {
                                 prev.message.avatar.Visibility = Visibility.Collapsed;
                                 Thickness prevMargin = prev.message.textBubble.border.Margin;
@@ -130,21 +117,21 @@ namespace Alika.UI.Dialog
                                 msg.message.textBubble.border.Margin = new Thickness(10, 2.5, 10, 5);
                             }
                         }
-                        this.Items.Add(new SwipeMessage(msg));
+                        this.Items.Add(this.GetSwipeMessage(msg));
                     }
                 });
             }
 
             public void AddOldMessage(Message message)
             {
-                var msg = new MessageBox(message, this.peer_id);
                 App.UILoop.AddAction(new UITask
                 {
                     Action = () =>
                     {
+                        var msg = new MessageBox(message, this.peer_id);
                         if (this.Items.Count > 0)
                         {
-                            if (this.Items.FirstOrDefault() is SwipeMessage s && s.Message is MessageBox next && next.message.textBubble.message.from_id == message.from_id)
+                            if (this.Items.FirstOrDefault() is SwipeControl s && s.Content is MessageBox next && next.message.textBubble.message.from_id == message.from_id)
                             {
                                 next.message.avatar.Visibility = Visibility.Visible;
                                 next.message.textBubble.name.Visibility = Visibility.Collapsed;
@@ -170,25 +157,48 @@ namespace Alika.UI.Dialog
                             }
                         }
                         msg.Loaded += (a, b) => this.OnNewMessage?.Invoke(false);
-                        this.Items.Add(new SwipeMessage(msg));
+                        this.Items.Insert(0, this.GetSwipeMessage(msg));
                     }
                 });
             }
 
+            private SwipeControl GetSwipeMessage(MessageBox msg)
+            {
+                var leftItems = new SwipeItems
+                {
+                    Mode = SwipeMode.Execute
+                };
+                var item = new SwipeItem
+                {
+                    IconSource = new FontIconSource
+                    {
+                        Glyph = "\uE8CA"
+                    },
+                    Text = Utils.LocString("Dialog/Reply")
+                };
+                item.Invoked += (a, b) =>
+                    {
+                        var reply = (App.main_page.dialog.Children[0] as Dialog).reply_grid;
+                        var message = msg.message.textBubble.message;
+                        if (reply.Content is Dialog.ReplyMessage prev && prev.Message.id == message.id) return;
+                        reply.Content = new Dialog.ReplyMessage(message);
+                    };
+                leftItems.Add(item);
+                return new SwipeControl
+                {
+                    Content = msg,
+                    LeftItems = leftItems
+                };
+            }
+
+            // Crashes on release, idk why. Use GetSwipeMessage.
+            [Windows.UI.Xaml.Data.Bindable]
             public class SwipeMessage : SwipeControl
             {
-                public MessageBox Message;
 
                 public SwipeMessage(MessageBox message)
                 {
-                    this.Message = message;
-                    this.Content = this.Message;
-
-                    this.GenerateItems();
-                }
-
-                public void GenerateItems()
-                {
+                    this.Content = message;
                     var leftItems = new SwipeItems
                     {
                         Mode = SwipeMode.Execute
@@ -204,7 +214,7 @@ namespace Alika.UI.Dialog
                     item.Invoked += (a, b) =>
                     {
                         var reply = (App.main_page.dialog.Children[0] as Dialog).reply_grid;
-                        var msg = this.Message.message.textBubble.message;
+                        var msg = message.message.textBubble.message;
                         if (reply.Content is Dialog.ReplyMessage prev && prev.Message.id == msg.id) return;
                         reply.Content = new Dialog.ReplyMessage(msg);
                     };

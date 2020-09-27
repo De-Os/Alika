@@ -103,23 +103,26 @@ namespace Alika.Libs.VK.Longpoll
                 if (msg_ids.Count > 0) foreach (Message msg in this.vk.Messages.GetById(msg_ids).messages) this.OnNewMessage?.Invoke(msg);
             });
 
-            Task.Factory.StartNew(() => {
+            Task.Factory.StartNew(() =>
+            {
                 var readStates = new List<LPEvents.ReadState>();
                 foreach (JToken update in updates)
                 {
-                    if ((int)update[0] == 6 || (int) update[0] == 7) readStates.Add(new LPEvents.ReadState { 
-                        peer_id = (int) update[1],
-                        msg_id = (int) update[2]
+                    if ((int)update[0] == 6 || (int)update[0] == 7) readStates.Add(new LPEvents.ReadState
+                    {
+                        peer_id = (int)update[1],
+                        msg_id = (int)update[2]
                     });
                 }
                 if (readStates.Count > 0) foreach (var rs in readStates) this.OnReadMessage?.Invoke(rs);
             });
 
-            Task.Factory.StartNew(() => {
+            Task.Factory.StartNew(() =>
+            {
                 var msg_ids = new List<int>();
                 foreach (JToken update in updates)
                 {
-                    if ((int)update[0] == 5) msg_ids.Add((int) update[1]);
+                    if ((int)update[0] == 5) msg_ids.Add((int)update[1]);
                 }
                 if (msg_ids.Count > 0) foreach (Message msg in this.vk.Messages.GetById(msg_ids).messages) this.OnMessageEdition?.Invoke(msg);
             });

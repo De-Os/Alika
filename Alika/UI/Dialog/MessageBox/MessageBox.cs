@@ -29,7 +29,7 @@ namespace Alika.UI
             this.HorizontalContentAlignment = msg.from_id == App.vk.user_id ? HorizontalAlignment.Right : HorizontalAlignment.Left;
 
             this.message = new MessageGrid(msg, peer_id);
-            this.Content = (this.message);
+            this.Content = this.message;
         }
 
         /// <summary>
@@ -48,7 +48,8 @@ namespace Alika.UI
             };
             public StackPanel states = new StackPanel
             {
-                Orientation = Orientation.Horizontal
+                Orientation = Orientation.Horizontal,
+                HorizontalAlignment = HorizontalAlignment.Right
             };
             private bool _edited = false;
             private bool Edited
@@ -78,8 +79,8 @@ namespace Alika.UI
                 this.MaxWidth = 700;
 
                 this.textBubble = new TextBubble(msg, peer_id, isStatic);
-
                 this.LoadAvatar(msg.from_id);
+
                 var date = msg.date.ToDateTime();
                 if (date.Date != DateTime.Today.Date)
                 {
@@ -153,9 +154,9 @@ namespace Alika.UI
 
                 stateHolder.Children.Add(this.states);
                 stateHolder.Children.Add(this.time);
+                this.Children.Add(stateHolder);
                 this.Children.Add(this.textBubble);
                 this.Children.Add(this.avatar);
-                this.Children.Add(stateHolder);
 
                 this.RightTapped += (a, b) => new MessageFlyout(msg, this._editions).ShowAt(this, b.GetPosition(b.OriginalSource as UIElement));
             }
@@ -181,7 +182,7 @@ namespace Alika.UI
         [Windows.UI.Xaml.Data.Bindable]
         public class TextBubble : StackPanel
         {
-            public Message message { get; set; }
+            public Message message;
             public Border border = new Border
             {
                 BorderThickness = new Thickness(1),
@@ -217,26 +218,18 @@ namespace Alika.UI
             {
                 this.message = msg;
                 this.peer_id = peer_id;
-                this.LoadText();
                 this.LoadName();
-                this.textGrid.Children.Add(this.text);
 
                 if (this.message.reply_message != null) this.borderContent.Children.Add(new Dialog.Dialog.ReplyMessage(this.message.reply_message)
                 {
                     CrossEnabled = false,
                     LineWidth = 1
                 });
-                if (this.message.text != null && this.message.text.Length > 0) this.borderContent.Children.Add(this.textGrid); // TODO: make service messages support
-                if (this.message.attachments.Count > 0)
-                {
-                    this.borderContent.Children.Add(this.attachGrid);
-                    this.LoadAttachments();
-                }
-                if (this.message.keyboard != null && this.message.keyboard.buttons.Count > 0)
-                {
-                    this.borderContent.Children.Add(this.keyboardGrid);
-                    this.LoadButtons();
-                }
+
+                this.LoadText();
+                this.LoadAttachments();
+                this.LoadButtons();
+
                 this.border.Child = this.borderContent;
 
                 this.Children.Add(this.name);
@@ -292,7 +285,7 @@ namespace Alika.UI
                                 }
                                 catch { }
                             }
-                            // TODO: Fix crash on some messagesъtry
+                            // TODO: Fix crash on some messages
                             try
                             {
                                 if (!m.Value.Contains("["))
@@ -317,6 +310,11 @@ namespace Alika.UI
                     }
                     else p.Inlines.Add(new Run { Text = text });
                     this.text.Blocks.Add(p);
+                    if (text.Length > 0)
+                    {
+                        if (!this.textGrid.Children.Contains(this.text)) this.textGrid.Children.Add(this.text);
+                        if (!this.borderContent.Children.Contains(this.textGrid)) this.borderContent.Children.Add(this.textGrid);
+                    }
                 }
             }
 
@@ -341,7 +339,7 @@ namespace Alika.UI
                 this.attachGrid.Children.Clear();
                 if (this.message.attachments != null && this.message.attachments.Count > 0)
                 {
-                    this.message.attachments.ForEach((Attachment att) =>
+                    foreach (Attachment att in this.message.attachments)
                     {
                         FrameworkElement attach = null;
                         switch (att.type)
@@ -374,20 +372,22 @@ namespace Alika.UI
                             this.attachGrid.RowDefinitions.Add(new RowDefinition());
                             this.attachGrid.Children.Add(attach);
                         }
-                    });
+                    }
+                    if (!this.borderContent.Children.Contains(this.attachGrid)) this.borderContent.Children.Add(this.attachGrid);
                 }
+
             }
 
             public void LoadButtons() // TODO: Support for callback buttons?
             {
-                if (this.message.keyboard != null && this.message.keyboard.inline)
+                if (this.message.keyboard != null && this.message.keyboard.inline && this.message.keyboard.buttons.Count > 0)
                 {
-                    this.message.keyboard.buttons.ForEach((List<Message.Keyboard.Button> buttons) =>
+                    foreach (List<Message.Keyboard.Button> buttons in this.message.keyboard.buttons)
                     {
                         Grid grid = new Grid();
                         Grid.SetRow(grid, this.keyboardGrid.RowDefinitions.Count);
                         this.keyboardGrid.RowDefinitions.Add(new RowDefinition());
-                        buttons.ForEach((Message.Keyboard.Button button) =>
+                        foreach (Message.Keyboard.Button button in buttons)
                         {
                             Button btn = new Button
                             {
@@ -407,13 +407,15 @@ namespace Alika.UI
                             Grid.SetColumn(btn, grid.ColumnDefinitions.Count);
                             grid.ColumnDefinitions.Add(new ColumnDefinition());
                             grid.Children.Add(btn);
-                        });
+                        }
                         this.keyboardGrid.Children.Add(grid);
-                    });
+                    }
                 }
+                if (!this.borderContent.Children.Contains(this.keyboardGrid)) this.borderContent.Children.Add(this.keyboardGrid);
             }
         }
 
+        [Windows.UI.Xaml.Data.Bindable]
         public class MessageFlyout : MenuFlyout
         {
             public MessageFlyout(Message msg, List<Message> editions = null)
@@ -434,7 +436,7 @@ namespace Alika.UI
                 };
                 this.Items.Add(reply);
 
-                if(editions != null && editions.Count > 0)
+                if (editions != null && editions.Count > 0)
                 {
                     var edHistory = new MenuFlyoutItem
                     {
@@ -444,7 +446,8 @@ namespace Alika.UI
                         },
                         Text = Utils.LocString("Dialog/EditHistory")
                     };
-                    edHistory.Click += (a, b) => App.main_page.popup.Children.Add(new Popup { 
+                    edHistory.Click += (a, b) => App.main_page.popup.Children.Add(new Popup
+                    {
                         Content = new MessageEditHistory(editions),
                         Title = Utils.LocString("Dialog/EditHistory")
                     });

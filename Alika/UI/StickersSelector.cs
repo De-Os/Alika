@@ -184,7 +184,6 @@ namespace Alika.UI
                         grids.Add(new Grid());
                         x++;
                     }
-                    System.Diagnostics.Debug.WriteLine(grids[x].Children.Count);
                     StickerHolder img = new StickerHolder(sticker);
                     Grid.SetColumn(img, grids[x].ColumnDefinitions.Count);
                     grids[x].ColumnDefinitions.Add(new ColumnDefinition { Width = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Auto) });

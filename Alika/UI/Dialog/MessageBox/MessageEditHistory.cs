@@ -5,17 +5,19 @@ using Windows.UI.Xaml.Controls;
 
 namespace Alika.UI.Dialog
 {
+    [Windows.UI.Xaml.Data.Bindable]
     public class MessageEditHistory : Grid
     {
         public MessageEditHistory(List<Message> Messages)
         {
             this.MaxWidth = 500;
 
-            var list = new StackPanel { 
+            var list = new StackPanel
+            {
                 HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Stretch
             };
 
-            foreach(Message msg in Messages)
+            foreach (Message msg in Messages)
             {
                 var item = new Button
                 {
@@ -29,8 +31,10 @@ namespace Alika.UI.Dialog
                     },
                     Background = Coloring.Transparent.Full
                 };
-                item.Click += (a, b) => App.main_page.popup.Children.Add(new Popup { 
-                    Content = new ScrollViewer { 
+                item.Click += (a, b) => App.main_page.popup.Children.Add(new Popup
+                {
+                    Content = new ScrollViewer
+                    {
                         HorizontalScrollMode = ScrollMode.Disabled,
                         VerticalScrollMode = ScrollMode.Auto,
                         Content = new MessageBox.MessageGrid(msg, msg.peer_id, true)

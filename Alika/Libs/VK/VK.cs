@@ -54,7 +54,7 @@ namespace Alika.Libs.VK
                     return this.Call<Type>(method, fields);
                 }
                 else */
-                throw new Exception(job.error.message);
+                throw new Exception(method + ": " + job.error.message);
             };
             return job.response;
         }

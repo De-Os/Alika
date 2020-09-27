@@ -56,7 +56,7 @@ namespace Alika.UI
                     A = Convert.ToByte(Math.Round(255 * percent)),
                     R = (byte)(App.systemDarkTheme ? 255 : 0),
                     G = (byte)(App.systemDarkTheme ? 255 : 0),
-                    B = (byte)(App.systemDarkTheme ? 255 :0)
+                    B = (byte)(App.systemDarkTheme ? 255 : 0)
                 });
             }
 

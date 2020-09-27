@@ -234,8 +234,6 @@ namespace Alika.UI
 
             public AudioMessage(Attachment.AudioMessage audio)
             {
-                System.Diagnostics.Debug.WriteLine(ObjectDumper.Dump(audio));
-
                 while (audio.waveform.Count < 128) audio.waveform.Add(0);
                 this.audio = audio;
 

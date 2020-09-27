@@ -132,6 +132,7 @@ namespace Alika.UI.Dialog
             });
         }
 
+        [Windows.UI.Xaml.Data.Bindable]
         public class ReplyMessage : Grid
         {
             public Message Message;
