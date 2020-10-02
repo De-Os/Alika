@@ -321,8 +321,17 @@ namespace Alika.UI.Dialog
                     App.cache.StickerDictionary[text].ForEach((sticker) =>
                     {
                         var holder = new StickerSuggestionHolder(sticker);
-                        holder.PointerPressed += (a, m) => Task.Factory.StartNew(() => App.vk.Messages.Send(peer_id, sticker_id: sticker.sticker_id));
-                        holder.PointerPressed += (a, m) => this.send_text.Text = "";
+                        holder.PointerPressed += (a, m) =>
+                        {
+                            var reply_id = 0;
+                            if (this.reply_grid.Content is ReplyMessage reply)
+                            {
+                                this.reply_grid.Content = null;
+                                reply_id = reply.Message.id;
+                            }
+                            this.send_text.Text = "";
+                            Task.Factory.StartNew(() => App.vk.Messages.Send(peer_id, sticker_id: sticker.sticker_id, reply_to: reply_id));
+                        };
                         Grid.SetColumn(holder, grid.ColumnDefinitions.Count);
                         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                         grid.Children.Add(holder);

@@ -1,6 +1,5 @@
 ﻿using Alika.UI;
 using Alika.UI.Dialog;
-using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 
@@ -8,7 +7,6 @@ namespace Alika
 {
     public sealed partial class MainPage : Page
     {
-        public ChatsList chats_list = new ChatsList();
         private int _peer_id;
         public int peer_id
         {
@@ -35,19 +33,7 @@ namespace Alika
         {
             this.InitializeComponent();
 
-            this.chats_scroll.Content = this.chats_list;
-            this.chats_scroll.ViewChanged += this.OnChatsScroll;
-
-            App.lp.OnNewMessage += (msg) =>
-            {
-                if (msg.peer_id == this.peer_id)
-                {
-                    App.UILoop.AddAction(new UITask
-                    {
-                        Action = () => this.chats_scroll.ChangeView(null, 0, null)
-                    });
-                }
-            };
+            this.chats_grid.Content = new ChatsHolder();
 
             Task.Factory.StartNew(() =>
             {
@@ -60,30 +46,26 @@ namespace Alika
             });
         }
 
-        /// <summary>
-        /// Loading new chats when user scrolled to bottom
-        /// </summary>
-        public void OnChatsScroll(object sender, ScrollViewerViewChangedEventArgs e) // TODO: Fix scrolling
+        /*private void LoadMenu()
         {
-            if (e.IsIntermediate)
+            var settings = new Button
             {
-                App.UILoop.AddAction(new UITask
+                Background = Coloring.Transparent.Full,
+                Content = new Image
                 {
-                    Action = () =>
-                    {
-                        if (this.chats_scroll.VerticalOffset == this.chats_scroll.ScrollableHeight)
-                        {
-                            double height = this.chats_scroll.ScrollableHeight;
-                            this.chats_scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
-                            this.chats_scroll.VerticalScrollMode = ScrollMode.Disabled;
-                            this.chats_list.LoadChats(offset: 1, count: 25, start_msg_id: this.chats_list.Items.Cast<ChatsList.ChatItem>().Select(item => item as ChatsList.ChatItem).ToList().Last().message.id);
-                            this.chats_scroll.ChangeView(null, height, null);
-                            this.chats_scroll.VerticalScrollMode = ScrollMode.Enabled;
-                            this.chats_scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
-                        }
-                    }
-                });
-            }
-        }
+                    VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Center,
+                    HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Center,
+                    Source = new SvgImageSource(new System.Uri(Utils.AssetTheme("settings.svg"))),
+                    Width = 20,
+                    Height = 20
+                },
+                Margin = new Windows.UI.Xaml.Thickness(5),
+                HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Right,
+                VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Center
+            };
+            settings.Click += (a, b) => new Settings();
+            this.bottomChatsMenu.Children.Add(settings);
+            this.BlurView.BottomMenu = this.bottomChatsMenu;
+        }*/
     }
 }

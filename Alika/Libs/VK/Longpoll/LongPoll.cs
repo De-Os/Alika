@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Alika.Libs.VK.Longpoll
@@ -13,7 +14,21 @@ namespace Alika.Libs.VK.Longpoll
         private readonly VK vk;
         private bool stop;
 
-        private RestClient http;
+        public WebProxy proxy
+        {
+            get
+            {
+                return this._http.Proxy as WebProxy;
+            }
+            set
+            {
+                this._proxy = value;
+                this._http.Proxy = value;
+            }
+        }
+
+        private WebProxy _proxy;
+        private RestClient _http;
         private RestRequest request;
         private int ts;
 
@@ -40,7 +55,7 @@ namespace Alika.Libs.VK.Longpoll
                 {"lp_version", 3},
                 {"need_pts", 0}
             });
-            this.http = new RestClient("https://" + lp.server);
+            this._http = new RestClient("https://" + lp.server) { Proxy = this._proxy };
             this.request = new RestRequest("");
             request.AddParameter("act", "a_check");
             request.AddParameter("key", lp.key);
@@ -61,7 +76,7 @@ namespace Alika.Libs.VK.Longpoll
                     try
                     {
                         this.request.AddOrUpdateParameter("ts", this.ts);
-                        string data = this.http.Get(this.request).Content;
+                        string data = this._http.Get(this.request).Content;
                         if (data == null || data.Length == 0)
                         {
                             this.stop = true;

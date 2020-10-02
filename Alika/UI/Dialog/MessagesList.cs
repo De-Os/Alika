@@ -11,12 +11,6 @@ namespace Alika.UI.Dialog
     {
         public int peer_id;
 
-        public ScrollViewer Scroll = new ScrollViewer
-        {
-            HorizontalScrollMode = ScrollMode.Disabled,
-            VerticalScrollMode = ScrollMode.Auto,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto
-        };
         public MessagesListView Messages;
 
         public MessagesList(int peer_id)
@@ -30,6 +24,7 @@ namespace Alika.UI.Dialog
                 VerticalAlignment = VerticalAlignment.Center,
                 IsActive = true
             });
+
             this.Loaded += (a, b) => this.Load();
         }
 
@@ -40,12 +35,11 @@ namespace Alika.UI.Dialog
                 SelectionMode = ListViewSelectionMode.None
             };
             this.Children.Clear();
-            this.Children.Add(this.Scroll);
-            this.Scroll.Content = this.Messages;
+            this.Children.Add(this.Messages);
 
             this.Messages.Loaded += (a, b) =>
             {
-                this.Scroll.ChangeView(null, double.MaxValue, null);
+                (this.Parent as ScrollViewer).ChangeView(null, double.MaxValue, null);
                 this.Messages.SizeChanged += (c, d) => this.NewMessageScroll();
             };
         }
@@ -54,9 +48,10 @@ namespace Alika.UI.Dialog
         {
             if (this.Messages.Items.LastOrDefault(l => l != this.Messages.Items.LastOrDefault() as UIElement) is UIElement msg)
             {
-                if (this.Scroll.IsElementVisible(msg))
+                var scroll = (this.Parent as ScrollViewer);
+                if (scroll.IsElementVisible(msg))
                 {
-                    this.Scroll.ChangeView(null, double.MaxValue, null);
+                    scroll.ChangeView(null, double.MaxValue, null);
                 }
             }
         }
@@ -174,7 +169,8 @@ namespace Alika.UI.Dialog
                     {
                         Glyph = "\uE8CA"
                     },
-                    Text = Utils.LocString("Dialog/Reply")
+                    Text = Utils.LocString("Dialog/Reply"),
+                    Background = Coloring.Transparent.Full
                 };
                 item.Invoked += (a, b) =>
                     {

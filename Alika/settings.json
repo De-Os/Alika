@@ -4,7 +4,17 @@
 		"login": {
 			"client_id": 2274003,
 			"client_secret": "hHbZxrka2uZ6jB1inYsH",
-			"scope": ["messages", "offline"]
-		}
+			"scope": ["messages", "offline"],
+			"domain": "https://oauth.vk.com/token"
+		},
+		"domain" : "https://api.vk.com/method",
+		"ping_url" : "https://vk.com/ping.txt"
+	},
+	"proxy":{
+		"enabled": false,
+		"url" : "1.1.1.1",
+		"port" : 8080,
+		"username": "",
+		"password": ""
 	}
 }

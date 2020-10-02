@@ -25,6 +25,7 @@ namespace Alika.UI.Dialog
         {
             this.peer_id = peer_id;
 
+            this.Margin = new Thickness(0, 25, 0, 10);
             this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
 
@@ -88,8 +89,8 @@ namespace Alika.UI.Dialog
                     Height = 20,
                 },
                 HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(0, 0, 10, 0),
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Margin = new Thickness(0, 10, 5, 0),
                 Background = Coloring.Transparent.Full,
                 Flyout = new FlyoutMenu(this.peer_id)
             };

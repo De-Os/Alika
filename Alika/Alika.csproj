@@ -21,7 +21,7 @@
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <PackageCertificateThumbprint>99ECE3637E695A93916F2E6FE943DEEC12CF0B8A</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundle>Never</AppxBundle>
     <AppxBundlePlatforms>x86|x64|arm|arm64</AppxBundlePlatforms>
@@ -131,7 +131,6 @@
     <Compile Include="Caching.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Libs\Utils.cs" />
-    <Compile Include="Libs\VK\CaptchaDialog.cs" />
     <Compile Include="Libs\VK\Limits.cs" />
     <Compile Include="Libs\VK\Responses\Stickers.cs" />
     <Compile Include="Libs\VK\Responses\UploadServers.cs" />
@@ -154,6 +153,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UIThread.cs" />
+    <Compile Include="UI\BlurView.cs" />
     <Compile Include="UI\ChatInformation.cs" />
     <Compile Include="UI\ChatsList.cs" />
     <Compile Include="UI\Coloring.cs" />
@@ -169,6 +169,7 @@
     <Compile Include="UI\MediaViewer.cs" />
     <Compile Include="UI\Misc.cs" />
     <Compile Include="UI\Popup.cs" />
+    <Compile Include="UI\Settings.cs" />
     <Compile Include="UI\StickersSelector.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -289,6 +290,8 @@
     <Content Include="settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <PRIResource Include="Strings\en-US\Settings.resw" />
+    <PRIResource Include="Strings\ru-RU\Settings.resw" />
     <PRIResource Include="Strings\ru-RU\Attachments.resw" />
     <PRIResource Include="Strings\en-US\Attachments.resw" />
     <PRIResource Include="Strings\en-US\FilesChoose.resw" />

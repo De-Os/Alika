@@ -117,28 +117,49 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Byte" xml:space="preserve">
-    <value>Б</value>
+  <data name="PROXY" xml:space="preserve">
+    <value>Proxy</value>
   </data>
-  <data name="Error" xml:space="preserve">
-    <value>Ошибка!</value>
+  <data name="PROXY_ENABLED" xml:space="preserve">
+    <value>Enable?</value>
   </data>
-  <data name="Gigabyte" xml:space="preserve">
-    <value>ГБ</value>
+  <data name="PROXY_PASSWORD" xml:space="preserve">
+    <value>Password (if needed)</value>
   </data>
-  <data name="Kibibyte" xml:space="preserve">
-    <value>КиБ</value>
+  <data name="PROXY_PORT" xml:space="preserve">
+    <value>Port</value>
   </data>
-  <data name="Megabyte" xml:space="preserve">
-    <value>МБ</value>
+  <data name="PROXY_URL" xml:space="preserve">
+    <value>URL</value>
   </data>
-  <data name="Save" xml:space="preserve">
-    <value>Сохранить</value>
+  <data name="PROXY_USERNAME" xml:space="preserve">
+    <value>Username (if needed)</value>
   </data>
-  <data name="Search" xml:space="preserve">
-    <value>Поиск</value>
+  <data name="VK" xml:space="preserve">
+    <value>VKontakte</value>
   </data>
-  <data name="Settings" xml:space="preserve">
-    <value>Настройки</value>
+  <data name="VK_API" xml:space="preserve">
+    <value>API version</value>
+  </data>
+  <data name="VK_DOMAIN" xml:space="preserve">
+    <value>API domain</value>
+  </data>
+  <data name="VK_LOGIN" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="VK_LOGIN_CLIENT_ID" xml:space="preserve">
+    <value>Application ID</value>
+  </data>
+  <data name="VK_LOGIN_CLIENT_SECRET" xml:space="preserve">
+    <value>Application unique key</value>
+  </data>
+  <data name="VK_LOGIN_DOMAIN" xml:space="preserve">
+    <value>OAuth domain</value>
+  </data>
+  <data name="VK_LOGIN_SCOPE" xml:space="preserve">
+    <value>Permissions</value>
+  </data>
+  <data name="VK_PING_URL" xml:space="preserve">
+    <value>Ping.txt url</value>
   </data>
 </root>

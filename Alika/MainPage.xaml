@@ -6,20 +6,18 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource SystemControlAcrylicWindowBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
 
-    <Grid Margin="0, 30, 0, 0">
+    <Grid>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.4*" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0" Margin="-10, 0, 0, 0" x:Name="chats_grid">
-                <ScrollViewer x:Name="chats_scroll" HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Visible">
-
-                </ScrollViewer>
-            </Grid>
+            <ContentControl Grid.Column="0" x:Name="chats_grid" VerticalAlignment="Stretch">
+                
+            </ContentControl>
             <Grid Grid.Column="1" x:FieldModifier="public" x:Name="dialog"></Grid>
         </Grid>
         <!--popup elements (костыль)-->

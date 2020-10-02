@@ -48,8 +48,7 @@ namespace Alika.UI
             };
             public StackPanel states = new StackPanel
             {
-                Orientation = Orientation.Horizontal,
-                HorizontalAlignment = HorizontalAlignment.Right
+                Orientation = Orientation.Horizontal
             };
             private bool _edited = false;
             private bool Edited
@@ -63,7 +62,7 @@ namespace Alika.UI
                         {
                             Width = 15,
                             Height = 15,
-                            HorizontalAlignment = HorizontalAlignment.Right,
+                            HorizontalAlignment = App.vk.user_id == this.textBubble.message.from_id ? HorizontalAlignment.Right : HorizontalAlignment.Left,
                             VerticalAlignment = VerticalAlignment.Bottom,
                             Source = new SvgImageSource(new Uri(Utils.AssetTheme("pen.svg")))
                         })
@@ -75,6 +74,7 @@ namespace Alika.UI
 
             public MessageGrid(Message msg, int peer_id, bool isStatic = false)
             {
+                this.states.HorizontalAlignment = App.vk.user_id == msg.from_id ? HorizontalAlignment.Right : HorizontalAlignment.Left;
                 this.MinWidth = 200;
                 this.MaxWidth = 700;
 

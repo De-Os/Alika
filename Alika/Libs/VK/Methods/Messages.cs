@@ -292,5 +292,24 @@ namespace Alika.Libs.VK.Methods
                     {"file", response.response}
                 });
         }
+
+        public GetConversationsByIdResponse SearchConversations(string query, int count = 20, string fields = "")
+        {
+            var request = new Dictionary<string, dynamic>
+            {
+                { "q", query },
+                { "count", count },
+            };
+            if (fields.Length > 0)
+            {
+                request.Add("fields", fields);
+                request.Add("extended", 1);
+            }
+            GetConversationsByIdResponse response = this._vk.Call<GetConversationsByIdResponse>("messages.searchConversations", request);
+            App.cache.Update(response.conversations);
+            App.cache.Update(response.profiles);
+            App.cache.Update(response.groups);
+            return response;
+        }
     }
 }

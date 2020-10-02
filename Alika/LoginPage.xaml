@@ -22,8 +22,19 @@
             <TextBlock x:Name="title" HorizontalAlignment="Center" FontWeight="Bold" FontSize="49" />
             <TextBox x:Name="number"  Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" />
             <PasswordBox x:Name="password" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" />
-            <Button x:Name="login" Click="LoginClick" Grid.Row="3" HorizontalAlignment="Center" />
+            <Grid Grid.Row="3" Width="500" MaxHeight="40">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="login" Click="LoginClick" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalAlignment="Stretch"/>
+                <Button x:Name="settings" Click="OpenSettings" Grid.Column="2" HorizontalAlignment="Right" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" />
+
+            </Grid>
         </Grid>
-        
-        </Grid>
+
+        <!--popup elements (костыль)-->
+        <Grid x:Name="popup" x:FieldModifier="public"></Grid>
+    </Grid>
 </Page>

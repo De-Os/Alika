@@ -5,22 +5,46 @@ using Newtonsoft.Json;
 using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Net;
 
 namespace Alika.Libs.VK
 {
     public partial class VK
     {
-        private readonly string token;
-        public string version;
+
         public int user_id;
-
-        public CaptchaSettings captchaSettings;
-
-        public VK(string token, string version, CaptchaSettings captcha = null)
+        public string domain
         {
-            this.token = token;
-            this.version = version;
-            this.captchaSettings = captcha;
+            get
+            {
+                return this._http.BaseUrl.AbsoluteUri;
+            }
+            set
+            {
+                this._http = new RestClient(value);
+            }
+        }
+        public WebProxy proxy
+        {
+            get
+            {
+                return this._http.Proxy as WebProxy;
+            }
+            set
+            {
+                this._http.Proxy = value;
+            }
+        }
+        public string api_ver;
+
+        private readonly string token;
+        private RestClient _http = new RestClient();
+
+        public VK(Settings settings)
+        {
+            this.token = settings.Token;
+            this.api_ver = settings.ApiVer;
+            this.domain = settings.ApiDomain;
 
             this.user_id = this.Users.Get(new List<int>(), "photo_200")[0].user_id; // Getting current user's user_id & adding it's photo to cache
         }
@@ -40,23 +64,9 @@ namespace Alika.Libs.VK
             BasicResponse<Type> job = JsonConvert.DeserializeObject<BasicResponse<Type>>(result);
             if (job?.error != null)
             {
-                // TODO: Captcha handling
-                /*if (job.error.code == 14 && this.captchaSettings != null)
-                {
-                    System.Diagnostics.Debug.WriteLine(ObjectDumper.Dump(job.error));
-                    CaptchaDialog captcha = new CaptchaDialog(job.error.captcha_img, this.captchaSettings);
-                    CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
-                    {
-                        await captcha.ShowAsync();
-                    });
-                    fields.Add("captcha_sid", job.error.captcha_sid);
-                    fields.Add("captcha_key", captcha.text.Text);
-                    return this.Call<Type>(method, fields);
-                }
-                else */
                 throw new Exception(method + ": " + job.error.message);
-            };
-            return job.response;
+            }
+            else return job.response;
         }
 
         /// <summary>
@@ -67,17 +77,16 @@ namespace Alika.Libs.VK
         /// <returns>JSON string</returns>
         public string CallMethod(string method, Dictionary<string, dynamic> fields = null)
         {
-            var http = new RestClient("https://api.vk.com/method");
             var request = new RestRequest(method);
             request.AddOrUpdateParameter("access_token", this.token);
-            request.AddOrUpdateParameter("v", this.version);
+            request.AddOrUpdateParameter("v", this.api_ver);
 
             if (fields != null && fields.Count > 0)
             {
                 foreach (KeyValuePair<string, dynamic> field in fields) request.AddOrUpdateParameter(field.Key, field.Value);
             }
 
-            return http.Post(request).Content;
+            return this._http.Post(request).Content;
         }
 
         /// <summary>
@@ -99,5 +108,12 @@ namespace Alika.Libs.VK
         public Groups Groups => new Groups(this);
         public Users Users => new Users(this);
         public Messages Messages => new Messages(this);
+
+        public class Settings
+        {
+            public string ApiDomain { get; set; } = "https://api.vk.com/method";
+            public string ApiVer { get; set; } = "5.129";
+            public string Token { get; set; }
+        }
     }
 }

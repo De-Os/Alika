@@ -1,4 +1,5 @@
 ﻿using Alika.Libs;
+using Alika.UI;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System;
@@ -27,6 +28,14 @@ namespace Alika
             this.number.PlaceholderText = Utils.LocString("Login/NumberPlaceholder");
             this.password.PlaceholderText = Utils.LocString("Login/PasswordPlaceholder");
             this.login.Content = new TextBlock { Text = Utils.LocString("Login/ButtonText") };
+            this.settings.Content = new Image
+            {
+                Source = new SvgImageSource(new Uri(Utils.AssetTheme("settings.svg"))),
+                Width = 20,
+                Height = 20,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
 
             this.RegisterEvents();
         }
@@ -85,9 +94,11 @@ namespace Alika
                 }
             }
         }
+        private void OpenSettings(object sender, RoutedEventArgs e) => new Settings();
         private async void Login(string number, string password, string captcha_sid = null, string captcha_key = null, string code = null)
         {
-            var http = new RestClient("https://oauth.vk.com/token");
+            var http = new RestClient(App.settings.vk.login.domain);
+            if (App.settings.proxy != null) http.Proxy = App.settings.proxy.ToWebProxy();
             var request = new RestRequest();
             request.AddParameter("password", password);
             request.AddParameter("grant_type", "password");

@@ -72,17 +72,12 @@ namespace Alika.UI.Dialog
             this.top_menu = new TopMenu(this.peer_id);
             this.MessagesList = new MessagesList(this.peer_id);
 
-            this.RowDefinitions.Add(new RowDefinition { Height = new GridLength(60) });
-            this.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-            this.RowDefinitions.Add(new RowDefinition { Height = new GridLength(60, GridUnitType.Auto) });
-
-            Grid.SetRow(this.top_menu, 0);
-            Grid.SetRow(this.MessagesList, 1);
-            Grid.SetRow(this.bottom_menu, 2);
-
-            this.Children.Add(this.top_menu);
-            this.Children.Add(this.MessagesList);
-            this.Children.Add(this.bottom_menu);
+            this.Children.Add(new BlurView
+            {
+                TopMenu = this.top_menu,
+                Content = this.MessagesList,
+                BottomMenu = this.bottom_menu,
+            });
 
             this.send_text.SetValue(ScrollViewer.HorizontalScrollBarVisibilityProperty, ScrollBarVisibility.Disabled);
             this.send_text.SetValue(ScrollViewer.VerticalScrollBarVisibilityProperty, ScrollBarVisibility.Disabled);

@@ -137,6 +137,9 @@
     <value>Mb</value>
     <comment>Short megabyte name</comment>
   </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
   <data name="Search" xml:space="preserve">
     <value>Search</value>
     <comment>Search placeholder/text</comment>
