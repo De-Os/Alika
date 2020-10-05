@@ -192,6 +192,9 @@
   <data name="PermissionsTypeOwnerAndAdmins" xml:space="preserve">
     <value>Создатель и администраторы</value>
   </data>
+  <data name="Pin" xml:space="preserve">
+    <value>Закрепить</value>
+  </data>
   <data name="Promote" xml:space="preserve">
     <value>Назначить администратором</value>
   </data>
@@ -218,6 +221,9 @@
   </data>
   <data name="TopMenuLeave" xml:space="preserve">
     <value>Покинуть</value>
+  </data>
+  <data name="Unpin" xml:space="preserve">
+    <value>Открепить</value>
   </data>
   <data name="You" xml:space="preserve">
     <value>Вы</value>

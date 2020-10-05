@@ -15,7 +15,7 @@
                 <ColumnDefinition Width="0.4*" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <ContentControl Grid.Column="0" x:Name="chats_grid" VerticalAlignment="Stretch">
+            <ContentControl Grid.Column="0" x:Name="chats_grid" VerticalAlignment="Stretch" x:FieldModifier="public">
                 
             </ContentControl>
             <Grid Grid.Column="1" x:FieldModifier="public" x:Name="dialog"></Grid>

@@ -16,7 +16,6 @@ using Windows.Storage.Streams;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
 
 namespace Alika.Libs
 {
@@ -166,17 +165,25 @@ namespace Alika.Libs
             }
         }
 
-        public static void RemoveParent(this UIElement element)
+        public static void RemoveParent(this FrameworkElement element)
         {
-            var parent = VisualTreeHelper.GetParent(element);
+            var parent = element.Parent;
             if (parent == null) return;
-            if (parent is Panel p)
+            if (parent as Panel != null)
             {
-                p.Children.Remove(element);
+                (parent as Panel).Children.Remove(element);
             }
-            else if (parent is ContentControl c)
+            else if (parent as ContentControl != null)
             {
-                c.Content = null;
+                (parent as ContentControl).Content = null;
+            }
+            else if (parent as ItemsControl != null)
+            {
+                (parent as ItemsControl).Items.Remove(element);
+            }
+            else if (parent as Border != null)
+            {
+                (parent as Border).Child = null;
             }
         }
 

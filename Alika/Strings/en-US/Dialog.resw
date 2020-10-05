@@ -197,6 +197,9 @@
   <data name="PermissionsTypeOwnerAndAdmins" xml:space="preserve">
     <value>Owner and admins</value>
   </data>
+  <data name="Pin" xml:space="preserve">
+    <value>Pin</value>
+  </data>
   <data name="Promote" xml:space="preserve">
     <value>Promote user</value>
   </data>
@@ -228,6 +231,9 @@
   <data name="TopMenuLeave" xml:space="preserve">
     <value>Leave</value>
     <comment>Leave from chat text in top menu</comment>
+  </data>
+  <data name="Unpin" xml:space="preserve">
+    <value>Unpin</value>
   </data>
   <data name="You" xml:space="preserve">
     <value>You</value>

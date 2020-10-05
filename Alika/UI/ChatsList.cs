@@ -16,7 +16,9 @@ namespace Alika.UI
     [Windows.UI.Xaml.Data.Bindable]
     public class ChatsHolder : BlurView
     {
-        private ChatsList Chats = new ChatsList();
+        public ChatsList Chats;
+        public PinnedChatsList PinnedChats;
+
         private Grid Menu = new Grid
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -37,8 +39,9 @@ namespace Alika.UI
         public ChatsHolder()
         {
             var grid = new Grid();
-            grid.Children.Add(this.Chats);
-            grid.Children.Add(this.FoundChats);
+            grid.RowDefinitions.Add(new RowDefinition());
+            grid.RowDefinitions.Add(new RowDefinition());
+            Load();
             this.TopMenu = this.Menu;
             this.Content = grid;
             this.LoadMenu();
@@ -68,6 +71,31 @@ namespace Alika.UI
                     this.SearchBar.Text = "";
                 }
             };
+
+
+            async void Load()
+            {
+                var pinned = await Config.GetPinnedChats();
+                this.Chats = new ChatsList(pinned);
+                this.PinnedChats = new PinnedChatsList(pinned);
+
+                Grid.SetRow(this.PinnedChats, 0);
+                Grid.SetRow(this.Chats, 1);
+
+                grid.Children.Add(this.PinnedChats);
+                grid.Children.Add(this.Chats);
+                grid.Children.Add(this.FoundChats);
+
+                this.Scroll.ViewChanging += (a, b) =>
+                {
+                    if (b.FinalView.VerticalOffset == (a as ScrollViewer).ScrollableHeight)
+                    {
+                        this.Chats.LoadChats(0, start_msg_id: this.Chats.Items.Select(i => i as ChatsList.ChatItem).ToList().Last().message.id);
+                    }
+                };
+                this.Chats.SelectionChanged += (a, b) => { if (this.Chats.SelectedIndex != -1) this.PinnedChats.SelectedIndex = -1; };
+                this.PinnedChats.SelectionChanged += (a, b) => { if (this.PinnedChats.SelectedIndex != -1) this.Chats.SelectedIndex = -1; };
+            }
         }
 
         protected override void UpdateColors()
@@ -157,8 +185,10 @@ namespace Alika.UI
     [Windows.UI.Xaml.Data.Bindable]
     public class ChatsList : ListView
     {
-        public ChatsList()
+        public List<int> IgnorePeers = new List<int>();
+        public ChatsList(List<int> pinned = null)
         {
+            if (pinned != null) this.IgnorePeers = pinned;
             this.Background = new AcrylicBrush
             {
                 TintOpacity = 0.7,
@@ -172,20 +202,6 @@ namespace Alika.UI
                     if (i.peer_id != App.main_page.peer_id) App.main_page.peer_id = i.peer_id;
                 }
             };
-            if (this.Parent is ScrollViewer scroll)
-            {
-                scroll.ViewChanging += (a, b) =>
-                {
-                    if (b.FinalView.VerticalOffset == (a as ScrollViewer).ScrollableHeight)
-                    {
-                        this.LoadChats(this.Items.
-                        Cast<ChatsList.ChatItem>().
-                        Select(item => item as ChatsList.ChatItem).
-                        ToList().
-                        Last().message.id);
-                    }
-                };
-            }
             this.LoadChats(0);
             App.lp.OnNewMessage += this.ProcessMessage;
         }
@@ -195,14 +211,16 @@ namespace Alika.UI
             Task.Factory.StartNew(() =>
               {
                   var conversations = App.vk.Messages.GetConversations(count: count, offset: offset, fields: "photo_200,online_info", start_message_id: start_msg_id).conversations;
-                  List<ListViewItem> items = new List<ListViewItem>();
-                  foreach (GetConversationsResponse.ConversationResponse conv in conversations)
+                  foreach (var conv in conversations)
                   {
-                      App.UILoop.RunAction(new UITask
+                      if (!this.IgnorePeers.Contains(conv.conversation.peer.id))
                       {
-                          Action = () => this.Items.Add(new ChatItem(conv.conversation.peer.id, conv.last_message)),
-                          Priority = CoreDispatcherPriority.High
-                      });
+                          App.UILoop.RunAction(new UITask
+                          {
+                              Action = () => this.Items.Add(new ChatItem(conv.conversation.peer.id, conv.last_message)),
+                              Priority = CoreDispatcherPriority.High
+                          });
+                      }
                   }
               });
         }
@@ -234,6 +252,10 @@ namespace Alika.UI
         [Windows.UI.Xaml.Data.Bindable]
         public class ChatItem : ListViewItem
         {
+            public delegate void Pin();
+            public Pin OnPin;
+            public Pin OnUnPin;
+
             public int peer_id;
             public Message message;
             public Grid grid = new Grid();
@@ -251,9 +273,37 @@ namespace Alika.UI
                 VerticalAlignment = VerticalAlignment.Top
             };
             public Avatar image;
-            public ChatItem(int peer_id, Message last_msg)
+            private bool _pinned;
+            private bool Pinned
+            {
+                get
+                {
+                    return this._pinned;
+                }
+                set
+                {
+                    var chats = App.main_page.chats_grid.Content as ChatsHolder;
+                    this.RemoveParent();
+                    if (value)
+                    {
+                        chats.PinnedChats.Items.Add(this);
+                        this.OnPin?.Invoke();
+                        Config.AddPinnedChat(this.peer_id);
+                    }
+                    else
+                    {
+                        chats.Chats.Items.Insert(0, this);
+                        this.OnUnPin?.Invoke();
+                        Config.RemovePinnedChat(this.peer_id);
+                    }
+                    this._pinned = value;
+                }
+            }
+
+            public ChatItem(int peer_id, Message last_msg, bool pinned = false)
             {
                 this.peer_id = peer_id;
+                this._pinned = pinned;
 
                 this.Render();
 
@@ -271,6 +321,37 @@ namespace Alika.UI
                         });
                     }
                 };
+
+                var flyout = new MenuFlyout();
+
+
+                var pin = new MenuFlyoutItem
+                {
+                    Text = pinned ? Utils.LocString("Dialog/Unpin") : Utils.LocString("Dialog/Pin"),
+                    Icon = new FontIcon
+                    {
+                        Glyph = pinned ? "\uE735" : "\uE734"
+                    }
+                };
+                flyout.Items.Add(pin);
+                this.OnPin += () =>
+                {
+                    pin.Text = Utils.LocString("Dialog/Unpin");
+                    pin.Icon = new FontIcon
+                    {
+                        Glyph = "\uE735"
+                    };
+                };
+                this.OnUnPin += () =>
+                {
+                    pin.Text = Utils.LocString("Dialog/Pin");
+                    pin.Icon = new FontIcon
+                    {
+                        Glyph = "\uE734"
+                    };
+                };
+                pin.Click += (a, b) => this.Pinned = !this.Pinned;
+                this.RightTapped += (a, b) => flyout.ShowAt(this);
             }
 
             public ChatItem(int peer_id)
@@ -337,6 +418,44 @@ namespace Alika.UI
                 var name = App.cache.GetName(id);
                 if (name.Count(c => c == ' ') != 1 || this.peer_id > Libs.VK.Limits.Messages.PEERSTART) return name;
                 return name.Split(" ")[0];
+            }
+        }
+    }
+
+    [Windows.UI.Xaml.Data.Bindable]
+    public class PinnedChatsList : ListView
+    {
+        public PinnedChatsList(List<int> pinned)
+        {
+            this.Background = new AcrylicBrush
+            {
+                TintOpacity = 0.7,
+                BackgroundSource = AcrylicBackgroundSource.Backdrop,
+                TintColor = Coloring.Transparent.Percent(100).Color
+            };
+            this.SelectionChanged += (a, b) =>
+            {
+                if (this.SelectedItem is ChatsList.ChatItem i)
+                {
+                    if (i.peer_id != App.main_page.peer_id) App.main_page.peer_id = i.peer_id;
+                }
+            };
+
+            if (pinned.Count > 0)
+            {
+                Task.Factory.StartNew(() =>
+                {
+                    var convs = App.vk.Messages.GetConversationsById(pinned);
+                    var messages = App.vk.Messages.GetById(convs.conversations.Select(c => c.last_message_id).ToList()).messages;
+                    foreach (var conv in convs.conversations)
+                    {
+                        App.UILoop.RunAction(new UITask
+                        {
+                            Action = () => this.Items.Add(new ChatsList.ChatItem(conv.peer.id, messages.Find(i => i.id == conv.last_message_id), true)),
+                            Priority = CoreDispatcherPriority.High
+                        });
+                    }
+                });
             }
         }
     }
