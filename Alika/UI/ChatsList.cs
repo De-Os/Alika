@@ -258,8 +258,15 @@ namespace Alika.UI
 
             public int peer_id;
             public Message message;
-            public Grid grid = new Grid();
-            public Grid textGrid = new Grid();
+            public Grid grid = new Grid
+            {
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            public Grid textGrid = new Grid
+            {
+                HorizontalAlignment = HorizontalAlignment.Stretch
+            };
             public TextBlock nameBlock = new TextBlock
             {
                 FontSize = 15,
@@ -273,7 +280,17 @@ namespace Alika.UI
                 VerticalAlignment = VerticalAlignment.Top
             };
             public Avatar image;
-            private bool _pinned;
+            public Image PinImage = new Image
+            {
+                Source = new SvgImageSource(new System.Uri(Utils.AssetTheme("pin.svg"))),
+                Height = 10,
+                Width = 10,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Margin = new Thickness(5, 0, 5, 0),
+                Visibility = Visibility.Collapsed
+            };
+            private bool _pinned = false;
             private bool Pinned
             {
                 get
@@ -287,12 +304,14 @@ namespace Alika.UI
                     if (value)
                     {
                         chats.PinnedChats.Items.Add(this);
+                        this.PinImage.Visibility = Visibility.Visible;
                         this.OnPin?.Invoke();
                         Config.AddPinnedChat(this.peer_id);
                     }
                     else
                     {
                         chats.Chats.Items.Insert(0, this);
+                        this.PinImage.Visibility = Visibility.Collapsed;
                         this.OnUnPin?.Invoke();
                         Config.RemovePinnedChat(this.peer_id);
                     }
@@ -363,8 +382,11 @@ namespace Alika.UI
             private void Render()
             {
                 this.Height = 70;
+                this.HorizontalAlignment = HorizontalAlignment.Stretch;
+                this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
                 this.grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) }); // Avatar
-                this.grid.ColumnDefinitions.Add(new ColumnDefinition()); // Text fields
+                this.grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // Text fields
+                this.grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) }); // Pin icon
                 this.textGrid.RowDefinitions.Add(new RowDefinition()); // Chat name
                 this.textGrid.RowDefinitions.Add(new RowDefinition()); // Message texzt
                 this.LoadAvatar();
@@ -374,8 +396,12 @@ namespace Alika.UI
                 this.textGrid.Children.Add(this.nameBlock);
                 this.textGrid.Children.Add(this.textBlock);
                 Grid.SetColumn(this.textGrid, 1);
+                Grid.SetColumn(this.PinImage, 2);
                 this.grid.Children.Add(this.textGrid);
+                this.grid.Children.Add(this.PinImage);
                 this.Content = this.grid;
+
+                if (this._pinned) this.PinImage.Visibility = Visibility.Visible;
             }
 
             private void OnNewMessage(Message msg)

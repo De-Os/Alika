@@ -1,6 +1,7 @@
 ﻿using Alika.Libs;
 using Alika.Libs.VK.Responses;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -32,7 +33,8 @@ namespace Alika.UI.Dialog
         {
             this.Messages = new MessagesListView(this.peer_id)
             {
-                SelectionMode = ListViewSelectionMode.None
+                SelectionMode = ListViewSelectionMode.None,
+                VerticalAlignment = VerticalAlignment.Bottom
             };
             this.Children.Clear();
             this.Children.Add(this.Messages);
@@ -68,9 +70,18 @@ namespace Alika.UI.Dialog
             {
                 this.peer_id = peer_id;
 
-                var messages = App.vk.Messages.GetHistory(this.peer_id).messages;
-                messages.Reverse();
-                foreach (Message msg in messages) this.AddNewMessage(msg);
+                Task.Factory.StartNew(() =>
+                {
+                    var messages = App.vk.Messages.GetHistory(this.peer_id).messages;
+                    messages.Reverse();
+                    App.UILoop.AddAction(new UITask
+                    {
+                        Action = () =>
+                        {
+                            foreach (var msg in messages) this.AddNewMessage(msg);
+                        }
+                    });
+                });
 
                 App.lp.OnNewMessage += (msg) =>
                 {
@@ -170,7 +181,8 @@ namespace Alika.UI.Dialog
                         Glyph = "\uE8CA"
                     },
                     Text = Utils.LocString("Dialog/Reply"),
-                    Background = Coloring.Transparent.Full
+                    Background = Coloring.Transparent.Percent(100),
+                    Foreground = Coloring.InvertedTransparent.Percent(100),
                 };
                 item.Invoked += (a, b) =>
                     {

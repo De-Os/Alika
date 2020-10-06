@@ -35,37 +35,19 @@ namespace Alika
 
             this.chats_grid.Content = new ChatsHolder();
 
+            // Updating stickers cache on app startup
             Task.Factory.StartNew(() =>
             {
-                // Updating cache stickers on app startup
+                var stickers = App.vk.GetStickers();
+                if (stickers?.items == null || stickers.items.Count == 0) return;
                 App.UILoop.AddAction(new UITask
                 {
-                    Action = () => App.cache.Update(App.vk.GetStickers().items)
+                    Action = () => App.cache.Update(stickers.items),
+                    Priority = Windows.UI.Core.CoreDispatcherPriority.Low
                 });
-                App.cache.Update(App.vk.GetStickersKeywords().dictionary);
             });
-        }
+            Task.Factory.StartNew(() => App.cache.Update(App.vk.GetStickersKeywords().dictionary));
 
-        /*private void LoadMenu()
-        {
-            var settings = new Button
-            {
-                Background = Coloring.Transparent.Full,
-                Content = new Image
-                {
-                    VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Center,
-                    HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Center,
-                    Source = new SvgImageSource(new System.Uri(Utils.AssetTheme("settings.svg"))),
-                    Width = 20,
-                    Height = 20
-                },
-                Margin = new Windows.UI.Xaml.Thickness(5),
-                HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Right,
-                VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Center
-            };
-            settings.Click += (a, b) => new Settings();
-            this.bottomChatsMenu.Children.Add(settings);
-            this.BlurView.BottomMenu = this.bottomChatsMenu;
-        }*/
+        }
     }
 }

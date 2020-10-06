@@ -71,6 +71,7 @@ namespace Alika.UI.Dialog
         {
             this.top_menu = new TopMenu(this.peer_id);
             this.MessagesList = new MessagesList(this.peer_id);
+            this.bottom_menu.Transitions.Add(new EntranceThemeTransition { IsStaggeringEnabled = true });
 
             this.Children.Add(new BlurView
             {
@@ -80,7 +81,7 @@ namespace Alika.UI.Dialog
             });
 
             this.send_text.SetValue(ScrollViewer.HorizontalScrollBarVisibilityProperty, ScrollBarVisibility.Disabled);
-            this.send_text.SetValue(ScrollViewer.VerticalScrollBarVisibilityProperty, ScrollBarVisibility.Disabled);
+            this.send_text.SetValue(ScrollViewer.VerticalScrollBarVisibilityProperty, ScrollBarVisibility.Auto);
 
             this.bottom_menu.RowDefinitions.Add(new RowDefinition());
             this.bottom_menu.RowDefinitions.Add(new RowDefinition());
