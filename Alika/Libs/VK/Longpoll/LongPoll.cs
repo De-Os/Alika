@@ -110,35 +110,23 @@ namespace Alika.Libs.VK.Longpoll
 
             Task.Factory.StartNew(() =>
             {
-                List<int> msg_ids = new List<int>();
-                foreach (JToken update in updates)
-                {
-                    if ((int)update[0] == 4) msg_ids.Add((int)update[1]);
-                }
+                var msg_ids = updates.Where(i => (int)i[0] == 4).Select(i => (int)i[1]).ToList();
                 if (msg_ids.Count > 0) foreach (Message msg in this.vk.Messages.GetById(msg_ids).messages) this.OnNewMessage?.Invoke(msg);
             });
 
             Task.Factory.StartNew(() =>
             {
-                var readStates = new List<LPEvents.ReadState>();
-                foreach (JToken update in updates)
+                var readStates = updates.Where(i => (int)i[0] == 6 || (int)i[1] == 7).Select(i => new LPEvents.ReadState
                 {
-                    if ((int)update[0] == 6 || (int)update[0] == 7) readStates.Add(new LPEvents.ReadState
-                    {
-                        peer_id = (int)update[1],
-                        msg_id = (int)update[2]
-                    });
-                }
+                    peer_id = (int)i[1],
+                    msg_id = (int)i[2]
+                }).ToList();
                 if (readStates.Count > 0) foreach (var rs in readStates) this.OnReadMessage?.Invoke(rs);
             });
 
             Task.Factory.StartNew(() =>
             {
-                var msg_ids = new List<int>();
-                foreach (JToken update in updates)
-                {
-                    if ((int)update[0] == 5) msg_ids.Add((int)update[1]);
-                }
+                var msg_ids = updates.Where(i => (int)i[0] == 5).Select(i => (int)i[1]).ToList();
                 if (msg_ids.Count > 0) foreach (Message msg in this.vk.Messages.GetById(msg_ids).messages) this.OnMessageEdition?.Invoke(msg);
             });
         }
@@ -156,7 +144,7 @@ namespace Alika.Libs.VK.Longpoll
 
     public class LPEvents
     {
-        public class ReadState
+        public struct ReadState
         {
             public int peer_id { get; set; }
             public int msg_id { get; set; }

@@ -117,117 +117,49 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Close" xml:space="preserve">
-    <value>Close</value>
-    <comment>Close button text</comment>
+  <data name="DaysFrom0To0" xml:space="preserve">
+    <value>дней назад</value>
   </data>
-  <data name="Conference" xml:space="preserve">
-    <value>Conference</value>
-    <comment>Conference title in top menu</comment>
+  <data name="DaysFrom1To1" xml:space="preserve">
+    <value>день назад</value>
   </data>
-  <data name="ConversationInfo" xml:space="preserve">
-    <value>Conversation info</value>
+  <data name="DaysFrom2To4" xml:space="preserve">
+    <value>дня назад</value>
   </data>
-  <data name="Demote" xml:space="preserve">
-    <value>Demote user</value>
+  <data name="DaysFrom5To9" xml:space="preserve">
+    <value>дней назад</value>
   </data>
-  <data name="EditHistory" xml:space="preserve">
-    <value>Editions history</value>
+  <data name="HoursFrom0To0" xml:space="preserve">
+    <value>часов назад</value>
   </data>
-  <data name="Group" xml:space="preserve">
-    <value>Group</value>
-    <comment>Group title in top menu</comment>
+  <data name="HoursFrom1To1" xml:space="preserve">
+    <value>час назад</value>
   </data>
-  <data name="InvitedTime" xml:space="preserve">
-    <value>Joined: %time%</value>
+  <data name="HoursFrom2To4" xml:space="preserve">
+    <value>часа назад</value>
   </data>
-  <data name="JoinedInfo" xml:space="preserve">
-    <value>Invited by %user%</value>
+  <data name="HoursFrom5To9" xml:space="preserve">
+    <value>часов назад</value>
   </data>
-  <data name="Kick" xml:space="preserve">
-    <value>Kick</value>
+  <data name="LastSeen" xml:space="preserve">
+    <value>Был(а) онлайн %date%</value>
   </data>
-  <data name="Management" xml:space="preserve">
-    <value>Management</value>
+  <data name="MinutesFrom0To0" xml:space="preserve">
+    <value>минут назад</value>
   </data>
-  <data name="Members" xml:space="preserve">
-    <value>Members</value>
+  <data name="MinutesFrom1To1" xml:space="preserve">
+    <value>минуту назад</value>
   </data>
-  <data name="MembersCount" xml:space="preserve">
-    <value>Members: %count%</value>
+  <data name="MinutesFrom2To4" xml:space="preserve">
+    <value>минуты назад</value>
   </data>
-  <data name="Permissions" xml:space="preserve">
-    <value>Permissions</value>
+  <data name="MinutesFrom5To9" xml:space="preserve">
+    <value>минут назад</value>
   </data>
-  <data name="PermissionsCall" xml:space="preserve">
-    <value>Make group call</value>
+  <data name="Online" xml:space="preserve">
+    <value>Онлайн</value>
   </data>
-  <data name="PermissionsChangeAdmins" xml:space="preserve">
-    <value>Change admins</value>
-  </data>
-  <data name="PermissionsChangeInfo" xml:space="preserve">
-    <value>Edit information</value>
-  </data>
-  <data name="PermissionsInvite" xml:space="preserve">
-    <value>Invite</value>
-  </data>
-  <data name="PermissionsLink" xml:space="preserve">
-    <value>See invite link</value>
-  </data>
-  <data name="PermissionsMentions" xml:space="preserve">
-    <value>Use mass mentions</value>
-  </data>
-  <data name="PermissionsPin" xml:space="preserve">
-    <value>Pin messages</value>
-  </data>
-  <data name="PermissionsTypeAll" xml:space="preserve">
-    <value>All</value>
-  </data>
-  <data name="PermissionsTypeOwner" xml:space="preserve">
-    <value>Owner</value>
-  </data>
-  <data name="PermissionsTypeOwnerAndAdmins" xml:space="preserve">
-    <value>Owner and admins</value>
-  </data>
-  <data name="Pin" xml:space="preserve">
-    <value>Pin</value>
-  </data>
-  <data name="Promote" xml:space="preserve">
-    <value>Promote user</value>
-  </data>
-  <data name="RemovePhoto" xml:space="preserve">
-    <value>Remove  photo</value>
-  </data>
-  <data name="Reply" xml:space="preserve">
-    <value>Reply</value>
-  </data>
-  <data name="Save" xml:space="preserve">
-    <value>Save</value>
-    <comment>Save button text</comment>
-  </data>
-  <data name="Send" xml:space="preserve">
-    <value>Send</value>
-  </data>
-  <data name="TextBoxPlaceholder" xml:space="preserve">
-    <value>Message...</value>
-    <comment>Message TextBox placeholder</comment>
-  </data>
-  <data name="TopMenuAttachments" xml:space="preserve">
-    <value>Attachments</value>
-    <comment>Attachments text in top menu</comment>
-  </data>
-  <data name="TopMenuInformation" xml:space="preserve">
-    <value>Information</value>
-    <comment>Information about conversation text in top menu</comment>
-  </data>
-  <data name="TopMenuLeave" xml:space="preserve">
-    <value>Leave</value>
-    <comment>Leave from chat text in top menu</comment>
-  </data>
-  <data name="Unpin" xml:space="preserve">
-    <value>Unpin</value>
-  </data>
-  <data name="You" xml:space="preserve">
-    <value>You</value>
+  <data name="RightNow" xml:space="preserve">
+    <value>только что</value>
   </data>
 </root>

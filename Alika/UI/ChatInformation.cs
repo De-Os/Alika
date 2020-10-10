@@ -136,7 +136,11 @@ namespace Alika.UI
                     else
                     {
                         var user = App.cache.Users.Find(u => u.user_id == this.conv.peer.id);
-                        subtext = Utils.OnlineText(user.online_info.is_online, user.online_info.last_seen);
+                        if (user.online_info.is_online)
+                        {
+                            subtext = Utils.LocString("Time/Online");
+                        }
+                        else subtext = Utils.LocString("Time/LastSeen").Replace("%date%", Utils.Time.OnlineFormat(user.online_info.last_seen.ToDateTime()));
                     }
                 }
                 if (this.conv.peer.id > Limits.Messages.PEERSTART)

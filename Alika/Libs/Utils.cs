@@ -2,6 +2,7 @@
 using Microsoft.Graphics.Canvas;
 using Microsoft.Toolkit.Uwp.Helpers;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -147,24 +148,6 @@ namespace Alika.Libs
 
         public static string AppPath(string path) => Package.Current.InstalledLocation.Path + "/" + path;
 
-        public static string OnlineText(bool online, int last_time) => Utils.OnlineText(online, last_time.ToDateTime());
-
-        public static string OnlineText(bool online, DateTime last_time)
-        {
-            if (online)
-            {
-                return Utils.LocString("Dialog/Online");
-            }
-            else
-            {
-                if (last_time.Day == DateTime.Today.Day)
-                {
-                    return Utils.LocString("Dialog/LastSeen").Replace("%date%", last_time.ToString("HH:mm"));
-                }
-                else return Utils.LocString("Dialog/LastSeen").Replace("%date%", last_time.ToString("HH:mm d.M"));
-            }
-        }
-
         public static void RemoveParent(this FrameworkElement element)
         {
             var parent = element.Parent;
@@ -289,6 +272,155 @@ namespace Alika.Libs
                 }
             }
             return text;
+        }
+
+        public static class Time
+        {
+            private static readonly Dictionary<string, List<Format>> Formats = new Dictionary<string, List<Format>>
+            {
+                {"minutes", new List<Format>{
+                    new Format{
+                        Name = Utils.LocString("Time/MinutesFrom0To0"),
+                        Start = 0,
+                        End = 0
+                    },
+                    new Format{
+                        Name = Utils.LocString("Time/MinutesFrom0To0"),
+                        Start = 10,
+                        End = 20
+                    },
+                    new Format{
+                        Name = Utils.LocString("Time/MinutesFrom1To1"),
+                        Start = 1,
+                        End = 1
+                    },
+                    new Format{
+                        Name = Utils.LocString("Time/MinutesFrom2To4"),
+                        Start = 2,
+                        End = 4
+                    },
+                    new Format{
+                        Name = Utils.LocString("Time/MinutesFrom5To9"),
+                        Start = 5,
+                        End = 9
+                    }
+                } },
+                {"hours", new List<Format>{
+                    new Format{
+                        Name = Utils.LocString("Time/HoursFrom0To0"),
+                        Start = 0,
+                        End = 0
+                    },
+                    new Format{
+                        Name = Utils.LocString("Time/HoursFrom0To0"),
+                        Start = 10,
+                        End = 20
+                    },
+                    new Format{
+                        Name = Utils.LocString("Time/HoursFrom1To1"),
+                        Start = 1,
+                        End = 1
+                    },
+                    new Format{
+                        Name = Utils.LocString("Time/HoursFrom2To4"),
+                        Start = 2,
+                        End = 4
+                    },
+                    new Format{
+                        Name = Utils.LocString("Time/HoursFrom5To9"),
+                        Start = 5,
+                        End = 9
+                    }
+                } },
+                {"days", new List<Format>{
+                    new Format{
+                        Name = Utils.LocString("Time/DaysFrom0To0"),
+                        Start = 0,
+                        End = 0
+                    },
+                    new Format{
+                        Name = Utils.LocString("Time/DaysFrom0To0"),
+                        Start = 10,
+                        End = 20
+                    },
+                    new Format{
+                        Name = Utils.LocString("Time/DaysFrom1To1"),
+                        Start = 1,
+                        End = 1
+                    },
+                    new Format{
+                        Name = Utils.LocString("Time/DaysFrom2To4"),
+                        Start = 2,
+                        End = 4
+                    },
+                    new Format{
+                        Name = Utils.LocString("Time/DaysFrom5To9"),
+                        Start = 5,
+                        End = 9
+                    }
+                } }
+            };
+
+            public static string OnlineFormat(DateTime time)
+            {
+                var curr = DateTime.Now;
+
+                double finalTime = 0;
+                List<Format> finalFormats = new List<Format>();
+
+                if (time > curr.AddSeconds(-60))
+                {
+                    return Utils.LocString("Time/RightNow");
+                }
+                else
+                {
+                    if (time > curr.AddHours(-1))
+                    {
+                        finalTime = (curr - time).TotalMinutes;
+                        finalFormats = Formats["minutes"];
+                    }
+                    else
+                    {
+                        if (time > curr.AddDays(-1))
+                        {
+                            finalTime = (curr - time).TotalHours;
+                            finalFormats = Formats["hours"];
+                        }
+                        else
+                        {
+                            if (time > curr.AddDays(-16))
+                            {
+                                finalTime = (curr - time).TotalDays;
+                                finalFormats = Formats["days"];
+                            }
+                            else
+                            {
+                                if (time.Year == curr.Year)
+                                {
+                                    return time.ToString("d MMMM");
+                                }
+                                else return time.ToString("dd.MM.yy");
+                            }
+                        }
+                    }
+                }
+                finalTime = Math.Round(finalTime);
+                if (finalTime < 10 || finalTime > 20)
+                {
+                    return finalTime + " " + finalFormats.Where(a => int.Parse(finalTime.ToString().Last().ToString()) is int t && t >= a.Start && t <= a.End).Select(i => i.Name).First();
+                }
+                else
+                {
+                    return finalTime + finalFormats.Where(a => finalTime >= a.Start && finalTime <= a.End).Select(i => i.Name).First();
+                }
+            }
+
+            private struct Format
+            {
+                public string Name;
+                public int Start;
+                public int End;
+            }
         }
     }
 }

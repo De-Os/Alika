@@ -1,6 +1,7 @@
 ﻿using Alika.Libs;
 using Alika.Libs.VK;
 using System;
+using System.Threading.Tasks;
 using Windows.UI.Core;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
@@ -20,6 +21,43 @@ namespace Alika.UI.Dialog
             VerticalAlignment = VerticalAlignment.Bottom,
             HorizontalAlignment = HorizontalAlignment.Left
         };
+        public TextBlock about = new TextBlock
+        {
+            FontSize = 15,
+            VerticalAlignment = VerticalAlignment.Top,
+            HorizontalAlignment = HorizontalAlignment.Left
+        };
+        public DateTime online
+        {
+            set
+            {
+                App.UILoop.AddAction(new UITask
+                {
+                    Action = () => this.about.Text = Utils.LocString("Time/LastSeen").Replace("%date%", Utils.Time.OnlineFormat(value))
+                });
+            }
+        }
+        public bool IsOnline
+        {
+            set
+            {
+                Task.Factory.StartNew(() =>
+                {
+                    if (value)
+                    {
+                        App.UILoop.AddAction(new UITask
+                        {
+                            Action = () => this.about.Text = Utils.LocString("Time/Online")
+                        });
+                    }
+                    else
+                    {
+                        var user = App.cache.GetUser(this.peer_id);
+                        this.online = user.online_info.last_seen.ToDateTime();
+                    }
+                });
+            }
+        }
 
         public TopMenu(int peer_id)
         {
@@ -36,22 +74,20 @@ namespace Alika.UI.Dialog
         public void LoadTitles()
         {
             string title = App.cache.GetName(this.peer_id);
-            string desc;
             if (this.peer_id > 0)
             {
                 if (this.peer_id > Limits.Messages.PEERSTART)
                 {
-                    desc = Utils.LocString("Dialog/Conference");
+                    this.about.Text = Utils.LocString("Dialog/Conference");
                 }
                 else
                 {
-                    var user = App.cache.GetUser(this.peer_id);
-                    desc = Utils.OnlineText(user.online_info.is_online, user.online_info.last_seen);
+                    this.IsOnline = App.cache.GetUser(this.peer_id).online_info.is_online;
                 }
             }
             else
             {
-                desc = Utils.LocString("Dialog/Group");
+                this.about.Text = Utils.LocString("Dialog/Group");
             }
 
             Grid text = new Grid
@@ -67,15 +103,8 @@ namespace Alika.UI.Dialog
             this.name.Text = title;
             Grid.SetRow(this.name, 0);
             text.Children.Add(this.name);
-            TextBlock about = new TextBlock
-            {
-                Text = desc,
-                FontSize = 15,
-                VerticalAlignment = VerticalAlignment.Top,
-                HorizontalAlignment = HorizontalAlignment.Left
-            };
-            Grid.SetRow(about, 1);
-            text.Children.Add(about);
+            Grid.SetRow(this.about, 1);
+            text.Children.Add(this.about);
             this.Children.Add(text);
         }
         private void LoadMenu()

@@ -144,9 +144,6 @@
   <data name="Kick" xml:space="preserve">
     <value>Исключить</value>
   </data>
-  <data name="LastSeen" xml:space="preserve">
-    <value>Был(а) онлайн в: %date%</value>
-  </data>
   <data name="Management" xml:space="preserve">
     <value>Управление</value>
   </data>
@@ -155,9 +152,6 @@
   </data>
   <data name="MembersCount" xml:space="preserve">
     <value>Участников: %count%</value>
-  </data>
-  <data name="Online" xml:space="preserve">
-    <value>Онлайн</value>
   </data>
   <data name="Permissions" xml:space="preserve">
     <value>Права</value>

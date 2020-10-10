@@ -290,6 +290,8 @@
     <Content Include="settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <PRIResource Include="Strings\ru-RU\Time.resw" />
+    <PRIResource Include="Strings\en-US\Time.resw" />
     <PRIResource Include="Strings\en-US\Settings.resw" />
     <PRIResource Include="Strings\ru-RU\Settings.resw" />
     <PRIResource Include="Strings\ru-RU\Attachments.resw" />
