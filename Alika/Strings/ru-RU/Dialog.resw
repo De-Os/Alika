@@ -216,6 +216,12 @@
   <data name="TopMenuLeave" xml:space="preserve">
     <value>Покинуть</value>
   </data>
+  <data name="Typing" xml:space="preserve">
+    <value>печатает</value>
+  </data>
+  <data name="TypingMany" xml:space="preserve">
+    <value>печатают</value>
+  </data>
   <data name="Unpin" xml:space="preserve">
     <value>Открепить</value>
   </data>

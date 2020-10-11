@@ -26,7 +26,6 @@ namespace Alika.UI.Dialog
             this.send_text.PreviewKeyDown += this.TextBoxPreviewKeyDown;
             this.send_text.PreviewKeyDown += this.TextPaste;
             this.send_text.TextChanged += this.StickerSuggestion;
-            this.PreviewKeyDown += this.PreviewKeyEvent;
             this.attach_button.Click += this.AttachSelection;
             this.Loaded += (object s, RoutedEventArgs e) => this.send_text.Focus(FocusState.Pointer);
             this.stickers.Flyout = new Flyout { Content = App.cache.StickersSelector };

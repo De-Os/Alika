@@ -43,17 +43,21 @@ namespace Alika.UI.Dialog
             {
                 (this.Parent as ScrollViewer).ChangeView(null, double.MaxValue, null);
                 this.Messages.SizeChanged += (c, d) => this.NewMessageScroll();
+                this.SizeChanged += (c, d) => this.NewMessageScroll();
             };
         }
 
         private void NewMessageScroll()
         {
-            if (this.Messages.Items.LastOrDefault(l => l != this.Messages.Items.LastOrDefault() as UIElement) is UIElement msg)
+            if (this.Messages.Items.LastOrDefault(l => l != this.Messages.Items.LastOrDefault()) is UIElement msg)
             {
-                var scroll = (this.Parent as ScrollViewer);
-                if (scroll.IsElementVisible(msg))
+
+                if (this.Parent is ScrollViewer scroll)
                 {
-                    scroll.ChangeView(null, double.MaxValue, null);
+                    if (scroll.IsElementVisible(msg))
+                    {
+                        scroll.ChangeView(null, double.MaxValue, null);
+                    }
                 }
             }
         }

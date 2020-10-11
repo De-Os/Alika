@@ -224,6 +224,12 @@
     <value>Leave</value>
     <comment>Leave from chat text in top menu</comment>
   </data>
+  <data name="Typing" xml:space="preserve">
+    <value>is typing</value>
+  </data>
+  <data name="TypingMany" xml:space="preserve">
+    <value>are typing</value>
+  </data>
   <data name="Unpin" xml:space="preserve">
     <value>Unpin</value>
   </data>

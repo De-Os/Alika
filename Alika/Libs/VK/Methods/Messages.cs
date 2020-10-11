@@ -47,6 +47,7 @@ namespace Alika.Libs.VK.Methods
             if (start_message_id > 0) request.Add("start_message_id", start_message_id);
             if (fields.Length > 0)
             {
+                if (!fields.Contains("online_info")) fields += ",online_info";
                 request.Add("fields", fields);
                 request.Add("extended", 1);
             }
@@ -65,6 +66,7 @@ namespace Alika.Libs.VK.Methods
             var request = new Dictionary<string, dynamic>();
             if (fields.Length > 0)
             {
+                if (!fields.Contains("online_info")) fields += ",online_info";
                 request.Add("fields", fields);
                 request.Add("extended", 1);
             }
@@ -91,6 +93,7 @@ namespace Alika.Libs.VK.Methods
             if (rev) request.Add("rev", 1);
             if (fields.Length > 0)
             {
+                if (!fields.Contains("online_info")) fields += ",online_info";
                 request.Add("extended", 1);
                 request.Add("fields", fields);
             }
@@ -108,6 +111,7 @@ namespace Alika.Libs.VK.Methods
             var request = new Dictionary<string, dynamic>();
             if (fields.Length > 0)
             {
+                if (!fields.Contains("online_info")) fields += ",online_info";
                 request.Add("fields", fields);
                 request.Add("extended", 1);
             }
@@ -118,13 +122,17 @@ namespace Alika.Libs.VK.Methods
             return response;
         }
 
-        public GetConversationMembersResponse GetConversationMembers(int peer_id, string fields = null)
+        public GetConversationMembersResponse GetConversationMembers(int peer_id, string fields = "")
         {
             var request = new Dictionary<string, dynamic>
             {
                 { "peer_id", peer_id }
             };
-            if (fields != null) request.Add("fields", fields);
+            if (fields.Length > 0)
+            {
+                if (!fields.Contains("online_info")) fields += ",online_info";
+                request.Add("fields", fields);
+            }
             var response = this._vk.Call<GetConversationMembersResponse>("messages.getConversationMembers", request);
             App.cache.Update(response.profiles);
             App.cache.Update(response.groups);
@@ -302,6 +310,7 @@ namespace Alika.Libs.VK.Methods
             };
             if (fields.Length > 0)
             {
+                if (!fields.Contains("online_info")) fields += ",online_info";
                 request.Add("fields", fields);
                 request.Add("extended", 1);
             }

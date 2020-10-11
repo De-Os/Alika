@@ -46,7 +46,7 @@ namespace Alika.Libs.VK
             this.api_ver = settings.ApiVer;
             this.domain = settings.ApiDomain;
 
-            this.user_id = this.Users.Get(new List<int>(), "photo_200")[0].user_id; // Getting current user's user_id & adding it's photo to cache
+            this.user_id = this.Users.Get(new List<int>(), "photo_200, online_info")[0].user_id; // Getting current user's user_id & adding it's photo to cache
         }
 
         public LongPoll GetLP() => new LongPoll(this);

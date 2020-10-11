@@ -41,7 +41,7 @@ namespace Alika.UI.Dialog
             VerticalAlignment = VerticalAlignment.Bottom,
             HorizontalAlignment = HorizontalAlignment.Left,
             Visibility = Visibility.Collapsed,
-            CornerRadius = new CornerRadius(10)
+            CornerRadius = new CornerRadius(10, 10, 0, 0)
         };
         public Grid bottom_buttons_grid = new Grid();
         public Button send_button = new Buttons.Send();

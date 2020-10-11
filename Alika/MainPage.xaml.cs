@@ -20,10 +20,12 @@ namespace Alika
                 if (this.dialog.Children.Count > 0 && this.dialog.Children[0] is Dialog old)
                 {
                     if (old.peer_id == value) return;
+                    this.dialog.PreviewKeyDown -= old.PreviewKeyEvent;
                     (old.stickers.Flyout as Flyout).Content = null; // Remove previous flyout to prevent crash on stickers opening
                     this.dialog.Children.Clear();
                 }
                 var list = new Dialog(value);
+                this.dialog.PreviewKeyDown += list.PreviewKeyEvent;
                 this.dialog.Children.Add(list);
                 this.dialog.Children.Add(list.stickers_suggestions);
             }

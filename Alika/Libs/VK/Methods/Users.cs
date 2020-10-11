@@ -18,7 +18,11 @@ namespace Alika.Libs.VK.Methods
             Dictionary<string, dynamic> request = new Dictionary<string, dynamic>();
             if (user_ids.Count > 0) request.Add("user_ids", String.Join(",", user_ids));
             request.Add("name_case", name_case);
-            if (fields.Length > 0) request.Add("fields", fields);
+            if (fields.Length > 0)
+            {
+                if (!fields.Contains("online_info")) fields += ",online_info";
+                request.Add("fields", fields);
+            }
             List<User> users = this._vk.Call<List<User>>("users.get", request);
             App.cache.Update(users);
             return users;

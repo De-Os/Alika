@@ -220,11 +220,19 @@ namespace Alika.UI
                 this.peer_id = peer_id;
                 this.LoadName();
 
-                if (this.message.reply_message != null) this.borderContent.Children.Add(new Dialog.Dialog.ReplyMessage(this.message.reply_message)
+                if (this.message.reply_message != null)
                 {
-                    CrossEnabled = false,
-                    LineWidth = 1
-                });
+                    var reply = new Dialog.Dialog.ReplyMessage(this.message.reply_message)
+                    {
+                        CrossEnabled = false,
+                        LineWidth = 1,
+                    };
+
+                    var margin = reply.Margin;
+                    margin.Bottom = 0;
+                    reply.Margin = margin;
+                    this.borderContent.Children.Add(reply);
+                }
 
                 this.LoadText();
                 this.LoadAttachments();

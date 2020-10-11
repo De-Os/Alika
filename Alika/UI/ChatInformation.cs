@@ -1,9 +1,11 @@
 ﻿using Alika.Libs;
 using Alika.Libs.VK;
 using Alika.Libs.VK.Responses;
+using Alika.UI.Items;
 using Microsoft.Toolkit.Uwp.UI;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage.Pickers;
 using Windows.UI.Core;
@@ -126,35 +128,28 @@ namespace Alika.UI
 
                 text.Children.Add(this.Title);
 
-                string subtext = "";
+                FrameworkElement subtext = new TextBlock
+                {
+                    TextTrimming = TextTrimming.CharacterEllipsis,
+                };
                 if (this.conv.peer.id > 0)
                 {
                     if (this.conv.peer.id > Limits.Messages.PEERSTART)
                     {
-                        subtext = this.conv.settings.members_count.ToString() + " members";
+                        (subtext as TextBlock).Text = this.conv.settings.members_count.ToString() + " members";
                     }
                     else
                     {
-                        var user = App.cache.Users.Find(u => u.user_id == this.conv.peer.id);
-                        if (user.online_info.is_online)
-                        {
-                            subtext = Utils.LocString("Time/Online");
-                        }
-                        else subtext = Utils.LocString("Time/LastSeen").Replace("%date%", Utils.Time.OnlineFormat(user.online_info.last_seen.ToDateTime()));
+                        subtext = new OnlineText(this.conv.peer.id);
                     }
                 }
                 if (this.conv.peer.id > Limits.Messages.PEERSTART)
                 {
-                    subtext = Utils.LocString("Dialog/MembersCount").Replace("%count%", this.conv.settings.members_count.ToString());
+                    (subtext as TextBlock).Text = Utils.LocString("Dialog/MembersCount").Replace("%count%", this.conv.settings.members_count.ToString());
                 }
-                TextBlock sub = new TextBlock
-                {
-                    VerticalAlignment = VerticalAlignment.Top,
-                    TextTrimming = TextTrimming.CharacterEllipsis,
-                    Text = subtext
-                };
-                Grid.SetRow(sub, 1);
-                text.Children.Add(sub);
+                subtext.VerticalAlignment = VerticalAlignment.Top;
+                Grid.SetRow(subtext, 1);
+                text.Children.Add(subtext);
 
                 Grid.SetColumn(text, 1);
                 this.Children.Add(text);
@@ -290,7 +285,7 @@ namespace Alika.UI
                         VerticalScrollMode = ScrollMode.Auto,
                         Content = this.content
                     };
-                    scroll.ViewChanged += (a, b) => { if (scroll.VerticalOffset == scroll.ScrollableHeight) this.Load(); };
+                    scroll.ViewChanging += (a, b) => { if (b.FinalView.VerticalOffset == scroll.ScrollableHeight) this.Load(); };
 
                     this.popup.Content = scroll;
 
@@ -299,96 +294,85 @@ namespace Alika.UI
                     this.Load();
                 }
 
-                public async void Load()
+                public void Load()
                 {
                     if (!this.Loading)
                     {
-                        App.UILoop.AddAction(new UITask
-                        {
-                            Action = () => this.Loading = true
-                        });
+                        this.Loading = true;
                     }
                     else return;
-                    var response = App.vk.Messages.GetHistoryAttachments(peer_id: this.peer_id, type: this.type, start_from: this.offset, count: 40);
-                    if (response.items.Count > 0)
+                    Task.Factory.StartNew(() =>
                     {
-                        this.offset = response.next_from;
-
-                        List<Grid> grids = new List<Grid> { new Grid() };
-
-                        int x = 0;
-                        for (int i = 0; i < response.items.Count; i++)
-                        {
-                            var attach = response.items[i].attachment;
-                            switch (attach.type)
-                            {
-                                case "photo":
-                                    if (grids[x].Children.Count == 4)
-                                    {
-                                        grids.Add(new Grid());
-                                        x++;
-                                    }
-                                    var img = new Image
-                                    {
-                                        Stretch = Windows.UI.Xaml.Media.Stretch.UniformToFill,
-                                        Width = 100,
-                                        Height = 100,
-                                        Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(attach.photo.GetBestQuality().url))
-                                    };
-                                    img.PointerPressed += (a, b) => new MediaViewer(attach);
-                                    Border border = new Border
-                                    {
-                                        BorderThickness = new Thickness(0),
-                                        CornerRadius = new CornerRadius(5),
-                                        Child = img,
-                                        Margin = new Thickness(5)
-                                    };
-                                    Grid.SetColumn(border, grids[x].ColumnDefinitions.Count);
-                                    grids[x].ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
-                                    grids[x].Children.Add(border);
-                                    break;
-                                case "doc":
-                                    var doc = new MessageAttachment.Document(attach.document)
-                                    {
-                                        HorizontalAlignment = HorizontalAlignment.Stretch,
-                                        HorizontalContentAlignment = HorizontalAlignment.Left
-                                    };
-                                    Grid.SetRow(doc, grids[x].RowDefinitions.Count);
-                                    grids[x].RowDefinitions.Add(new RowDefinition());
-                                    grids[x].Children.Add(doc);
-                                    break;
-                                case "audio_message":
-                                    if (this.type == "doc") break;
-                                    var voice = new MessageAttachment.AudioMessage(attach.audio_message)
-                                    {
-                                        HorizontalAlignment = HorizontalAlignment.Stretch
-                                    };
-                                    Grid.SetRow(voice, grids[x].RowDefinitions.Count);
-                                    grids[x].RowDefinitions.Add(new RowDefinition());
-                                    grids[x].Children.Add(voice);
-                                    break;
-                            }
-                        }
-
-                        Grid final = new Grid();
-                        grids.ForEach((grid) =>
-                        {
-                            Grid.SetRow(grid, final.RowDefinitions.Count);
-                            final.RowDefinitions.Add(new RowDefinition());
-                            final.Children.Add(grid);
-                        });
-                        final.Loaded += (a, b) => this.Loading = false;
-
+                        var response = App.vk.Messages.GetHistoryAttachments(peer_id: this.peer_id, type: this.type, start_from: this.offset, count: 50);
                         App.UILoop.AddAction(new UITask
                         {
-                            Action = () =>
-                            {
-                                Grid.SetRow(final, this.content.RowDefinitions.Count);
-                                this.content.RowDefinitions.Add(new RowDefinition());
-                                this.content.Children.Add(final);
-                            }
+                            Action = async () =>
+                           {
+                               if (response.items.Count > 0)
+                               {
+                                   this.offset = response.next_from;
+
+                                   StackPanel final = new StackPanel();
+
+                                   if (this.type == "photo")
+                                   {
+                                       StackPanel stack = new StackPanel { Orientation = Orientation.Horizontal };
+                                       foreach (var att in response.items)
+                                       {
+                                           if (stack.Children.Count == 4)
+                                           {
+                                               final.Children.Add(stack);
+                                               stack = new StackPanel { Orientation = Orientation.Horizontal };
+                                           }
+                                           var img = new Image
+                                           {
+                                               Stretch = Windows.UI.Xaml.Media.Stretch.UniformToFill,
+                                               Width = 100,
+                                               Height = 100,
+                                               Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(att.attachment.photo.GetBestQuality().url))
+                                           };
+                                           img.PointerPressed += (a, b) => new MediaViewer(att.attachment);
+                                           stack.Children.Add(new Border
+                                           {
+                                               Child = img,
+                                               CornerRadius = new CornerRadius(10),
+                                               Margin = new Thickness(5)
+                                           });
+                                       }
+                                   }
+                                   else
+                                   {
+                                       foreach (var att in response.items)
+                                       {
+                                           switch (this.type)
+                                           {
+                                               case "doc":
+                                                   final.Children.Add(new MessageAttachment.Document(att.attachment.document)
+                                                   {
+                                                       HorizontalAlignment = HorizontalAlignment.Stretch,
+                                                       HorizontalContentAlignment = HorizontalAlignment.Left,
+                                                       Margin = new Thickness(5)
+                                                   });
+                                                   break;
+                                               case "audio_message":
+                                                   final.Children.Add(new MessageAttachment.AudioMessage(att.attachment.audio_message)
+                                                   {
+                                                       HorizontalAlignment = HorizontalAlignment.Stretch,
+                                                       Margin = new Thickness(5)
+                                                   });
+                                                   break;
+                                           }
+                                       }
+                                   }
+
+                                   Grid.SetRow(final, this.content.RowDefinitions.Count);
+                                   this.content.RowDefinitions.Add(new RowDefinition());
+                                   this.content.Children.Add(final);
+                               }
+                               this.Loading = false;
+                           }
                         });
-                    }
+                    });
                 }
             }
         }
@@ -728,41 +712,45 @@ namespace Alika.UI
 
                 public void Load()
                 {
-                    var users = App.vk.Messages.GetConversationMembers(this.peer_id, "photo_200,online_info");
-
-                    StackPanel menu = new StackPanel();
-
-                    users.members.ForEach((m) =>
+                    Task.Factory.StartNew(() =>
                     {
-                        var member = new Member(m, this.peer_id);
-                        menu.Children.Add(member);
-                    });
-
-                    App.UILoop.AddAction(new UITask
-                    {
-                        Action = () =>
+                        var users = App.vk.Messages.GetConversationMembers(this.peer_id, "photo_200,online_info");
+                        App.UILoop.AddAction(new UITask
                         {
-                            this.Children.Clear();
-                            this.Children.Add(new ScrollViewer
+                            Action = () =>
                             {
-                                HorizontalScrollMode = ScrollMode.Disabled,
-                                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                                VerticalScrollMode = ScrollMode.Auto,
-                                Content = menu
-                            });
-                        }
+                                StackPanel menu = new StackPanel();
+                                var search = new TextBox
+                                {
+                                    PlaceholderText = Utils.LocString("Search"),
+                                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                                    Margin = new Thickness(5)
+                                };
+                                menu.Children.Add(search);
+                                foreach (var m in users.members)
+                                {
+                                    var member = new Member(m, this.peer_id);
+                                    search.TextChanged += (a, b) => member.Visibility = Regex.IsMatch(member.name.Text, (a as TextBox).Text, RegexOptions.IgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+                                    menu.Children.Add(member);
+                                };
+                                this.Children.Clear();
+                                this.Children.Add(new ScrollViewer
+                                {
+                                    HorizontalScrollMode = ScrollMode.Disabled,
+                                    VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                                    VerticalScrollMode = ScrollMode.Auto,
+                                    Content = menu
+                                });
+                                this.MinWidth = 500;
+                                this.MinHeight = 500;
+                            }
+                        });
                     });
                 }
 
                 [Windows.UI.Xaml.Data.Bindable]
                 public class Member : Grid
                 {
-                    public PersonPicture Avatar = new PersonPicture
-                    {
-                        Width = 50,
-                        Height = 50,
-                        Margin = new Thickness(10, 0, 10, 0)
-                    };
                     public Button actions = new Button
                     {
                         Content = new Image
@@ -800,9 +788,14 @@ namespace Alika.UI
                         this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                         this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
 
-                        Grid.SetColumn(this.Avatar, 0);
-                        this.Children.Add(Avatar);
-                        this.LoadImage();
+                        var avatar = new Misc.Avatar(member.member_id)
+                        {
+                            Width = 50,
+                            Height = 50,
+                            Margin = new Thickness(0, 0, 10, 0)
+                        };
+                        Grid.SetColumn(avatar, 0);
+                        this.Children.Add(avatar);
 
                         this.GenerateName();
                         Grid.SetColumn(this.name, 1);
@@ -857,11 +850,6 @@ namespace Alika.UI
                     {
                         this.name.Text = App.cache.GetName(this.member.member_id);
                         if (member.is_admin) this.name.Text += " ⭐";
-                    }
-
-                    public async void LoadImage()
-                    {
-                        this.Avatar.ProfilePicture = await ImageCache.Instance.GetFromCacheAsync(new Uri(App.cache.GetAvatar(this.member.member_id)));
                     }
 
                     [Windows.UI.Xaml.Data.Bindable]

@@ -166,6 +166,8 @@
     <Compile Include="UI\Dialog\MessageBox\MessageEditHistory.cs" />
     <Compile Include="UI\Dialog\MessagesList.cs" />
     <Compile Include="UI\Dialog\TopMenu.cs" />
+    <Compile Include="UI\Items\OnlineText.cs" />
+    <Compile Include="UI\Items\TypeState.cs" />
     <Compile Include="UI\MediaViewer.cs" />
     <Compile Include="UI\Misc.cs" />
     <Compile Include="UI\Popup.cs" />

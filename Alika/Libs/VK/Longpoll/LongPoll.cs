@@ -33,12 +33,17 @@ namespace Alika.Libs.VK.Longpoll
         private int ts;
 
         public delegate void LPHandler(JToken lpevent);
-        public event LPHandler Event;
         public delegate void NewMessage(Message message);
         public delegate void ReadMessage(LPEvents.ReadState readState);
+        public delegate void OnlineEvent(LPEvents.OnlineState onlineState);
+        public delegate void TypeEvent(LPEvents.TypeState typeState);
+        public event LPHandler Event;
         public event NewMessage OnNewMessage;
         public event NewMessage OnMessageEdition;
         public event ReadMessage OnReadMessage;
+        public event OnlineEvent UserOnline;
+        public event OnlineEvent UserOffline;
+        public event TypeEvent Typing;
 
         public LongPoll(VK vk)
         {
@@ -60,7 +65,7 @@ namespace Alika.Libs.VK.Longpoll
             request.AddParameter("act", "a_check");
             request.AddParameter("key", lp.key);
             request.AddParameter("ts", lp.ts);
-            request.AddParameter("wait", 25);
+            request.AddParameter("wait", 50);
             request.AddParameter("mode", 2);
             request.AddParameter("version", 3);
             this.ts = lp.ts;
@@ -129,6 +134,56 @@ namespace Alika.Libs.VK.Longpoll
                 var msg_ids = updates.Where(i => (int)i[0] == 5).Select(i => (int)i[1]).ToList();
                 if (msg_ids.Count > 0) foreach (Message msg in this.vk.Messages.GetById(msg_ids).messages) this.OnMessageEdition?.Invoke(msg);
             });
+
+            Task.Factory.StartNew(() =>
+            {
+                var onlines = updates.Where(i => (int)i[0] == 8).Select(i => new LPEvents.OnlineState
+                {
+                    user_id = -(int)i[1],
+                    timestamp = (int)i[3]
+                }).ToList();
+                if (onlines.Count > 0) foreach (var online in onlines) this.UserOnline?.Invoke(online);
+            });
+
+            Task.Factory.StartNew(() =>
+            {
+                var offlines = updates.Where(i => (int)i[0] == 9).Select(i => new LPEvents.OnlineState
+                {
+                    user_id = -(int)i[1],
+                    timestamp = (int)i[3]
+                }).ToList();
+                if (offlines.Count > 0) foreach (var offline in offlines) this.UserOffline?.Invoke(offline);
+            });
+
+            Task.Factory.StartNew(() =>
+            {
+                var typings = updates.Where(i => (int)i[0] == 63).Select(i => new LPEvents.TypeState
+                {
+                    user_ids = i[1].ToObject<List<int>>(),
+                    peer_id = (int)i[2]
+                }).ToList();
+                if (typings.Count > 0) foreach (var type in typings) this.Typing?.Invoke(type);
+            });
+
+            Task.Factory.StartNew(() =>
+            {
+                var typings = updates.Where(i => (int)i[0] == 62).Select(i => new LPEvents.TypeState
+                {
+                    user_ids = new List<int> { (int)i[1] },
+                    peer_id = (int)i[2] + Limits.Messages.PEERSTART
+                }).ToList();
+                if (typings.Count > 0) foreach (var type in typings) this.Typing?.Invoke(type);
+            });
+
+            Task.Factory.StartNew(() =>
+            {
+                var typings = updates.Where(i => (int)i[0] == 61).Select(i => new LPEvents.TypeState
+                {
+                    user_ids = new List<int> { (int)i[1] },
+                    peer_id = (int)i[1]
+                }).ToList();
+                if (typings.Count > 0) foreach (var type in typings) this.Typing?.Invoke(type);
+            });
         }
     }
 
@@ -146,8 +201,20 @@ namespace Alika.Libs.VK.Longpoll
     {
         public struct ReadState
         {
-            public int peer_id { get; set; }
-            public int msg_id { get; set; }
+            public int peer_id;
+            public int msg_id;
+        }
+
+        public struct OnlineState
+        {
+            public int user_id;
+            public int timestamp;
+        }
+
+        public struct TypeState
+        {
+            public List<int> user_ids;
+            public int peer_id;
         }
     }
 }

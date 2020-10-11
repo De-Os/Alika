@@ -21,7 +21,8 @@ namespace Alika.UI
                 BackgroundSource = AcrylicBackgroundSource.Backdrop
             },
             CornerRadius = new CornerRadius(10),
-            Padding = new Thickness(10)
+            Padding = new Thickness(10),
+            MaxHeight = 600
         };
 
         private TextBlock _title = new TextBlock
@@ -69,6 +70,7 @@ namespace Alika.UI
             set
             {
                 if (this._content.Children.Count > 1 && this._content.Children[1] is FrameworkElement prev) this._content.Children.Remove(prev);
+                value.Transitions.Add(new EntranceThemeTransition { IsStaggeringEnabled = true });
                 Grid.SetRow(value, 1);
                 this._content.Children.Add(value);
             }
