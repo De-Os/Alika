@@ -10,7 +10,7 @@
   <Identity
     Name="0a816845-f771-4ecd-a4ad-e8e7992ca001"
     Publisher="CN=al3ta"
-    Version="0.3.1.0" />
+    Version="0.3.3.0" />
 
   <mp:PhoneIdentity PhoneProductId="0a816845-f771-4ecd-a4ad-e8e7992ca001" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
@@ -46,6 +46,5 @@
 
   <Capabilities>
     <Capability Name="internetClient" />
-    <uap3:Capability Name="backgroundMediaPlayback"/>
   </Capabilities>
 </Package>

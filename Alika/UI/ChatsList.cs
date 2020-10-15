@@ -1,10 +1,12 @@
 ﻿using Alika.Libs;
 using Alika.Libs.VK.Responses;
+using Alika.Misc;
 using Alika.UI.Misc;
 using Microsoft.UI.Xaml.Media;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
@@ -18,6 +20,20 @@ namespace Alika.UI
     {
         public ChatsList Chats;
         public PinnedChatsList PinnedChats;
+
+        public Button MsgExport = new Button
+        {
+            Content = new ProgressRing
+            {
+                IsActive = true,
+                Width = 20,
+                Height = 20
+            },
+            Background = Coloring.Transparent.Full,
+            CornerRadius = new CornerRadius(10),
+            Visibility = Visibility.Collapsed,
+            Margin = new Thickness(5, 0, 0, 0)
+        };
 
         private Grid Menu = new Grid
         {
@@ -113,30 +129,62 @@ namespace Alika.UI
 
         private void LoadMenu()
         {
-            var settings = new Button
+            var menu = new Button
             {
                 Background = Coloring.Transparent.Full,
                 Content = new Image
                 {
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    Source = new SvgImageSource(new System.Uri(Utils.AssetTheme("settings.svg"))),
+                    Source = new SvgImageSource(new System.Uri(Utils.AssetTheme("fly_menu.svg"))),
                     Width = 20,
                     Height = 20
                 },
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(0, 0, 5, 0)
+                Margin = new Thickness(0, 0, 5, 0),
+                Flyout = this.GetMenu()
             };
-            settings.Click += (a, b) => new Settings();
             this.Menu.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
-            this.AddMenuElement(settings);
+            this.AddMenuElement(menu);
 
             this.SearchBar.TextChanging += this.SearchChat;
             this.Menu.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             this.AddMenuElement(this.SearchBar);
+
+            this.Menu.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+            this.AddMenuElement(this.MsgExport);
         }
 
+        private MenuFlyout GetMenu()
+        {
+            var menu = new MenuFlyout();
+
+            var settings = new MenuFlyoutItem
+            {
+                Icon = new FontIcon
+                {
+                    Glyph = "\uE713"
+                },
+                Text = Utils.LocString("Settings")
+            };
+            settings.Click += (a, b) => new Settings();
+            menu.Items.Add(settings);
+
+            var loadExport = new MenuFlyoutItem
+            {
+                Icon = new FontIcon
+                {
+                    Glyph = "\uE8DE"
+                },
+                Text = Utils.LocString("Dialog/ExportLoad")
+            };
+            loadExport.Click += (a, b) => new DialogExportReader();
+            loadExport.RightTapped += (a, b) => new DialogExportReader(Window.Current.CoreWindow.GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down));
+            menu.Items.Add(loadExport);
+
+            return menu;
+        }
 
         private void AddMenuElement(FrameworkElement element)
         {
@@ -318,6 +366,7 @@ namespace Alika.UI
                     this._pinned = value;
                 }
             }
+            private MenuFlyout Flyout = new MenuFlyout();
 
             public ChatItem(int peer_id, Message last_msg, bool pinned = false)
             {
@@ -340,10 +389,6 @@ namespace Alika.UI
                         });
                     }
                 };
-
-                var flyout = new MenuFlyout();
-
-
                 var pin = new MenuFlyoutItem
                 {
                     Text = pinned ? Utils.LocString("Dialog/Unpin") : Utils.LocString("Dialog/Pin"),
@@ -352,7 +397,7 @@ namespace Alika.UI
                         Glyph = pinned ? "\uE735" : "\uE734"
                     }
                 };
-                flyout.Items.Add(pin);
+                this.Flyout.Items.Add(pin);
                 this.OnPin += () =>
                 {
                     pin.Text = Utils.LocString("Dialog/Unpin");
@@ -370,7 +415,6 @@ namespace Alika.UI
                     };
                 };
                 pin.Click += (a, b) => this.Pinned = !this.Pinned;
-                this.RightTapped += (a, b) => flyout.ShowAt(this);
             }
 
             public ChatItem(int peer_id)
@@ -388,7 +432,7 @@ namespace Alika.UI
                 this.grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // Text fields
                 this.grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) }); // Pin icon
                 this.textGrid.RowDefinitions.Add(new RowDefinition()); // Chat name
-                this.textGrid.RowDefinitions.Add(new RowDefinition()); // Message texzt
+                this.textGrid.RowDefinitions.Add(new RowDefinition()); // Message text
                 this.LoadAvatar();
                 this.nameBlock.Text = App.cache.GetName(this.peer_id);
                 Grid.SetRow(this.nameBlock, 0);
@@ -402,6 +446,31 @@ namespace Alika.UI
                 this.Content = this.grid;
 
                 if (this._pinned) this.PinImage.Visibility = Visibility.Visible;
+
+                var export = new MenuFlyoutItem
+                {
+                    Icon = new FontIcon
+                    {
+                        Glyph = "\uEE71"
+                    },
+                    Text = Utils.LocString("Dialog/Export")
+                };
+                export.Click += (a, b) =>
+                {
+                    if ((App.main_page.chats_grid.Content as ChatsHolder).MsgExport.Visibility == Visibility.Collapsed)
+                    {
+                        var popup = new Popup
+                        {
+                            Title = Utils.LocString("Dialog/Export")
+                        };
+                        var exportPopup = new ExportPopup(this.peer_id);
+                        exportPopup.Confirm.Click += (c, d) => popup.Hide();
+                        popup.Content = exportPopup;
+                        App.main_page.popup.Children.Add(popup);
+                    }
+                };
+                this.Flyout.Items.Add(export);
+                this.RightTapped += (a, b) => this.Flyout.ShowAt(this);
             }
 
             private void OnNewMessage(Message msg)

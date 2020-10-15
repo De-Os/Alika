@@ -62,9 +62,9 @@ namespace Alika.Libs.VK
         {
             var result = this.CallMethod(method, fields);
             BasicResponse<Type> job = JsonConvert.DeserializeObject<BasicResponse<Type>>(result);
-            if (job?.error != null)
+            if (job == null || job?.error != null)
             {
-                throw new Exception(method + ": " + job.error.message);
+                throw new Exception(method + ": " + (job == null ? result : job.error.message));
             }
             else return job.response;
         }

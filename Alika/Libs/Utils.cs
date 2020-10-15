@@ -145,6 +145,8 @@ namespace Alika.Libs
             return str;
         }
 
+        public static int ToUnixTime(this DateTime time) => (int)(time.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+
         public static string AppPath(string path) => Package.Current.InstalledLocation.Path + "/" + path;
 
         public static void RemoveParent(this FrameworkElement element)

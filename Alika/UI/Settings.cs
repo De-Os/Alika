@@ -140,8 +140,8 @@ namespace Alika.UI
         private void Show()
         {
             var content = new Grid();
-            content.RowDefinitions.Add(new RowDefinition());
-            content.RowDefinitions.Add(new RowDefinition());
+            content.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+            content.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
             var scroll = new ScrollViewer
             {
                 Content = this.menu,

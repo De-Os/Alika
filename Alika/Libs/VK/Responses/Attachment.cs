@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Alika.Libs.VK.Responses
 {
@@ -32,14 +32,10 @@ namespace Alika.Libs.VK.Responses
         [JsonProperty("gift", NullValueHandling = NullValueHandling.Ignore)]
         public Gift gift { get; set; }
 
-        public class Photo
+        public class Photo : AttachBase
         {
-            [JsonProperty("id")]
-            public int id { get; set; }
             [JsonProperty("album_id")]
             public int album_id { get; set; }
-            [JsonProperty("owner_id")]
-            public int owner_id { get; set; }
             [JsonProperty("user_id")]
             public int user_id { get; set; }
             [JsonProperty("text")]
@@ -48,25 +44,10 @@ namespace Alika.Libs.VK.Responses
             public int dateUnix { get; set; }
             [JsonProperty("sizes")]
             public List<Size> sizes { get; set; }
-            [JsonProperty("access_key", NullValueHandling = NullValueHandling.Ignore)]
-            public string access_key { get; set; }
 
-            public Size GetBestQuality()
-            {
-                int width = 0;
-                int height = 0;
-                Size size = null;
-                this.sizes.ForEach((Size s) =>
-                {
-                    if (s.width >= width && s.height >= height) size = s;
-                });
-                return size;
-            }
+            public Size GetBestQuality() => this.sizes.OrderByDescending(i => i.width).ThenByDescending(i => i.height).First();
 
-            public string ToAttachFormat()
-            {
-                return "photo" + this.owner_id.ToString() + "_" + this.id.ToString() + (this.access_key != null ? "_" + this.access_key : "");
-            }
+            public override string ToAttachFormat() => "photo" + base.ToAttachFormat();
 
             public class Size
             {
@@ -81,12 +62,8 @@ namespace Alika.Libs.VK.Responses
 
             }
         }
-        public class Video
+        public class Video : AttachBase
         {
-            [JsonProperty("id")]
-            public int id { get; set; }
-            [JsonProperty("owner_id")]
-            public int owner_id { get; set; }
             [JsonProperty("title")]
             public string title { get; set; }
             [JsonProperty("description")]
@@ -131,8 +108,6 @@ namespace Alika.Libs.VK.Responses
             public int can_add { get; set; }
             [JsonProperty("is_private")]
             public int is_private { get; set; }
-            [JsonProperty("access_key")]
-            public string access_key { get; set; }
             [JsonProperty("processing", NullValueHandling = NullValueHandling.Ignore)]
             public int processing { get; set; }
             [JsonProperty("live", NullValueHandling = NullValueHandling.Ignore)]
@@ -142,13 +117,10 @@ namespace Alika.Libs.VK.Responses
             [JsonProperty("is_favorite")]
             public bool is_favorite { get; set; }
 
+            public override string ToAttachFormat() => "video" + base.ToAttachFormat();
         }
-        public class Audio
+        public class Audio : AttachBase
         {
-            [JsonProperty("id")]
-            public int id { get; set; }
-            [JsonProperty("owner_id")]
-            public int owner_id { get; set; }
             [JsonProperty("artist")]
             public string artist { get; set; }
             [JsonProperty("title")]
@@ -169,13 +141,11 @@ namespace Alika.Libs.VK.Responses
             public int no_search { get; set; }
             [JsonProperty("is_hq", NullValueHandling = NullValueHandling.Ignore)]
             public int is_hq { get; set; }
+
+            public override string ToAttachFormat() => "audio" + base.ToAttachFormat();
         }
-        public class Document
+        public class Document : AttachBase
         {
-            [JsonProperty("id")]
-            public int id { get; set; }
-            [JsonProperty("owner_id")]
-            public int owner_id { get; set; }
             [JsonProperty("title")]
             public string title { get; set; }
             [JsonProperty("size")]
@@ -190,13 +160,8 @@ namespace Alika.Libs.VK.Responses
             public string type { get; set; }
             [JsonProperty("preview")]
             public Preview preview { get; set; }
-            [JsonProperty("access_key", NullValueHandling = NullValueHandling.Ignore)]
-            public string access_key { get; set; }
 
-            public string ToAttachFormat()
-            {
-                return "doc" + this.owner_id.ToString() + "_" + this.id.ToString() + (this.access_key != null ? "_" + this.access_key : "");
-            }
+            public override string ToAttachFormat() => "doc" + base.ToAttachFormat();
 
             public class Preview
             {
@@ -208,32 +173,22 @@ namespace Alika.Libs.VK.Responses
                 public AudioMessage audio_message { get; set; }
             }
         }
-        public class Graffiti
+        public class Graffiti : AttachBase
         {
-            [JsonProperty("id")]
-            public int id { get; set; }
-            [JsonProperty("owner_id")]
-            public int owner_id { get; set; }
             [JsonProperty("url")]
             public string url { get; set; }
             [JsonProperty("width")]
             public int width { get; set; }
             [JsonProperty("height")]
             public int height { get; set; }
-            [JsonProperty("access_key", NullValueHandling = NullValueHandling.Ignore)]
-            public string access_key { get; set; }
 
-            public string ToAttachFormat()
-            {
-                return "doc" + this.owner_id.ToString() + "_" + this.id.ToString() + (this.access_key != null ? "_" + this.access_key : "");
-            }
+            public override string ToAttachFormat() => "doc" + base.ToAttachFormat();
         }
-        public class AudioMessage
+        public class AudioMessage : AttachBase
         {
             [JsonProperty("duration")]
             public int duration { get; set; }
             [JsonProperty("waveform")]
-            [NotMapped]
             public List<int> waveform { get; set; }
             [JsonProperty("link_ogg")]
             public string link_ogg { get; set; }
@@ -243,6 +198,8 @@ namespace Alika.Libs.VK.Responses
             public string transcript { get; set; }
             [JsonProperty("transcript_state")]
             public string transcript_state { get; set; }
+
+            public override string ToAttachFormat() => "doc" + base.ToAttachFormat();
         }
         public class Link
         {
@@ -324,6 +281,7 @@ namespace Alika.Libs.VK.Responses
                     if (s.width >= width && s.height >= height) url = s.url;
                 });
                 return url;
+
             }
 
             public class Image
@@ -346,6 +304,18 @@ namespace Alika.Libs.VK.Responses
             public string thumb_96 { get; set; }
             [JsonProperty("thumb_48")]
             public string thumb_48 { get; set; }
+        }
+
+        public class AttachBase
+        {
+            [JsonProperty("id")]
+            public int id { get; set; }
+            [JsonProperty("owner_id")]
+            public int owner_id { get; set; }
+            [JsonProperty("access_key")]
+            public string access_key { get; set; }
+
+            public virtual string ToAttachFormat() => owner_id.ToString() + "_" + id.ToString() + (access_key?.Length > 0 ? "_" + access_key : "");
         }
     }
 

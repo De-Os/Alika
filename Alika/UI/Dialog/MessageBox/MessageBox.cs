@@ -23,12 +23,12 @@ namespace Alika.UI
     {
         public MessageGrid message { get; set; }
 
-        public MessageBox(Message msg, int peer_id)
+        public MessageBox(Message msg, int peer_id, bool isStatic = false)
         {
             this.HorizontalAlignment = HorizontalAlignment.Stretch;
             this.HorizontalContentAlignment = msg.from_id == App.vk.user_id ? HorizontalAlignment.Right : HorizontalAlignment.Left;
 
-            this.message = new MessageGrid(msg, peer_id);
+            this.message = new MessageGrid(msg, peer_id, isStatic);
             this.Content = this.message;
         }
 
@@ -158,7 +158,7 @@ namespace Alika.UI
                 this.Children.Add(this.textBubble);
                 this.Children.Add(this.avatar);
 
-                this.RightTapped += (a, b) => new MessageFlyout(msg, this._editions).ShowAt(this, b.GetPosition(b.OriginalSource as UIElement));
+                if (!isStatic) this.RightTapped += (a, b) => new MessageFlyout(msg, this._editions).ShowAt(this, b.GetPosition(b.OriginalSource as UIElement));
             }
 
             public void LoadAvatar(int user_id)

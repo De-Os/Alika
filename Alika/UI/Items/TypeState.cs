@@ -18,8 +18,7 @@ namespace Alika.UI.Items
 
         private TextBlock Text = new TextBlock
         {
-            TextTrimming = Windows.UI.Xaml.TextTrimming.CharacterEllipsis,
-            Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Blue)
+            TextTrimming = Windows.UI.Xaml.TextTrimming.CharacterEllipsis
         };
         private List<int> current = new List<int>();
         private DateTime updated = DateTime.Now;
@@ -85,8 +84,8 @@ namespace Alika.UI.Items
                     {
                         Action = () =>
 {
-this.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-this.Hide?.Invoke();
+    this.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+    this.Hide?.Invoke();
 }
                     });
                     Thread.Sleep(TimeSpan.FromSeconds(5));

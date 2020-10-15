@@ -115,8 +115,24 @@ namespace Alika.Libs.VK.Longpoll
 
             Task.Factory.StartNew(() =>
             {
-                var msg_ids = updates.Where(i => (int)i[0] == 4).Select(i => (int)i[1]).ToList();
-                if (msg_ids.Count > 0) foreach (Message msg in this.vk.Messages.GetById(msg_ids).messages) this.OnNewMessage?.Invoke(msg);
+                var msgs = updates.Where(i => (int)i[0] == 4 || (int)i[0] == 5);
+                foreach (var msg in msgs.Where(i => !i[7].HasValues))
+                {
+                    if ((int)msg[0] == 4) this.OnNewMessage?.Invoke(new Message(msg)); else this.OnMessageEdition?.Invoke(new Message(msg));
+                }
+                var msg_ids = msgs.Where(i => i[7].HasValues).Select(i => (int)i[1]).ToList();
+                if (msg_ids.Count > 0)
+                {
+                    var messages = this.vk.Messages.GetById(msg_ids).messages;
+                    foreach (var msg in messages)
+                    {
+                        if (msgs.Any(i => (int)i[1] == msg.id && (int)i[0] == 4))
+                        {
+                            this.OnNewMessage?.Invoke(msg);
+                        }
+                        else this.OnMessageEdition?.Invoke(msg);
+                    }
+                }
             });
 
             Task.Factory.StartNew(() =>
@@ -127,12 +143,6 @@ namespace Alika.Libs.VK.Longpoll
                     msg_id = (int)i[2]
                 }).ToList();
                 if (readStates.Count > 0) foreach (var rs in readStates) this.OnReadMessage?.Invoke(rs);
-            });
-
-            Task.Factory.StartNew(() =>
-            {
-                var msg_ids = updates.Where(i => (int)i[0] == 5).Select(i => (int)i[1]).ToList();
-                if (msg_ids.Count > 0) foreach (Message msg in this.vk.Messages.GetById(msg_ids).messages) this.OnMessageEdition?.Invoke(msg);
             });
 
             Task.Factory.StartNew(() =>

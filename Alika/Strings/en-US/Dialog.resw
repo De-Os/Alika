@@ -134,6 +134,33 @@
   <data name="EditHistory" xml:space="preserve">
     <value>Editions history</value>
   </data>
+  <data name="Export" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="ExportCreate" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="ExportInfo" xml:space="preserve">
+    <value>Export of %chat% at %date%</value>
+  </data>
+  <data name="Exporting" xml:space="preserve">
+    <value>Exporting chat %chat%: %ready% of %total%</value>
+  </data>
+  <data name="ExportLoad" xml:space="preserve">
+    <value>Open exported data</value>
+  </data>
+  <data name="ExportMode" xml:space="preserve">
+    <value>Export mode</value>
+  </data>
+  <data name="ExportModeAll" xml:space="preserve">
+    <value>Messages and attachments (messages with attachments cache)</value>
+  </data>
+  <data name="ExportModeAttachments" xml:space="preserve">
+    <value>Attachments only</value>
+  </data>
+  <data name="ExportModeMessages" xml:space="preserve">
+    <value>Messages only (without attachments cache)</value>
+  </data>
   <data name="Group" xml:space="preserve">
     <value>Group</value>
     <comment>Group title in top menu</comment>

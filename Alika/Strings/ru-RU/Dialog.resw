@@ -132,6 +132,33 @@
   <data name="EditHistory" xml:space="preserve">
     <value>История редактирования</value>
   </data>
+  <data name="Export" xml:space="preserve">
+    <value>Экспортировать</value>
+  </data>
+  <data name="ExportCreate" xml:space="preserve">
+    <value>Экспортировать</value>
+  </data>
+  <data name="ExportInfo" xml:space="preserve">
+    <value>Выгрузка чата %chat% от %date%</value>
+  </data>
+  <data name="Exporting" xml:space="preserve">
+    <value>Экспорт чата %chat%: %ready% из %total%</value>
+  </data>
+  <data name="ExportLoad" xml:space="preserve">
+    <value>Открыть выгрузку</value>
+  </data>
+  <data name="ExportMode" xml:space="preserve">
+    <value>Режим экспорта</value>
+  </data>
+  <data name="ExportModeAll" xml:space="preserve">
+    <value>Сообщения и вложения (сообщения и кеш вложений)</value>
+  </data>
+  <data name="ExportModeAttachments" xml:space="preserve">
+    <value>Только вложения</value>
+  </data>
+  <data name="ExportModeMessages" xml:space="preserve">
+    <value>Только сообщения (без кеша вложений)</value>
+  </data>
   <data name="Group" xml:space="preserve">
     <value>Группа</value>
   </data>

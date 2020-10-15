@@ -18,10 +18,11 @@ namespace Alika.Libs.VK.Methods
             Dictionary<string, dynamic> request = new Dictionary<string, dynamic>();
             if (group_ids.Count > 0)
             {
-                for (int x = 0; x < group_ids.Count; x++)
-                {
-                    if (group_ids[x] < 0) group_ids[x] = -group_ids[x];
-                }
+                foreach (var id in group_ids) if (id < 0)
+                    {
+                        group_ids.Remove(id);
+                        group_ids.Add(-id);
+                    }
                 request.Add("group_ids", String.Join(",", group_ids));
             }
             if (fields.Length > 0) request.Add("fields", fields);
