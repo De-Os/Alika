@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -275,6 +276,10 @@ namespace Alika.Misc
                             {
                                 if (json.messages.Count > 0)
                                 {
+                                    var content = new Grid();
+                                    content.RowDefinitions.Add(new RowDefinition { Height = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Star) });
+                                    content.RowDefinitions.Add(new RowDefinition { Height = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Auto) });
+
                                     var viewer = new Viewer(json.messages)
                                     {
                                         Width = 600,
@@ -285,15 +290,31 @@ namespace Alika.Misc
                                         Content = viewer,
                                         HorizontalScrollMode = ScrollMode.Disabled
                                     };
-
                                     scroll.ViewChanged += (a, b) =>
                                     {
                                         if (scroll.VerticalOffset >= scroll.ScrollableHeight) viewer.LoadMessages(250);
                                     };
+                                    var search = new Button
+                                    {
+                                        Content = new TextBlock { Text = Utils.LocString("Search") },
+                                        Margin = new Windows.UI.Xaml.Thickness(0, 5, 5, 0),
+                                        CornerRadius = new Windows.UI.Xaml.CornerRadius(5),
+                                        HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Right
+                                    };
+                                    search.Click += (a, b) => {
+                                        App.main_page.popup.Children.Add(new Popup
+                                        {
+                                            Content = new ViewerWithSearch(json.messages)
+                                        });
+                                    };
 
+                                    Grid.SetRow(scroll, 0);
+                                    Grid.SetRow(search, 1);
+                                    content.Children.Add(scroll);
+                                    content.Children.Add(search);
                                     App.main_page.popup.Children.Add(new Popup
                                     {
-                                        Content = scroll,
+                                        Content = content,
                                         Title = Utils.LocString("Dialog/ExportInfo").Replace("%chat%", json.peer_id.ToString()).Replace("%date%", json.export_time.ToDateTime().ToString("f"))
                                     });
                                 }
@@ -306,6 +327,109 @@ namespace Alika.Misc
                         System.Diagnostics.Debug.WriteLine(e);
                     }
                 });
+            }
+        }
+
+        [Bindable]
+        private class ViewerWithSearch : Grid
+        {
+            public ViewerWithSearch(List<Message> messages)
+            {
+                this.RowDefinitions.Add(new RowDefinition { Height = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Auto) });
+                this.RowDefinitions.Add(new RowDefinition { Height = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Star) });
+
+                var topgrid = new Grid();
+                topgrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Star) });
+                topgrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Auto) });
+                topgrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Auto) });
+                topgrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Auto) });
+
+                var searchbar = new TextBox
+                {
+                    PlaceholderText = Utils.LocString("Dialog/TextBoxPlaceholder"),
+                    HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Stretch,
+                    Margin = new Windows.UI.Xaml.Thickness(5),
+                };
+                var calendar = new CalendarDatePicker
+                {
+                    Margin = new Windows.UI.Xaml.Thickness(0, 5, 2.5, 5)
+                };
+                var button = new Button
+                {
+                    Content = new TextBlock { Text = Utils.LocString("Search") },
+                    Margin = new Windows.UI.Xaml.Thickness(0, 5, 5, 5),
+                    CornerRadius = new Windows.UI.Xaml.CornerRadius(5)
+                };
+
+                Grid.SetColumn(searchbar, 0);
+                Grid.SetColumn(calendar, 1);
+                Grid.SetColumn(button, 2);
+                topgrid.Children.Add(searchbar);
+                topgrid.Children.Add(calendar);
+                topgrid.Children.Add(button);
+
+                var holder = new ScrollViewer
+                {
+                    HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Stretch,
+                    Width = 600,
+                    Height = 500
+                };
+
+                Grid.SetRow(topgrid, 0);
+                Grid.SetRow(holder, 1);
+                this.Children.Add(topgrid);
+                this.Children.Add(holder);
+
+                button.Click += (a, b) => Search();
+                searchbar.PreviewKeyDown += (a, b) =>
+                {
+                    if (b.Key == Windows.System.VirtualKey.Enter) Search();
+                };
+                searchbar.TextChanged += (a, b) =>
+                {
+                    if (searchbar.Text == null || searchbar.Text.Length == 0) Search();
+                };
+                holder.ViewChanged += (a, b) =>
+                {
+                    if (holder.Content is Viewer viewer)
+                    {
+                        if (holder.VerticalOffset >= holder.ScrollableHeight) viewer.LoadMessages(250);
+                    }
+                };
+
+                void Search()
+                {
+                    var text = searchbar.Text;
+                    var calend = calendar.Date;
+
+                    Task.Factory.StartNew(() =>
+                    {
+                        var result = new List<Message>();
+                        if (text?.Length > 0) result.AddRange(messages.Where(i => i.text != null && Regex.IsMatch(i.text, text, RegexOptions.IgnoreCase)));
+                        if (calend.HasValue)
+                        {
+                            var date = calend.Value.DateTime.Date;
+                            System.Diagnostics.Debug.WriteLine(date.ToUnixTime());
+                            if (result.Count > 0)
+                            {
+                                result.RemoveAll(i => !(i.date >= date.ToUnixTime() && i.date <= date.AddDays(1).ToUnixTime()));
+                            }
+                            else result.AddRange(messages.Where(i => i.date >= date.ToUnixTime() && i.date <= date.AddDays(1).ToUnixTime()));
+                        }
+
+                        App.UILoop.AddAction(new UITask
+                        {
+                            Action = () =>
+                            {
+                                holder.Content = new Viewer(result)
+                                {
+                                    HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Stretch
+                                };
+                                holder.ChangeView(null, 0, null);
+                            }
+                        });
+                    });
+                }
             }
         }
 
@@ -340,12 +464,19 @@ namespace Alika.Misc
 
                     if (this.Items.Count > 0 && this.Items.Last() is MessageBox prev)
                     {
-                        if (prev.message.textBubble.message.from_id == msg.from_id)
+                        if(prev.message.textBubble.message.date.ToDateTime().Date != msg.date.ToDateTime().Date)
                         {
-                            prev.message.avatar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                            message.message.textBubble.name.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                            this.Items.Add(new DateSeparator(msg.date.ToDateTime()));
                         }
-                    }
+                        else
+                        {
+                            if (prev.message.textBubble.message.from_id == msg.from_id)
+                            {
+                                prev.message.avatar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                                message.message.textBubble.name.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                            }
+                        }
+                    }else this.Items.Add(new DateSeparator(msg.date.ToDateTime()));
 
                     this.Items.Add(message);
                     offset++;

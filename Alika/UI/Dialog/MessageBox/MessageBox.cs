@@ -464,4 +464,21 @@ namespace Alika.UI
             }
         }
     }
+
+    [Windows.UI.Xaml.Data.Bindable]
+    public class DateSeparator : ContentControl
+    {
+        public DateSeparator(DateTime time)
+        {
+            this.HorizontalAlignment = HorizontalAlignment.Stretch;
+            this.HorizontalContentAlignment = HorizontalAlignment.Center;
+            this.VerticalAlignment = VerticalAlignment.Center;
+            this.Padding = new Thickness(5);
+            this.CornerRadius = new CornerRadius(10);
+            this.Content = new TextBlock
+            {
+                Text = time.ToString(time.Date.Year == DateTime.Now.Year ? "M" : "D")
+            };
+        }
+    }
 }
