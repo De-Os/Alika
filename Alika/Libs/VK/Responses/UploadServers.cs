@@ -10,9 +10,9 @@ namespace Alika.Libs.VK.Responses
             public int album_id { get; set; }
             [JsonProperty("upload_url")]
             public string upload_url { get; set; }
-            [JsonProperty("user_id", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("user_id")]
             public int user_id { get; set; }
-            [JsonProperty("group_id", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("group_id")]
             public int group_id { get; set; }
 
             public class UploadResult
@@ -39,11 +39,11 @@ namespace Alika.Libs.VK.Responses
             {
                 [JsonProperty("type")]
                 public string type { get; set; }
-                [JsonProperty("doc", NullValueHandling = NullValueHandling.Ignore)]
+                [JsonProperty("doc")]
                 public Attachment.Document document { get; set; }
-                [JsonProperty("graffiti", NullValueHandling = NullValueHandling.Ignore)]
+                [JsonProperty("graffiti")]
                 public Attachment.Graffiti graffiti { get; set; }
-                [JsonProperty("audio_message", NullValueHandling = NullValueHandling.Ignore)]
+                [JsonProperty("audio_message")]
                 public Attachment.AudioMessage audio_message { get; set; }
 
             }

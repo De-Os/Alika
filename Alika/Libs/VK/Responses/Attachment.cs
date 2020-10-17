@@ -9,27 +9,27 @@ namespace Alika.Libs.VK.Responses
     {
         [JsonProperty("type")]
         public string type { get; set; }
-        [JsonProperty("photo", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("photo")]
         public Photo photo { get; set; }
-        [JsonProperty("video", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("video")]
         public Video video { get; set; }
-        [JsonProperty("audio", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("audio")]
         public Audio audio { get; set; }
-        [JsonProperty("doc", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("doc")]
         public Document document { get; set; }
-        [JsonProperty("graffiti", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("graffiti")]
         public Graffiti graffiti { get; set; }
-        [JsonProperty("audio_message", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("audio_message")]
         public AudioMessage audio_message { get; set; }
-        [JsonProperty("link", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("link")]
         public Link link { get; set; }
-        [JsonProperty("wall", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("wall")]
         public Wall wall { get; set; }
-        [JsonProperty("wall_reply", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("wall_reply")]
         public WallReply wall_reply { get; set; }
-        [JsonProperty("sticker", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("sticker")]
         public Sticker sticker { get; set; }
-        [JsonProperty("gift", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("gift")]
         public Gift gift { get; set; }
 
         public class Photo : AttachBase
@@ -70,25 +70,25 @@ namespace Alika.Libs.VK.Responses
             public string description { get; set; }
             [JsonProperty("duration")]
             public int duration { get; set; }
-            [JsonProperty("photo_130", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("photo_130")]
             public string photo_130 { get; set; }
-            [JsonProperty("photo_320", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("photo_320")]
             public string photo_320 { get; set; }
-            [JsonProperty("photo_640", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("photo_640")]
             public string photo_640 { get; set; }
-            [JsonProperty("photo_800", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("photo_800")]
             public string photo_800 { get; set; }
-            [JsonProperty("photo_1280", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("photo_1280")]
             public string photo_1280 { get; set; }
-            [JsonProperty("first_frame_130", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("first_frame_130")]
             public string first_frame_130 { get; set; }
-            [JsonProperty("first_frame_320", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("first_frame_320")]
             public string first_frame_320 { get; set; }
-            [JsonProperty("first_frame_640", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("first_frame_640")]
             public string first_frame_640 { get; set; }
-            [JsonProperty("first_frame_800", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("first_frame_800")]
             public string first_frame_800 { get; set; }
-            [JsonProperty("first_frame_1280", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("first_frame_1280")]
             public string first_frame_1280 { get; set; }
             [JsonProperty("date")]
             public int date { get; set; }
@@ -108,11 +108,11 @@ namespace Alika.Libs.VK.Responses
             public int can_add { get; set; }
             [JsonProperty("is_private")]
             public int is_private { get; set; }
-            [JsonProperty("processing", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("processing")]
             public int processing { get; set; }
-            [JsonProperty("live", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("live")]
             public int live { get; set; }
-            [JsonProperty("upcoming", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("upcoming")]
             public int upcoming { get; set; }
             [JsonProperty("is_favorite")]
             public bool is_favorite { get; set; }
@@ -129,7 +129,7 @@ namespace Alika.Libs.VK.Responses
             public int duration { get; set; }
             [JsonProperty("url")]
             public string url { get; set; }
-            [JsonProperty("lyrics_id", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("lyrics_id")]
             public int lyrics_id { get; set; }
             [JsonProperty("album_id")]
             public int album_id { get; set; }
@@ -137,9 +137,9 @@ namespace Alika.Libs.VK.Responses
             public int genre_id { get; set; }
             [JsonProperty("date")]
             public int date { get; set; }
-            [JsonProperty("no_search", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("no_search")]
             public int no_search { get; set; }
-            [JsonProperty("is_hq", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("is_hq")]
             public int is_hq { get; set; }
 
             public override string ToAttachFormat() => "audio" + base.ToAttachFormat();
@@ -165,11 +165,11 @@ namespace Alika.Libs.VK.Responses
 
             public class Preview
             {
-                [JsonProperty("photo", NullValueHandling = NullValueHandling.Ignore)]
+                [JsonProperty("photo")]
                 public Photo photo { get; set; }
-                [JsonProperty("graffiti", NullValueHandling = NullValueHandling.Ignore)]
+                [JsonProperty("graffiti")]
                 public Graffiti graffiti { get; set; }
-                [JsonProperty("audio_message ", NullValueHandling = NullValueHandling.Ignore)]
+                [JsonProperty("audio_message ")]
                 public AudioMessage audio_message { get; set; }
             }
         }
@@ -207,7 +207,7 @@ namespace Alika.Libs.VK.Responses
             public string url { get; set; }
             [JsonProperty("title")]
             public string title { get; set; }
-            [JsonProperty("caption ", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("caption ")]
             public string caption { get; set; }
             [JsonProperty("description")]
             public string description { get; set; }
@@ -219,9 +219,9 @@ namespace Alika.Libs.VK.Responses
         {
             [JsonProperty("id")]
             public int id { get; set; }
-            [JsonProperty("owner_id", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("owner_id")]
             public int owner_id { get; set; }
-            [JsonProperty("to_id", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("to_id")]
             public int to_id { get; set; }
             [JsonProperty("from_id")]
             public int from_id { get; set; }
@@ -229,11 +229,11 @@ namespace Alika.Libs.VK.Responses
             public int date { get; set; }
             [JsonProperty("text")]
             public string text { get; set; }
-            [JsonProperty("reply_owner_id", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("reply_owner_id")]
             public int reply_owner_id { get; set; }
-            [JsonProperty("reply_post_id", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("reply_post_id")]
             public int reply_post_id { get; set; }
-            [JsonProperty("friends_only", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("friends_only")]
             public int friends_only { get; set; }
         }
         public class WallReply
@@ -242,9 +242,9 @@ namespace Alika.Libs.VK.Responses
             public int id { get; set; }
             [JsonProperty("from_id")]
             public int from_id { get; set; }
-            [JsonProperty("post_id", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("post_id")]
             public int post_id { get; set; }
-            [JsonProperty("owner_id", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("owner_id")]
             public int owner_id { get; set; }
             [JsonProperty("date")]
             public int date { get; set; }
@@ -265,9 +265,9 @@ namespace Alika.Libs.VK.Responses
             public List<Image> images { get; set; }
             [JsonProperty("images_with_background")]
             public List<Image> images_with_background { get; set; }
-            [JsonProperty("animation_url", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("animation_url")]
             public string animation_url { get; set; }
-            [JsonProperty("is_allowed", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("is_allowed")]
             public bool is_allowed { get; set; }
 
             public string GetBestQuality(bool background = false)

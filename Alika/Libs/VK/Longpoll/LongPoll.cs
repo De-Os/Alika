@@ -57,7 +57,7 @@ namespace Alika.Libs.VK.Longpoll
         public void Generate()
         {
             LPResponse lp = this.vk.Call<LPResponse>("messages.getLongPollServer", new Dictionary<string, dynamic> {
-                {"lp_version", 3},
+                {"lp_version", 10},
                 {"need_pts", 0}
             });
             this._http = new RestClient("https://" + lp.server) { Proxy = this._proxy };
@@ -67,7 +67,7 @@ namespace Alika.Libs.VK.Longpoll
             request.AddParameter("ts", lp.ts);
             request.AddParameter("wait", 50);
             request.AddParameter("mode", 2);
-            request.AddParameter("version", 3);
+            request.AddParameter("version", 10);
             this.ts = lp.ts;
             this.stop = false;
         }
@@ -118,7 +118,8 @@ namespace Alika.Libs.VK.Longpoll
                 var msgs = updates.Where(i => (int)i[0] == 4 || (int)i[0] == 5);
                 foreach (var msg in msgs.Where(i => !i[7].HasValues))
                 {
-                    if ((int)msg[0] == 4) this.OnNewMessage?.Invoke(new Message(msg)); else this.OnMessageEdition?.Invoke(new Message(msg));
+                    var message = new Message(msg);
+                    if ((int)msg[0] == 4) this.OnNewMessage?.Invoke(message); else this.OnMessageEdition?.Invoke(message);
                 }
                 var msg_ids = msgs.Where(i => i[7].HasValues).Select(i => (int)i[1]).ToList();
                 if (msg_ids.Count > 0)
@@ -169,28 +170,8 @@ namespace Alika.Libs.VK.Longpoll
             {
                 var typings = updates.Where(i => (int)i[0] == 63).Select(i => new LPEvents.TypeState
                 {
-                    user_ids = i[1].ToObject<List<int>>(),
-                    peer_id = (int)i[2]
-                }).ToList();
-                if (typings.Count > 0) foreach (var type in typings) this.Typing?.Invoke(type);
-            });
-
-            Task.Factory.StartNew(() =>
-            {
-                var typings = updates.Where(i => (int)i[0] == 62).Select(i => new LPEvents.TypeState
-                {
-                    user_ids = new List<int> { (int)i[1] },
-                    peer_id = (int)i[2] + Limits.Messages.PEERSTART
-                }).ToList();
-                if (typings.Count > 0) foreach (var type in typings) this.Typing?.Invoke(type);
-            });
-
-            Task.Factory.StartNew(() =>
-            {
-                var typings = updates.Where(i => (int)i[0] == 61).Select(i => new LPEvents.TypeState
-                {
-                    user_ids = new List<int> { (int)i[1] },
-                    peer_id = (int)i[1]
+                    peer_id = (int)i[1],
+                    user_ids = i[2].ToObject<List<int>>()
                 }).ToList();
                 if (typings.Count > 0) foreach (var type in typings) this.Typing?.Invoke(type);
             });

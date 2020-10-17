@@ -5,9 +5,9 @@ namespace Alika.Libs.VK.Responses
 {
     class BasicResponse<Type>
     {
-        [JsonProperty("response", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("response")]
         public Type response { get; set; }
-        [JsonProperty("error", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("error")]
         public Error error { get; set; }
     }
 
@@ -17,9 +17,9 @@ namespace Alika.Libs.VK.Responses
         public int code { get; set; }
         [JsonProperty("error_msg")]
         public string message { get; set; }
-        [JsonProperty("captcha_sid", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("captcha_sid")]
         public string captcha_sid { get; set; }
-        [JsonProperty("captcha_img", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("captcha_img")]
         public string captcha_img { get; set; }
         [JsonProperty("request_params")]
         public List<Dictionary<string, string>> request_params { get; set; }

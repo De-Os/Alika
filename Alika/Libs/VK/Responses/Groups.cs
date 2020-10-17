@@ -21,13 +21,13 @@ namespace Alika.Libs.VK.Responses
         public string name { get; set; }
         [JsonProperty("screen_name")]
         public string screen_name { get; set; }
-        [JsonProperty("verified", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("verified")]
         public int verified { get; set; }
-        [JsonProperty("photo_50", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("photo_50")]
         public string photo_50 { get; set; }
-        [JsonProperty("photo_100", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("photo_100")]
         public string photo_100 { get; set; }
-        [JsonProperty("photo_200", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("photo_200")]
         public string photo_200 { get; set; }
         [JsonProperty("is_closed")]
         public int is_closed { get; set; }

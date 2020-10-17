@@ -9,9 +9,9 @@ namespace Alika.Libs.VK.Responses
         public int count { get; set; }
         [JsonProperty("items")]
         public List<ConversationResponse> conversations { get; set; }
-        [JsonProperty("profiles", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("profiles")]
         public List<User> profiles { get; set; }
-        [JsonProperty("groups", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("groups")]
         public List<Group> groups { get; set; }
 
         public class ConversationResponse
@@ -37,7 +37,7 @@ namespace Alika.Libs.VK.Responses
                 public PeerPushSettings push_settings { get; set; }
                 [JsonProperty("can_write")]
                 public PeerWriteSettings write_settings { get; set; }
-                [JsonProperty("chat_settings", NullValueHandling = NullValueHandling.Ignore)]
+                [JsonProperty("chat_settings")]
                 public PeerSettings settings { get; set; }
 
                 public class PeerInfo
@@ -93,7 +93,7 @@ namespace Alika.Libs.VK.Responses
                     [JsonProperty("title")]
                     public string title { get; set; }
 
-                    [JsonProperty("pinned_message", NullValueHandling = NullValueHandling.Ignore)]
+                    [JsonProperty("pinned_message")]
                     public Message pinned_message { get; set; }
                     [JsonProperty("state")]
                     public string state { get; set; }
@@ -155,11 +155,11 @@ namespace Alika.Libs.VK.Responses
 
                     public class PeerPhotos
                     {
-                        [JsonProperty("photo_50", NullValueHandling = NullValueHandling.Ignore)]
+                        [JsonProperty("photo_50")]
                         public string photo_50 { get; set; }
-                        [JsonProperty("photo_100", NullValueHandling = NullValueHandling.Ignore)]
+                        [JsonProperty("photo_100")]
                         public string photo_100 { get; set; }
-                        [JsonProperty("photo_200", NullValueHandling = NullValueHandling.Ignore)]
+                        [JsonProperty("photo_200")]
                         public string photo_200 { get; set; }
 
                     }
@@ -175,9 +175,9 @@ namespace Alika.Libs.VK.Responses
         [JsonProperty("items")]
         public List<Message> messages { get; set; }
 
-        [JsonProperty("profiles", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("profiles")]
         public List<User> profiles { get; set; }
-        [JsonProperty("groups", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("groups")]
         public List<Group> groups { get; set; }
     }
 
@@ -187,9 +187,9 @@ namespace Alika.Libs.VK.Responses
         public int count { get; set; }
         [JsonProperty("items")]
         public List<GetConversationsResponse.ConversationResponse.ConversationInfo> conversations { get; set; }
-        [JsonProperty("profiles", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("profiles")]
         public List<User> profiles { get; set; }
-        [JsonProperty("groups", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("groups")]
         public List<Group> groups { get; set; }
     }
 

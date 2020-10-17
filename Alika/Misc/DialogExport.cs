@@ -301,7 +301,8 @@ namespace Alika.Misc
                                         CornerRadius = new Windows.UI.Xaml.CornerRadius(5),
                                         HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Right
                                     };
-                                    search.Click += (a, b) => {
+                                    search.Click += (a, b) =>
+                                    {
                                         App.main_page.popup.Children.Add(new Popup
                                         {
                                             Content = new ViewerWithSearch(json.messages)
@@ -464,7 +465,7 @@ namespace Alika.Misc
 
                     if (this.Items.Count > 0 && this.Items.Last() is MessageBox prev)
                     {
-                        if(prev.message.textBubble.message.date.ToDateTime().Date != msg.date.ToDateTime().Date)
+                        if (prev.message.textBubble.message.date.ToDateTime().Date != msg.date.ToDateTime().Date)
                         {
                             this.Items.Add(new DateSeparator(msg.date.ToDateTime()));
                         }
@@ -476,7 +477,8 @@ namespace Alika.Misc
                                 message.message.textBubble.name.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                             }
                         }
-                    }else this.Items.Add(new DateSeparator(msg.date.ToDateTime()));
+                    }
+                    else this.Items.Add(new DateSeparator(msg.date.ToDateTime()));
 
                     this.Items.Add(message);
                     offset++;

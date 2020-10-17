@@ -19,23 +19,23 @@ namespace Alika.Libs.VK.Responses
         public int read_state { get; set; }
         [JsonProperty("text")]
         public string text { get; set; }
-        [JsonProperty("fwd_messages", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("fwd_messages")]
         public List<Message> fwd_messages { get; set; }
-        [JsonProperty("reply_message", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("reply_message")]
         public Message reply_message { get; set; }
-        [JsonProperty("out", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("out")]
         public int isOut { get; set; }
-        [JsonProperty("attachments", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("attachments")]
         public List<Attachment> attachments { get; set; }
-        [JsonProperty("important", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("important")]
         public bool important { get; set; }
-        [JsonProperty("payload", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("payload")]
         public string payload { get; set; }
-        [JsonProperty("keyboard", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("keyboard")]
         public Keyboard keyboard { get; set; }
-        [JsonProperty("action", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("action")]
         public Action action { get; set; }
-        [JsonProperty("update_time", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("update_time")]
         public int update_time { get; set; }
 
         public Message() { }
@@ -45,22 +45,26 @@ namespace Alika.Libs.VK.Responses
             {
                 this.id = (int)message[1];
                 this.peer_id = (int)message[3];
+                this.from_id = this.peer_id;
                 this.date = (int)message[4];
                 this.text = ((string)message[5]).Replace("<br>", "\n");
-                try { this.from_id = (int)message[6]["from"]; } catch { }
+                if (message[6] != null && message[6].HasValues)
+                {
+                    var additions = message[6];
+                    if (additions["keyboard"] != null) this.keyboard = additions["keyboard"].ToObject<Keyboard>();
+                    if (additions["payload"] != null) this.payload = (string)additions["payload"];
+                    if (additions["from"] != null) this.from_id = int.Parse((string)additions["from"]);
+                }
             }
         }
 
-        public DateTime GetFormattedDate()
-        {
-            return new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(this.date).ToLocalTime();
-        }
+        public DateTime GetFormattedDate() => new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(this.date).ToLocalTime();
 
         public class Keyboard
         {
-            [JsonProperty("one_time", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("one_time")]
             public bool one_time { get; set; }
-            [JsonProperty("inline", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("inline")]
             public bool inline { get; set; }
             [JsonProperty("buttons")]
             public List<List<Button>> buttons { get; set; }
@@ -75,18 +79,18 @@ namespace Alika.Libs.VK.Responses
                 {
                     [JsonProperty("type")]
                     public string type { get; set; }
-                    [JsonProperty("label", NullValueHandling = NullValueHandling.Ignore)]
+                    [JsonProperty("label")]
                     public string label { get; set; }
-                    [JsonProperty("payload", NullValueHandling = NullValueHandling.Ignore)]
+                    [JsonProperty("payload")]
                     public string payload { get; set; }
 
-                    [JsonProperty("url", NullValueHandling = NullValueHandling.Ignore)]
+                    [JsonProperty("url")]
                     public string url { get; set; }
-                    [JsonProperty("hash", NullValueHandling = NullValueHandling.Ignore)]
+                    [JsonProperty("hash")]
                     public string hash { get; set; }
-                    [JsonProperty("app_id", NullValueHandling = NullValueHandling.Ignore)]
+                    [JsonProperty("app_id")]
                     public int app_id { get; set; }
-                    [JsonProperty("owner_id", NullValueHandling = NullValueHandling.Ignore)]
+                    [JsonProperty("owner_id")]
                     public int owner_id { get; set; }
                 }
             }
@@ -95,13 +99,13 @@ namespace Alika.Libs.VK.Responses
         {
             [JsonProperty("type")]
             public string type { get; set; }
-            [JsonProperty("member_id", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("member_id")]
             public int member_id { get; set; }
-            [JsonProperty("text", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("text")]
             public string text { get; set; }
-            [JsonProperty("email", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("email")]
             public string email { get; set; }
-            [JsonProperty("photo", NullValueHandling = NullValueHandling.Ignore)]
+            [JsonProperty("photo")]
             public GetConversationsResponse.ConversationResponse.ConversationInfo.PeerSettings.PeerPhotos photo { get; set; }
         }
     }

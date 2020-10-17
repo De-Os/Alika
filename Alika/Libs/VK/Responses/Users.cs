@@ -11,21 +11,21 @@ namespace Alika.Libs.VK.Responses
         public string first_name { get; set; }
         [JsonProperty("last_name")]
         public string last_name { get; set; }
-        [JsonProperty("verified", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("verified")]
         public int verified { get; set; }
-        [JsonProperty("photo_50", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("photo_50")]
         public string photo_50 { get; set; }
-        [JsonProperty("photo_100", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("photo_100")]
         public string photo_100 { get; set; }
-        [JsonProperty("photo_200", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("photo_200")]
         public string photo_200 { get; set; }
-        [JsonProperty("screen_name", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("screen_name")]
         public string screen_name { get; set; }
-        [JsonProperty("online", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("online")]
         public int online { get; set; }
-        [JsonProperty("online_mobile", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("online_mobile")]
         public int online_mobile { get; set; }
-        [JsonProperty("online_info", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("online_info")]
         public OnlineInfo online_info { get; set; }
 
         public class OnlineInfo
