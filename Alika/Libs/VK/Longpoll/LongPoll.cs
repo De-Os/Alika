@@ -11,6 +11,28 @@ namespace Alika.Libs.VK.Longpoll
 {
     public class LongPoll
     {
+        enum Updates
+        {
+            SET_FLAGS = 2,
+            RESET_FLAGS = 3,
+            NEW_MESSAGE = 4,
+            EDIT_MESSAGE = 5,
+            READ_IN_MESSAGES = 6,
+            READ_OUT_MESSAGES = 7,
+            FRIEND_ONLINE = 8,
+            FRIEND_OFFLINE = 9,
+            RESET_CHAT_FLAGS = 10,
+            SET_CHAT_FLAGS = 12,
+            DELETE_ALL_MESSAGES = 13,
+            CHANGE_MESSAGE = 18,
+            RESET_CACHE_MESSAGE = 19,
+            EDIT_CHAT = 52,
+            TYPING = 63,
+            VOICING = 64,
+            UNREAD_COUNT_UPDATE = 80,
+            CALLBACK_BUTTON_RESPONSE = 119
+        }
+
         private readonly VK vk;
         private bool stop;
 
@@ -115,30 +137,28 @@ namespace Alika.Libs.VK.Longpoll
 
             Task.Factory.StartNew(() =>
             {
-                var msgs = updates.Where(i => (int)i[0] == 4 || (int)i[0] == 5);
-                foreach (var msg in msgs.Where(i => !i[7].HasValues))
+                var msgs = updates.Where(i => (int)i[0] == (int)Updates.NEW_MESSAGE || (int)i[0] == (int)Updates.EDIT_MESSAGE);
+                var basic = msgs.Where(i => !i[7].HasValues && (i[2].ToObject<Message.Flags>() & Message.Flags.REPLY_MSG) == Message.Flags.NONE);
+                foreach (var msg in basic)
                 {
                     var message = new Message(msg);
-                    if ((int)msg[0] == 4) this.OnNewMessage?.Invoke(message); else this.OnMessageEdition?.Invoke(message);
+                    if ((int)msg[0] == (int)Updates.NEW_MESSAGE) this.OnNewMessage?.Invoke(message); else this.OnMessageEdition?.Invoke(message);
                 }
-                var msg_ids = msgs.Where(i => i[7].HasValues).Select(i => (int)i[1]).ToList();
-                if (msg_ids.Count > 0)
+                var advanced = msgs.Where(i => !basic.Contains(i)).ToList();
+                if (advanced.Count > 0)
                 {
-                    var messages = this.vk.Messages.GetById(msg_ids).messages;
-                    foreach (var msg in messages)
+                    var messages = this.vk.Messages.GetById(advanced.Select(i => (int)i[1]).ToList()).messages;
+                    foreach (var msg in advanced)
                     {
-                        if (msgs.Any(i => (int)i[1] == msg.id && (int)i[0] == 4))
-                        {
-                            this.OnNewMessage?.Invoke(msg);
-                        }
-                        else this.OnMessageEdition?.Invoke(msg);
+                        var message = messages.Find(i => i.id == (int)msg[1]);
+                        if ((int)msg[0] == (int)Updates.NEW_MESSAGE) this.OnNewMessage?.Invoke(message); else this.OnMessageEdition?.Invoke(message);
                     }
                 }
             });
 
             Task.Factory.StartNew(() =>
             {
-                var readStates = updates.Where(i => (int)i[0] == 6 || (int)i[1] == 7).Select(i => new LPEvents.ReadState
+                var readStates = updates.Where(i => (int)i[0] == (int)Updates.READ_IN_MESSAGES || (int)i[1] == (int)Updates.READ_OUT_MESSAGES).Select(i => new LPEvents.ReadState
                 {
                     peer_id = (int)i[1],
                     msg_id = (int)i[2]
@@ -148,7 +168,7 @@ namespace Alika.Libs.VK.Longpoll
 
             Task.Factory.StartNew(() =>
             {
-                var onlines = updates.Where(i => (int)i[0] == 8).Select(i => new LPEvents.OnlineState
+                var onlines = updates.Where(i => (int)i[0] == (int)Updates.FRIEND_ONLINE).Select(i => new LPEvents.OnlineState
                 {
                     user_id = -(int)i[1],
                     timestamp = (int)i[3]
@@ -158,7 +178,7 @@ namespace Alika.Libs.VK.Longpoll
 
             Task.Factory.StartNew(() =>
             {
-                var offlines = updates.Where(i => (int)i[0] == 9).Select(i => new LPEvents.OnlineState
+                var offlines = updates.Where(i => (int)i[0] == (int)Updates.FRIEND_OFFLINE).Select(i => new LPEvents.OnlineState
                 {
                     user_id = -(int)i[1],
                     timestamp = (int)i[3]
@@ -168,7 +188,7 @@ namespace Alika.Libs.VK.Longpoll
 
             Task.Factory.StartNew(() =>
             {
-                var typings = updates.Where(i => (int)i[0] == 63).Select(i => new LPEvents.TypeState
+                var typings = updates.Where(i => (int)i[0] == (int)Updates.TYPING).Select(i => new LPEvents.TypeState
                 {
                     peer_id = (int)i[1],
                     user_ids = i[2].ToObject<List<int>>()

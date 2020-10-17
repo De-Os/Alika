@@ -1,14 +1,19 @@
-﻿using System.Linq;
+﻿using Alika.Libs;
+using System;
+using System.Linq;
+using System.Linq.Expressions;
 using Windows.UI.Core;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI
 {
-    [Windows.UI.Xaml.Data.Bindable]
+    [Bindable]
     public class Popup : Grid
     {
         private Grid _content = new Grid
@@ -135,6 +140,67 @@ namespace Alika.UI
 
             Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
             // TODO: Other...
+        }
+
+        [Bindable]
+        public class Menu : StackPanel
+        {
+            public Menu(string title = null)
+            {
+                if (title != null) this.Children.Add(new TextBlock {
+                    Margin = new Thickness(5, 0, 0, 2),
+                    Text = Utils.LocString(title),
+                    FontWeight = FontWeights.SemiLight,
+                    FontSize = 12.5
+                });
+            }
+
+            [Bindable]
+            public class Element : Button
+            {
+                public Element(string title, string icon, RoutedEventHandler action)
+                {
+                    this.HorizontalAlignment = HorizontalAlignment.Stretch;
+                    this.HorizontalContentAlignment = HorizontalAlignment.Left;
+                    this.Background = Coloring.Transparent.Full;
+                    this.Padding = new Thickness(10);
+                    this.CornerRadius = new CornerRadius(5);
+
+                    var content = new Grid();
+                    content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+                    content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+                    var image = new Image
+                    {
+                        Width = 20,
+                        Height = 20,
+                        Margin = new Thickness(0, 0, 10, 0),
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Source = new SvgImageSource(new Uri(Utils.AssetTheme(icon)))
+                    };
+                    var text = new TextBlock
+                    {
+                        VerticalAlignment = VerticalAlignment.Center,
+                        FontWeight = FontWeights.SemiBold,
+                        TextTrimming = TextTrimming.CharacterEllipsis,
+                        Text = Utils.LocString(title)
+                    };
+
+                    Grid.SetColumn(image, 0);
+                    Grid.SetColumn(text, 1);
+
+                    content.Children.Add(image);
+                    content.Children.Add(text);
+
+                    this.PointerEntered += (a, b) => Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Hand, 0);
+                    this.PointerExited += (a, b) => Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
+                    this.PointerPressed += (a, b) => Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
+
+                    if (action != null) this.Click += action;
+
+                    this.Content = content;
+                }
+            }
         }
     }
 }

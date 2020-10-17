@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage.Pickers;
-using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
@@ -170,71 +169,25 @@ namespace Alika.UI
         }
 
         [Windows.UI.Xaml.Data.Bindable]
-        public class AttachmentsList : StackPanel
+        public class AttachmentsList : ContentControl
         {
-
-            public AttachmentsList(int peer_id)
+            public AttachmentsList(int peer_id, string title = "Attachments/Attachments")
             {
-                this.Children.Add(new TextBlock
-                {
-                    Margin = new Thickness(5, 0, 0, 2),
-                    Text = Utils.LocString("Attachments/Attachments"),
-                    FontWeight = FontWeights.SemiLight,
-                    FontSize = 12.5
-                });
-                this.Children.Add(new Element("Attachments/Photos", "camera.svg", "photo", peer_id));
-                this.Children.Add(new Element("Attachments/Documents", "document.svg", "doc", peer_id));
-                this.Children.Add(new Element("Attachments/Videos", "video.svg", "video", peer_id));
-                this.Children.Add(new Element("Attachments/Links", "link.svg", "link", peer_id));
-                this.Children.Add(new Element("Attachments/VoiceMessages", "microphone.svg", "audio_message", peer_id));
-            }
+                var content = new Popup.Menu(title);
+                this.Content = content;
+                this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
 
-            [Windows.UI.Xaml.Data.Bindable]
-            public class Element : Button
-            {
-                public Image Icon = new Image
-                {
-                    Width = 20,
-                    Height = 20,
-                    Margin = new Thickness(0, 0, 10, 0),
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                public TextBlock Text = new TextBlock
-                {
-                    VerticalAlignment = VerticalAlignment.Center,
-                    FontWeight = FontWeights.SemiBold
-                };
-                private readonly Grid _content = new Grid();
-                public Element(string title, string icon, string type = null, int peer_id = 0)
-                {
-                    this.HorizontalAlignment = HorizontalAlignment.Stretch;
-                    this.HorizontalContentAlignment = HorizontalAlignment.Left;
-                    this.Background = Coloring.Transparent.Full;
+                AddElement("photo", "Attachments/Photos", "camera.svg");
+                AddElement("doc", "Attachments/Documents", "document.svg");
+                AddElement("video", "Attachments/Videos", "video.svg");
+                AddElement("link", "Attachments/Links", "link.svg");
+                AddElement("audio_message", "Attachments/VoiceMessages", "microphone.svg");
 
-                    this.Padding = new Thickness(10);
-                    this.CornerRadius = new CornerRadius(5);
-
-                    this._content.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
-                    this._content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
-                    this._content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-
-                    this.Icon.Source = new SvgImageSource(new Uri(Utils.AssetTheme(icon)));
-                    this.Text.Text = Utils.LocString(title);
-
-                    Grid.SetColumn(this.Icon, 0);
-                    Grid.SetColumn(this.Text, 1);
-
-                    this._content.Children.Add(this.Icon);
-                    this._content.Children.Add(this.Text);
-
-                    this.PointerEntered += (a, b) => Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Hand, 0);
-                    this.PointerExited += (a, b) => Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
-                    this.PointerPressed += (a, b) => Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
-
-                    if (type != null) this.Click += (a, c) => new AttachmentsPopup(peer_id, type, title);
-
-                    this.Content = this._content;
-                }
+                void AddElement(string type, string name, string image) => content.Children.Add(new Popup.Menu.Element(
+                        name,
+                        image,
+                        (a, b) => new AttachmentsPopup(peer_id, type, name)
+                    ));
             }
 
             public class AttachmentsPopup
@@ -347,7 +300,7 @@ namespace Alika.UI
                                            switch (this.type)
                                            {
                                                case "doc":
-                                                   final.Children.Add(new MessageAttachment.Document(att.attachment.document)
+                                                   if(att.attachment.document != null) final.Children.Add(new MessageAttachment.Document(att.attachment.document)
                                                    {
                                                        HorizontalAlignment = HorizontalAlignment.Stretch,
                                                        HorizontalContentAlignment = HorizontalAlignment.Left,
@@ -377,7 +330,7 @@ namespace Alika.UI
             }
         }
 
-        public class ConversationItems : StackPanel
+        public class ConversationItems : ContentControl
         {
             public delegate void Event(string str);
             public event Event AvatarUpdated;
@@ -389,13 +342,10 @@ namespace Alika.UI
 
             public ConversationItems(GetConversationsResponse.ConversationResponse.ConversationInfo peer)
             {
-                this.Children.Add(new TextBlock
-                {
-                    Margin = new Thickness(5, 0, 0, 2),
-                    Text = Utils.LocString("Dialog/Management"),
-                    FontWeight = FontWeights.SemiLight,
-                    FontSize = 12.5
-                });
+                var content = new Popup.Menu("Dialog/Management");
+                this.Content = content;
+                this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+
                 if (peer.settings.access.can_change_info)
                 {
                     var settings = new Settings(peer);
@@ -406,9 +356,11 @@ namespace Alika.UI
                         Content = settings,
                         Title = Utils.LocString("Settings")
                     };
-                    var perms = new Element("Settings", "edit.svg");
-                    perms.Click += (a, b) => App.main_page.popup.Children.Add(this.SettingsPopup);
-                    this.Children.Add(perms);
+                    content.Children.Add(new Popup.Menu.Element(
+                            "Settings",
+                            "edit.svg",
+                            (a, b) => App.main_page.popup.Children.Add(this.SettingsPopup)
+                        ));
                 }
                 if (peer.settings?.permissions != null && peer.settings?.owner_id == App.vk.user_id)
                 {
@@ -417,9 +369,11 @@ namespace Alika.UI
                         Content = new Permissions(peer.settings.permissions, peer.peer.id),
                         Title = Utils.LocString("Dialog/Permissions")
                     };
-                    var perms = new Element("Dialog/Permissions", "settings.svg");
-                    perms.Click += (a, b) => App.main_page.popup.Children.Add(this.PermsPopup);
-                    this.Children.Add(perms);
+                    content.Children.Add(new Popup.Menu.Element(
+                            "Dialog/Permissions",
+                            "settings.svg",
+                            (a, b) => App.main_page.popup.Children.Add(this.PermsPopup)
+                        ));
                 }
 
                 this.MembersPopup = new Popup
@@ -427,55 +381,11 @@ namespace Alika.UI
                     Content = new Members(peer.peer.id),
                     Title = Utils.LocString("Dialog/Members")
                 };
-                var members = new Element("Dialog/Members", "person.svg");
-                members.Click += (a, b) => App.main_page.popup.Children.Add(this.MembersPopup);
-                this.Children.Add(members);
-            }
-
-            [Windows.UI.Xaml.Data.Bindable]
-            public class Element : Button
-            {
-                public Image Icon = new Image
-                {
-                    Width = 20,
-                    Height = 20,
-                    Margin = new Thickness(0, 0, 10, 0),
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                public TextBlock Text = new TextBlock
-                {
-                    VerticalAlignment = VerticalAlignment.Center,
-                    FontWeight = FontWeights.SemiBold
-                };
-                private Grid _content = new Grid();
-                public Element(string title, string icon)
-                {
-                    this.HorizontalAlignment = HorizontalAlignment.Stretch;
-                    this.HorizontalContentAlignment = HorizontalAlignment.Left;
-                    this.Background = Coloring.Transparent.Full;
-
-                    this.Padding = new Thickness(10);
-                    this.CornerRadius = new CornerRadius(5);
-
-                    this._content.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
-                    this._content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
-                    this._content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-
-                    this.Icon.Source = new SvgImageSource(new Uri(Utils.AssetTheme(icon)));
-                    this.Text.Text = Utils.LocString(title);
-
-                    Grid.SetColumn(this.Icon, 0);
-                    Grid.SetColumn(this.Text, 1);
-
-                    this._content.Children.Add(this.Icon);
-                    this._content.Children.Add(this.Text);
-
-                    this.PointerEntered += (a, b) => Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Hand, 0);
-                    this.PointerExited += (a, b) => Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
-                    this.PointerPressed += (a, b) => Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
-
-                    this.Content = this._content;
-                }
+                content.Children.Add(new Popup.Menu.Element(
+                        "Dialog/Members",
+                        "person.svg",
+                        (a, b) => App.main_page.popup.Children.Add(this.MembersPopup)
+                    ));
             }
 
             [Windows.UI.Xaml.Data.Bindable]

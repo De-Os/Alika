@@ -7,6 +7,26 @@ namespace Alika.Libs.VK.Responses
 {
     public class Message
     {
+        public enum Flags
+        {
+            NONE = 0,
+            UNREAD = 1,
+            OUTBOX = 2,
+            IMPORTANT = 8,
+            CHAT = 16,
+            FRIENDS = 32,
+            SPAM = 64,
+            DELETED = 128,
+            AUDIO_LISTENED = 4096,
+            CHAT2 = 8192,
+            CANCEL_SPAM = 32768,
+            HIDDEN = 65536,
+            DELETED_ALL = 131072,
+            CHAT_IN = 524288,
+            SILENT = 1048576,
+            REPLY_MSG = 2097152
+        }
+
         [JsonProperty("id")]
         public int id { get; set; }
         [JsonProperty("peer_id")]
@@ -55,6 +75,8 @@ namespace Alika.Libs.VK.Responses
                     if (additions["payload"] != null) this.payload = (string)additions["payload"];
                     if (additions["from"] != null) this.from_id = int.Parse((string)additions["from"]);
                 }
+
+                if ((message[2].ToObject<Flags>() & Flags.OUTBOX) != Flags.NONE) this.from_id = App.vk.user_id;
             }
         }
 

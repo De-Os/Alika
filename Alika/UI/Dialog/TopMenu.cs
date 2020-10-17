@@ -122,7 +122,7 @@ namespace Alika.UI.Dialog
                 {
                     App.main_page.popup.Children.Add(new Popup
                     {
-                        Content = new ChatInformation.AttachmentsList(peer_id),
+                        Content = new ChatInformation.AttachmentsList(peer_id, null),
                         Title = Utils.LocString("Attachments/Attachments")
                     });
                 }; ;

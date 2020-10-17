@@ -5,32 +5,32 @@ using System.Linq;
 
 namespace Alika.Libs.VK.Responses
 {
-    public class Attachment
+    public struct Attachment
     {
         [JsonProperty("type")]
-        public string type { get; set; }
+        public string type;
         [JsonProperty("photo")]
-        public Photo photo { get; set; }
+        public Photo photo;
         [JsonProperty("video")]
-        public Video video { get; set; }
+        public Video video;
         [JsonProperty("audio")]
-        public Audio audio { get; set; }
+        public Audio audio;
         [JsonProperty("doc")]
-        public Document document { get; set; }
+        public Document document;
         [JsonProperty("graffiti")]
-        public Graffiti graffiti { get; set; }
+        public Graffiti graffiti;
         [JsonProperty("audio_message")]
-        public AudioMessage audio_message { get; set; }
+        public AudioMessage audio_message;
         [JsonProperty("link")]
-        public Link link { get; set; }
+        public Link link;
         [JsonProperty("wall")]
-        public Wall wall { get; set; }
+        public Wall wall;
         [JsonProperty("wall_reply")]
-        public WallReply wall_reply { get; set; }
+        public WallReply wall_reply;
         [JsonProperty("sticker")]
-        public Sticker sticker { get; set; }
+        public Sticker sticker;
         [JsonProperty("gift")]
-        public Gift gift { get; set; }
+        public Gift gift;
 
         public class Photo : AttachBase
         {
@@ -306,7 +306,7 @@ namespace Alika.Libs.VK.Responses
             public string thumb_48 { get; set; }
         }
 
-        public class AttachBase
+        public abstract class AttachBase
         {
             [JsonProperty("id")]
             public int id { get; set; }
