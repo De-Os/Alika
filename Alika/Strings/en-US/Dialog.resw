@@ -161,6 +161,10 @@
   <data name="ExportModeMessages" xml:space="preserve">
     <value>Messages only (without attachments cache)</value>
   </data>
+  <data name="FwdMessages" xml:space="preserve">
+    <value>Forwarded messages</value>
+    <comment>Forwarded messages</comment>
+  </data>
   <data name="Group" xml:space="preserve">
     <value>Group</value>
     <comment>Group title in top menu</comment>
@@ -197,36 +201,47 @@
   </data>
   <data name="PermissionsInvite" xml:space="preserve">
     <value>Invite</value>
+    <comment>Permission to invite someone</comment>
   </data>
   <data name="PermissionsLink" xml:space="preserve">
     <value>See invite link</value>
+    <comment>Permission to see invite link</comment>
   </data>
   <data name="PermissionsMentions" xml:space="preserve">
     <value>Use mass mentions</value>
+    <comment>Permission to use @all and @online</comment>
   </data>
   <data name="PermissionsPin" xml:space="preserve">
     <value>Pin messages</value>
+    <comment>Permission to pin messages</comment>
   </data>
   <data name="PermissionsTypeAll" xml:space="preserve">
     <value>All</value>
+    <comment>Permission type: all</comment>
   </data>
   <data name="PermissionsTypeOwner" xml:space="preserve">
     <value>Owner</value>
+    <comment>Permission type: owner only</comment>
   </data>
   <data name="PermissionsTypeOwnerAndAdmins" xml:space="preserve">
     <value>Owner and admins</value>
+    <comment>Permission type: admins</comment>
   </data>
   <data name="Pin" xml:space="preserve">
     <value>Pin</value>
+    <comment>Pin</comment>
   </data>
   <data name="Promote" xml:space="preserve">
     <value>Promote user</value>
+    <comment>Promote user</comment>
   </data>
   <data name="RemovePhoto" xml:space="preserve">
     <value>Remove  photo</value>
+    <comment>Remove chat photo</comment>
   </data>
   <data name="Reply" xml:space="preserve">
     <value>Reply</value>
+    <comment>Reply</comment>
   </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
@@ -234,6 +249,7 @@
   </data>
   <data name="Send" xml:space="preserve">
     <value>Send</value>
+    <comment>Send</comment>
   </data>
   <data name="TextBoxPlaceholder" xml:space="preserve">
     <value>Message...</value>
@@ -253,14 +269,18 @@
   </data>
   <data name="Typing" xml:space="preserve">
     <value>is typing</value>
+    <comment>... is typing</comment>
   </data>
   <data name="TypingMany" xml:space="preserve">
     <value>are typing</value>
+    <comment>..., ..., ... are typing</comment>
   </data>
   <data name="Unpin" xml:space="preserve">
     <value>Unpin</value>
+    <comment>Unpin</comment>
   </data>
   <data name="You" xml:space="preserve">
     <value>You</value>
+    <comment>You</comment>
   </data>
 </root>

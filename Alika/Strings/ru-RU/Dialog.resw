@@ -159,6 +159,9 @@
   <data name="ExportModeMessages" xml:space="preserve">
     <value>Только сообщения (без кеша вложений)</value>
   </data>
+  <data name="FwdMessages" xml:space="preserve">
+    <value>Forwarded messages</value>
+  </data>
   <data name="Group" xml:space="preserve">
     <value>Группа</value>
   </data>

@@ -119,50 +119,66 @@
   </resheader>
   <data name="Ago" xml:space="preserve">
     <value>ago</value>
+    <comment>n ... ago</comment>
   </data>
   <data name="DaysFrom0To0" xml:space="preserve">
     <value>days ago</value>
+    <comment>n days ago</comment>
   </data>
   <data name="DaysFrom1To1" xml:space="preserve">
     <value>day ago</value>
+    <comment>1 day ago</comment>
   </data>
   <data name="DaysFrom2To4" xml:space="preserve">
     <value>days ago</value>
+    <comment>2-4 days ago</comment>
   </data>
   <data name="DaysFrom5To9" xml:space="preserve">
     <value>days ago</value>
+    <comment>5-9 days ago</comment>
   </data>
   <data name="HoursFrom0To0" xml:space="preserve">
     <value>hours ago</value>
+    <comment>n hours aog</comment>
   </data>
   <data name="HoursFrom1To1" xml:space="preserve">
     <value>hour ago</value>
+    <comment>1 hour ago</comment>
   </data>
   <data name="HoursFrom2To4" xml:space="preserve">
     <value>hours ago</value>
+    <comment>2-4 hours ago</comment>
   </data>
   <data name="HoursFrom5To9" xml:space="preserve">
     <value>hours ago</value>
+    <comment>5-9 hours ago</comment>
   </data>
   <data name="LastSeen" xml:space="preserve">
     <value>Was online %date%</value>
+    <comment>Someone was online ...</comment>
   </data>
   <data name="MinutesFrom0To0" xml:space="preserve">
     <value>minutes ago</value>
+    <comment>n minutes ago</comment>
   </data>
   <data name="MinutesFrom1To1" xml:space="preserve">
     <value>minute ago</value>
+    <comment>1 minute ago</comment>
   </data>
   <data name="MinutesFrom2To4" xml:space="preserve">
     <value>minutes ago</value>
+    <comment>2-4 minutes ago</comment>
   </data>
   <data name="MinutesFrom5To9" xml:space="preserve">
     <value>minutes ago</value>
+    <comment>5-9 minutes ago</comment>
   </data>
   <data name="Online" xml:space="preserve">
     <value>Online</value>
+    <comment>Online text</comment>
   </data>
   <data name="RightNow" xml:space="preserve">
     <value>right now</value>
+    <comment>(was online) right now</comment>
   </data>
 </root>

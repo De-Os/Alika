@@ -158,7 +158,7 @@ namespace Alika.Libs.VK.Longpoll
 
             Task.Factory.StartNew(() =>
             {
-                var readStates = updates.Where(i => (int)i[0] == (int)Updates.READ_IN_MESSAGES || (int)i[1] == (int)Updates.READ_OUT_MESSAGES).Select(i => new LPEvents.ReadState
+                var readStates = updates.Where(i => (int)i[0] == (int)Updates.READ_IN_MESSAGES || (int)i[0] == (int)Updates.READ_OUT_MESSAGES).Select(i => new LPEvents.ReadState
                 {
                     peer_id = (int)i[1],
                     msg_id = (int)i[2]

@@ -119,44 +119,58 @@
   </resheader>
   <data name="Attachments" xml:space="preserve">
     <value>Attachments</value>
+    <comment>Attachments</comment>
   </data>
   <data name="Document" xml:space="preserve">
     <value>Document</value>
+    <comment>Document</comment>
   </data>
   <data name="Documents" xml:space="preserve">
     <value>Documents</value>
+    <comment>DocumentS</comment>
   </data>
   <data name="Gift" xml:space="preserve">
     <value>Gift</value>
+    <comment>Gift</comment>
   </data>
   <data name="Graffiti" xml:space="preserve">
     <value>Graffiti</value>
+    <comment>Graffiti</comment>
   </data>
   <data name="Link" xml:space="preserve">
     <value>Link</value>
+    <comment>Link</comment>
   </data>
   <data name="Links" xml:space="preserve">
     <value>Links</value>
+    <comment>Links</comment>
   </data>
   <data name="Photo" xml:space="preserve">
     <value>Photo</value>
+    <comment>Photo</comment>
   </data>
   <data name="Photos" xml:space="preserve">
     <value>Photos</value>
+    <comment>PhotoS</comment>
   </data>
   <data name="Sticker" xml:space="preserve">
     <value>Sticker</value>
+    <comment>Sticker</comment>
   </data>
   <data name="Video" xml:space="preserve">
     <value>Video</value>
+    <comment>Video</comment>
   </data>
   <data name="Videos" xml:space="preserve">
     <value>Videos</value>
+    <comment>VideoS</comment>
   </data>
   <data name="VoiceMessage" xml:space="preserve">
     <value>Voice message</value>
+    <comment>Voice message</comment>
   </data>
   <data name="VoiceMessages" xml:space="preserve">
     <value>Voice messages</value>
+    <comment>Voice messageS</comment>
   </data>
 </root>

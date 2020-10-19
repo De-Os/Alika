@@ -300,7 +300,7 @@ namespace Alika.UI
                                            switch (this.type)
                                            {
                                                case "doc":
-                                                   if(att.attachment.document != null) final.Children.Add(new MessageAttachment.Document(att.attachment.document)
+                                                   if (att.attachment.document != null) final.Children.Add(new MessageAttachment.Document(att.attachment.document)
                                                    {
                                                        HorizontalAlignment = HorizontalAlignment.Stretch,
                                                        HorizontalContentAlignment = HorizontalAlignment.Left,

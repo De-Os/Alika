@@ -243,7 +243,7 @@ namespace Alika.Libs
             {
                 if (msg.attachments != null && msg.attachments.Count > 0)
                 {
-                    switch (msg.attachments[0].type)
+                    switch (msg.attachments.First().type)
                     {
                         case "photo":
                             text += "📷 " + Utils.LocString("Attachments/Photo");
@@ -269,6 +269,13 @@ namespace Alika.Libs
                         case "graffiti":
                             text += "🖌 " + Utils.LocString("Attachments/Graffiti");
                             break;
+                    }
+                }
+                else
+                {
+                    if (msg.fwd_messages?.Count > 0)
+                    {
+                        text += "↩ " + Utils.LocString("Dialog/FwdMessages");
                     }
                 }
             }

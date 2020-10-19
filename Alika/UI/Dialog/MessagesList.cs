@@ -103,28 +103,40 @@ namespace Alika.UI.Dialog
                         msg.Loaded += (a, b) => this.OnNewMessage?.Invoke(true);
                         if (this.Items.Count > 0)
                         {
-                            if (this.Items.LastOrDefault() is SwipeControl s && s.Content is MessageBox prev && prev.message.textBubble.message.from_id == message.from_id)
+                            if ((this.Items.Last(i => i is SwipeControl) as SwipeControl).Content is MessageBox prev)
                             {
-                                prev.message.avatar.Visibility = Visibility.Collapsed;
-                                Thickness prevMargin = prev.message.textBubble.border.Margin;
-                                prevMargin.Bottom = 2.5;
-                                prev.message.textBubble.border.Margin = prevMargin;
-                                CornerRadius corners = prev.message.textBubble.border.CornerRadius;
-                                CornerRadius msg_corners = msg.message.textBubble.border.CornerRadius;
-                                if (prev.HorizontalContentAlignment == HorizontalAlignment.Left)
+                                if (prev.message.textBubble.message.date.ToDateTime().Date != message.date.ToDateTime().Date)
                                 {
-                                    corners.BottomLeft = 0;
-                                    msg_corners.TopLeft = 0;
+                                    this.Items.Add(new ListViewItem
+                                    {
+                                        Content = new DateSeparator(message.date.ToDateTime()),
+                                        HorizontalAlignment = HorizontalAlignment.Center,
+                                        HorizontalContentAlignment = HorizontalAlignment.Center
+                                    });
                                 }
-                                else
+                                if (prev.message.textBubble.message.from_id == message.from_id && this.Items.Last() is SwipeControl)
                                 {
-                                    corners.BottomRight = 0;
-                                    msg_corners.TopRight = 0;
+                                    prev.message.avatar.Visibility = Visibility.Collapsed;
+                                    Thickness prevMargin = prev.message.textBubble.border.Margin;
+                                    prevMargin.Bottom = 2.5;
+                                    prev.message.textBubble.border.Margin = prevMargin;
+                                    CornerRadius corners = prev.message.textBubble.border.CornerRadius;
+                                    CornerRadius msg_corners = msg.message.textBubble.border.CornerRadius;
+                                    if (prev.HorizontalContentAlignment == HorizontalAlignment.Left)
+                                    {
+                                        corners.BottomLeft = 0;
+                                        msg_corners.TopLeft = 0;
+                                    }
+                                    else
+                                    {
+                                        corners.BottomRight = 0;
+                                        msg_corners.TopRight = 0;
+                                    }
+                                    prev.message.textBubble.border.CornerRadius = corners;
+                                    msg.message.textBubble.border.CornerRadius = msg_corners;
+                                    msg.message.textBubble.name.Visibility = Visibility.Collapsed;
+                                    msg.message.textBubble.border.Margin = new Thickness(10, 2.5, 10, 5);
                                 }
-                                prev.message.textBubble.border.CornerRadius = corners;
-                                msg.message.textBubble.border.CornerRadius = msg_corners;
-                                msg.message.textBubble.name.Visibility = Visibility.Collapsed;
-                                msg.message.textBubble.border.Margin = new Thickness(10, 2.5, 10, 5);
                             }
                         }
                         this.Items.Add(this.GetSwipeMessage(msg));
@@ -141,7 +153,7 @@ namespace Alika.UI.Dialog
                         var msg = new MessageBox(message, this.peer_id);
                         if (this.Items.Count > 0)
                         {
-                            if (this.Items.FirstOrDefault() is SwipeControl s && s.Content is MessageBox next && next.message.textBubble.message.from_id == message.from_id)
+                            if ((this.Items.First(i => i is SwipeControl) as SwipeControl).Content is MessageBox next && next.message.textBubble.message.from_id == message.from_id)
                             {
                                 next.message.avatar.Visibility = Visibility.Visible;
                                 next.message.textBubble.name.Visibility = Visibility.Collapsed;

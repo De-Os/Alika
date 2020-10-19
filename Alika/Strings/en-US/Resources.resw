@@ -139,6 +139,7 @@
   </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
+    <comment>Save something</comment>
   </data>
   <data name="Search" xml:space="preserve">
     <value>Search</value>
@@ -146,5 +147,6 @@
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Settings</value>
+    <comment>Settings</comment>
   </data>
 </root>

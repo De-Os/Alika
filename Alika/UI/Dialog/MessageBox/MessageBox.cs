@@ -4,11 +4,13 @@ using Alika.UI.Dialog;
 using Alika.UI.Misc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
@@ -18,7 +20,7 @@ namespace Alika.UI
     /// <summary>
     /// Message box which holds MessageGrid (needed for future features)
     /// </summary>
-    [Windows.UI.Xaml.Data.Bindable]
+    [Bindable]
     public class MessageBox : ContentControl
     {
         public MessageGrid message { get; set; }
@@ -33,9 +35,9 @@ namespace Alika.UI
         }
 
         /// <summary>
-        /// Grid with avatar & text
+        /// Grid with avatar & message content
         /// </summary>
-        [Windows.UI.Xaml.Data.Bindable]
+        [Bindable]
         public class MessageGrid : Grid
         {
             public TextBubble textBubble { get; set; }
@@ -76,7 +78,6 @@ namespace Alika.UI
             {
                 this.states.HorizontalAlignment = App.vk.user_id == msg.from_id ? HorizontalAlignment.Right : HorizontalAlignment.Left;
                 this.MinWidth = 200;
-                this.MaxWidth = 700;
 
                 this.textBubble = new TextBubble(msg, peer_id, isStatic);
                 this.LoadAvatar(msg.from_id);
@@ -171,15 +172,15 @@ namespace Alika.UI
                     HorizontalAlignment = HorizontalAlignment.Center
                 };
                 Thickness margin = this.avatar.Margin;
-                margin.Bottom = this.textBubble.border.Margin.Bottom + (this.textBubble.text.Margin.Bottom / 2);
+                margin.Bottom = this.textBubble.border.Margin.Bottom + (this.textBubble.Margin.Bottom / 2);
                 this.avatar.Margin = margin;
             }
         }
 
         /// <summary>
-        /// Name,text, attachments & buttons holder
+        /// Content bubble
         /// </summary>
-        [Windows.UI.Xaml.Data.Bindable]
+        [Bindable]
         public class TextBubble : StackPanel
         {
             public Message message;
@@ -188,57 +189,24 @@ namespace Alika.UI
                 BorderThickness = new Thickness(1),
                 Background = App.systemDarkTheme ? Coloring.MessageBox.TextBubble.Dark : Coloring.MessageBox.TextBubble.Light,
                 Margin = new Thickness(10, 5, 10, 5),
-                MinHeight = 50,
+                MinHeight = 30,
                 MinWidth = 50,
                 CornerRadius = new CornerRadius(10)
-            };
-            public RichTextBlock text = new RichTextBlock
-            {
-                VerticalAlignment = VerticalAlignment.Center,
-                TextWrapping = TextWrapping.Wrap,
-                Margin = new Thickness(5),
-                Padding = new Thickness(5),
-                ContextFlyout = null
             };
             public TextBlock name = new TextBlock
             {
                 FontWeight = FontWeights.Bold,
                 Margin = new Thickness(12, 5, 12, 1)
             };
-            public Grid textGrid = new Grid();
-            public Grid attachGrid = new Grid();
-            public Grid keyboardGrid = new Grid();
-            public StackPanel borderContent = new StackPanel
-            {
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            public int peer_id;
 
             public TextBubble(Message msg, int peer_id, bool isStatic = false)
             {
                 this.message = msg;
-                this.peer_id = peer_id;
+
                 this.LoadName();
 
-                if (this.message.reply_message != null)
-                {
-                    var reply = new Dialog.Dialog.ReplyMessage(this.message.reply_message)
-                    {
-                        CrossEnabled = false,
-                        LineWidth = 1,
-                    };
-
-                    var margin = reply.Margin;
-                    margin.Bottom = 0;
-                    reply.Margin = margin;
-                    this.borderContent.Children.Add(reply);
-                }
-
-                this.LoadText();
-                this.LoadAttachments();
-                this.LoadButtons();
-
-                this.border.Child = this.borderContent;
+                this.border.Child = new MessageContent(this.message);
+                if (this.message.attachments?.Count > 0 && this.message.attachments.Any(i => i.graffiti != null || i.sticker != null)) this.border.Background = Coloring.Transparent.Full;
 
                 this.Children.Add(this.name);
                 this.Children.Add(this.border);
@@ -254,75 +222,11 @@ namespace Alika.UI
                             {
                                 Action = () =>
                                 {
-                                    this.LoadText();
-                                    this.LoadAttachments();
+                                    this.border.Child = new MessageContent(this.message);
                                 }
                             });
                         }
                     };
-                }
-            }
-
-            public void LoadText()
-            {
-                string text = this.message.text;
-                if (text != null)
-                {
-                    this.text.Blocks.Clear();
-                    List<Match> markdown = new List<Match>();
-
-                    MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(text);
-                    MatchCollection links = new Regex(@"((http|https)\:\/\/)?[\w]*\.[a-zA-Z]{1,6}(\/[\w\?\-\=\&.]*)*").Matches(text);
-                    if (pushes.Count > 0) foreach (Match push in pushes) markdown.Add(push);
-                    if (links.Count > 0) foreach (Match link in links) markdown.Add(link);
-
-                    Paragraph p = new Paragraph();
-                    if (markdown.Count > 0)
-                    {
-                        for (int i = 0; i < markdown.Count; i++)
-                        {
-                            Match m = markdown[i];
-                            if (i == 0 && !text.StartsWith(m.Value)) p.Inlines.Add(new Run { Text = text.Substring(0, m.Index) });
-                            if (i > 0 && markdown[i - 1].Index != m.Index)
-                            {
-                                try
-                                {
-                                    Match prev = markdown[i - 1];
-                                    int start = prev.Index + prev.Length;
-                                    p.Inlines.Add(new Run { Text = text.Substring(start, m.Index - start) });
-                                }
-                                catch { }
-                            }
-                            // TODO: Fix crash on some messages
-                            try
-                            {
-                                if (!m.Value.Contains("["))
-                                {
-                                    string lnk = m.Value;
-                                    if (!lnk.StartsWith("http://") && !lnk.StartsWith("https://")) lnk = "http://" + lnk;
-                                    Hyperlink link = new Hyperlink { NavigateUri = new Uri(lnk) };
-                                    link.Inlines.Add(new Run { Text = m.Value });
-                                    p.Inlines.Add(link);
-
-                                }
-                                else
-                                {
-                                    Hyperlink link = new Hyperlink { NavigateUri = new Uri("https://vk.com/" + m.Value.Split("|")[0].Replace("[", "")) };
-                                    link.Inlines.Add(new Run { Text = m.Value.Split("|")[1].Replace("]", "") });
-                                    p.Inlines.Add(link);
-                                }
-                            }
-                            catch { }
-                            if (i == markdown.Count - 1 && !text.EndsWith(m.Value)) p.Inlines.Add(new Run { Text = text.Substring(m.Index + m.Length) });
-                        }
-                    }
-                    else p.Inlines.Add(new Run { Text = text });
-                    this.text.Blocks.Add(p);
-                    if (text.Length > 0)
-                    {
-                        if (!this.textGrid.Children.Contains(this.text)) this.textGrid.Children.Add(this.text);
-                        if (!this.borderContent.Children.Contains(this.textGrid)) this.borderContent.Children.Add(this.textGrid);
-                    }
                 }
             }
 
@@ -342,88 +246,298 @@ namespace Alika.UI
                 if (this.message.from_id == App.vk.user_id) this.name.HorizontalTextAlignment = TextAlignment.Right;
             }
 
-            public void LoadAttachments()
+            /// <summary>
+            /// Message text, attachments, keyboard, etc.
+            /// </summary>
+            public class MessageContent : StackPanel
             {
-                this.attachGrid.Children.Clear();
-                if (this.message.attachments != null && this.message.attachments.Count > 0)
+                public RichTextBlock Text = new RichTextBlock
                 {
-                    foreach (Attachment att in this.message.attachments)
+                    VerticalAlignment = VerticalAlignment.Center,
+                    TextWrapping = TextWrapping.Wrap,
+                    Margin = new Thickness(5),
+                    Padding = new Thickness(5),
+                    ContextFlyout = null
+                };
+
+                private readonly Message message;
+
+                public MessageContent(Message msg)
+                {
+                    this.message = msg;
+                    this.MaxWidth = 600;
+
+                    if (this.message.reply_message != null)
                     {
-                        FrameworkElement attach = null;
-                        switch (att.type)
+                        var reply = new Dialog.Dialog.ReplyMessage(this.message.reply_message)
                         {
-                            case "photo":
-                                attach = new MessageAttachment.Photo(att.photo)
+                            CrossEnabled = false,
+                            LineWidth = 1,
+                        };
+
+                        var margin = reply.Margin;
+                        margin.Bottom = 0;
+                        reply.Margin = margin;
+                        this.Children.Add(reply);
+                    }
+
+                    if (this.message.text == null || this.message.text.Length > 0) this.LoadText();
+                    this.LoadAttachments();
+
+                    if (this.message.fwd_messages?.Count > 0)
+                    {
+                        var forwards = this.message.fwd_messages.Select(i => new ForwardGrid(i)).ToList();
+                        for (int i = 0; i < forwards.Count; i++)
+                        {
+                            var fwd = forwards[i];
+
+                            var margin = new Thickness();
+                            var radius = new CornerRadius();
+
+                            margin.Left = 2;
+
+                            if (i == 0)
+                            {
+                                radius.TopLeft = 1.5;
+                                radius.TopRight = 1.5;
+                                margin.Top = 3;
+                            }
+                            if (i == forwards.Count - 1)
+                            {
+                                radius.BottomLeft = 1.5;
+                                radius.BottomRight = 1.5;
+                                margin.Bottom = 3;
+                            }
+                            fwd.Border.Margin = margin;
+                            fwd.Border.CornerRadius = radius;
+
+                            this.Children.Add(fwd);
+                        }
+                    };
+
+                    if (this.message.keyboard != null) this.Children.Add(new ButtonsGrid(msg.keyboard, msg.peer_id));
+                }
+
+                private void LoadText()
+                {
+                    Task.Factory.StartNew(() =>
+                    {
+                        if (this.message.text != null)
+                        {
+                            List<Match> markdown = new List<Match>();
+
+                            MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(this.message.text);
+                            MatchCollection links = new Regex(@"((http|https)\:\/\/)?[\w]*\.[a-zA-Z]{1,6}(\/[\w\?\-\=\&.]*)*").Matches(this.message.text);
+                            if (pushes.Count > 0) markdown.AddRange(pushes);
+                            if (links.Count > 0) markdown.AddRange(links);
+
+                            var parsed = new List<ParsedText>();
+
+                            if (markdown.Count > 0)
+                            {
+                                for (int i = 0; i < markdown.Count; i++)
                                 {
-                                    Width = this.Width
-                                };
-                                break;
-                            case "sticker":
-                                attach = new MessageAttachment.Sticker(att.sticker);
-                                this.border.Background = Coloring.Transparent.Full;
-                                break;
-                            case "doc":
-                                attach = new MessageAttachment.Document(att.document);
-                                break;
-                            case "audio_message":
-                                attach = new MessageAttachment.AudioMessage(att.audio_message);
-                                break;
-                            case "graffiti":
-                                attach = new MessageAttachment.Graffiti(att.graffiti);
-                                this.border.Background = Coloring.Transparent.Full;
-                                break;
+                                    var m = markdown[i];
+                                    if (i == 0 && !this.message.text.StartsWith(m.Value)) parsed.Add(new ParsedText { Text = this.message.text.Substring(0, m.Index) });
+                                    if (i > 0 && markdown[i - 1].Index != m.Index)
+                                    {
+                                        try
+                                        {
+                                            Match prev = markdown[i - 1];
+                                            int start = prev.Index + prev.Length;
+                                            parsed.Add(new ParsedText { Text = this.message.text.Substring(start, m.Index - start) });
+                                        }
+                                        catch { }
+                                    }
+                                    // TODO: Fix crash on some messages
+                                    try
+                                    {
+                                        if (!m.Value.Contains("["))
+                                        {
+                                            string link = m.Value;
+                                            if (!link.StartsWith("http://") && !link.StartsWith("https://")) link = "http://" + link;
+                                            parsed.Add(new ParsedText
+                                            {
+                                                Text = m.Value,
+                                                Link = true,
+                                                Url = link
+                                            });
+                                        }
+                                        else
+                                        {
+                                            parsed.Add(new ParsedText
+                                            {
+                                                Text = m.Value.Split("|")[1].Replace("]", ""),
+                                                Link = true,
+                                                Url = "https://vk.com/" + m.Value.Split("|")[0].Replace("[", "")
+                                            });
+                                        }
+                                    }
+                                    catch { }
+                                    if (i == markdown.Count - 1 && !this.message.text.EndsWith(m.Value)) parsed.Add(new ParsedText { Text = this.message.text.Substring(m.Index + m.Length) });
+                                }
+                            }
+                            else parsed.Add(new ParsedText { Text = this.message.text });
+
+                            App.UILoop.AddAction(new UITask
+                            {
+                                Action = () =>
+                                {
+                                    Paragraph p = new Paragraph();
+                                    foreach (var t in parsed)
+                                    {
+                                        if (t.Link)
+                                        {
+                                            Hyperlink link = new Hyperlink { NavigateUri = new Uri(t.Url) };
+                                            link.Inlines.Add(new Run { Text = t.Text });
+                                            p.Inlines.Add(link);
+                                        }
+                                        else p.Inlines.Add(new Run { Text = t.Text });
+                                    }
+                                    this.Text.Blocks.Add(p);
+                                }
+                            });
                         }
-                        if (attach != null)
-                        {
-                            attach.Loaded += (a, b) => this.Height += attach.Height;
-                            Grid.SetRow(attach, this.attachGrid.RowDefinitions.Count);
-                            this.attachGrid.RowDefinitions.Add(new RowDefinition());
-                            this.attachGrid.Children.Add(attach);
-                        }
-                    }
-                    if (!this.borderContent.Children.Contains(this.attachGrid)) this.borderContent.Children.Add(this.attachGrid);
+                    });
+                    this.Children.Add(this.Text);
                 }
-
-            }
-
-            public void LoadButtons() // TODO: Support for callback buttons?
-            {
-                if (this.message.keyboard != null && this.message.keyboard.inline && this.message.keyboard.buttons.Count > 0)
+                private void LoadAttachments()
                 {
-                    foreach (List<Message.Keyboard.Button> buttons in this.message.keyboard.buttons)
+                    if (this.message.attachments?.Count > 0)
                     {
-                        Grid grid = new Grid();
-                        Grid.SetRow(grid, this.keyboardGrid.RowDefinitions.Count);
-                        this.keyboardGrid.RowDefinitions.Add(new RowDefinition());
-                        foreach (Message.Keyboard.Button button in buttons)
+                        foreach (var att in this.message.attachments.OrderBy(i => i.type))
                         {
-                            Button btn = new Button
+                            FrameworkElement attach = null;
+                            switch (att.type)
                             {
-                                HorizontalAlignment = HorizontalAlignment.Stretch,
-                                VerticalAlignment = VerticalAlignment.Stretch,
-                                Margin = new Thickness(5),
-                                CornerRadius = this.border.CornerRadius
-                            };
-                            if (button.color != "default") btn.Background = new SolidColorBrush(Coloring.FromHash(Coloring.MessageBox.Keyboard.GetColor(button.color)));
-                            btn.Content = new TextBlock
+                                case "photo":
+                                    attach = new MessageAttachment.Photo(att.photo)
+                                    {
+                                        Width = this.Width
+                                    };
+                                    break;
+                                case "sticker":
+                                    attach = new MessageAttachment.Sticker(att.sticker);
+                                    break;
+                                case "doc":
+                                    attach = new MessageAttachment.Document(att.document);
+                                    break;
+                                case "audio_message":
+                                    attach = new MessageAttachment.AudioMessage(att.audio_message);
+                                    break;
+                                case "graffiti":
+                                    attach = new MessageAttachment.Graffiti(att.graffiti);
+                                    break;
+                            }
+                            if (attach != null)
                             {
-                                Text = button.action.label,
-                                HorizontalAlignment = HorizontalAlignment.Center,
-                                VerticalAlignment = VerticalAlignment.Center
-                            };
-                            btn.Click += (object sender, RoutedEventArgs e) => Task.Factory.StartNew(() => App.vk.Messages.Send(this.peer_id, text: button.action.label, payload: button.action.payload));
-                            Grid.SetColumn(btn, grid.ColumnDefinitions.Count);
-                            grid.ColumnDefinitions.Add(new ColumnDefinition());
-                            grid.Children.Add(btn);
+                                attach.Loaded += (a, b) => this.Height += attach.Height;
+                                this.Children.Add(attach);
+                            }
                         }
-                        this.keyboardGrid.Children.Add(grid);
                     }
                 }
-                if (!this.borderContent.Children.Contains(this.keyboardGrid)) this.borderContent.Children.Add(this.keyboardGrid);
+                private struct ParsedText
+                {
+                    public string Text;
+                    public bool Link;
+                    public string Url;
+                }
+
+                [Bindable]
+                /// <summary>
+                /// Keyboard
+                /// </summary>
+                public class ButtonsGrid : StackPanel
+                {
+                    public ButtonsGrid(Message.Keyboard keyboard, int peer_id)
+                    {
+                        this.HorizontalAlignment = HorizontalAlignment.Stretch;
+                        foreach (var btns in keyboard.buttons)
+                        {
+                            var grid = new Grid
+                            {
+                                HorizontalAlignment = HorizontalAlignment.Stretch
+                            };
+                            foreach (var button in btns)
+                            {
+                                Button btn = new Button
+                                {
+                                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                                    Margin = new Thickness(5),
+                                    CornerRadius = new CornerRadius(5)
+                                };
+                                if (button.color != "default") btn.Background = new SolidColorBrush(Coloring.FromHash(Coloring.MessageBox.Keyboard.GetColor(button.color)));
+                                btn.Content = new TextBlock
+                                {
+                                    Text = button.action.label,
+                                    HorizontalAlignment = HorizontalAlignment.Center,
+                                    VerticalAlignment = VerticalAlignment.Center
+                                };
+                                btn.Click += (object sender, RoutedEventArgs e) => Task.Factory.StartNew(() => App.vk.Messages.Send(peer_id, text: button.action.label, payload: button.action.payload));
+
+                                Grid.SetColumn(btn, grid.ColumnDefinitions.Count);
+                                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                                grid.Children.Add(btn);
+                            }
+                            this.Children.Add(grid);
+                        }
+                    }
+                }
+                /// <summary>
+                /// Forward message holder
+                /// </summary>
+                [Bindable]
+                public class ForwardGrid : StackPanel
+                {
+                    public Border Border = new Border
+                    {
+                        VerticalAlignment = VerticalAlignment.Stretch,
+                        BorderThickness = new Thickness(0),
+                        Background = Coloring.InvertedTransparent.Percent(100),
+                        Width = 2.5
+                    };
+                    public MessageContent Message;
+
+                    public ForwardGrid(Message msg)
+                    {
+                        this.Orientation = Orientation.Horizontal;
+
+                        var content = new StackPanel();
+
+                        var topContent = new StackPanel { Orientation = Orientation.Horizontal };
+                        topContent.PointerPressed += (a, b) => new ChatInformation(msg.from_id);
+                        topContent.Children.Add(new Avatar(msg.from_id)
+                        {
+                            Width = 20,
+                            Height = 20,
+                            OpenInfoOnClick = false,
+                            Margin = new Thickness(5, 5, 0, 0),
+                            VerticalAlignment = VerticalAlignment.Center
+                        });
+                        topContent.Children.Add(new TextBlock
+                        {
+                            FontWeight = FontWeights.Bold,
+                            Text = App.cache.GetName(msg.from_id),
+                            Margin = new Thickness(5, 5, 0, 0),
+                            VerticalAlignment = VerticalAlignment.Center
+                        });
+
+                        this.Children.Add(this.Border);
+                        this.Children.Add(content);
+
+                        this.Message = new MessageContent(msg);
+                        this.Message.Text.Margin = new Thickness(5, 2, 5, 5);
+                        this.Message.Text.Padding = new Thickness(0);
+
+                        content.Children.Add(topContent);
+                        content.Children.Add(this.Message);
+                    }
+                }
             }
         }
 
-        [Windows.UI.Xaml.Data.Bindable]
+        [Bindable]
         public class MessageFlyout : MenuFlyout
         {
             public MessageFlyout(Message msg, List<Message> editions = null)
@@ -465,7 +579,7 @@ namespace Alika.UI
         }
     }
 
-    [Windows.UI.Xaml.Data.Bindable]
+    [Bindable]
     public class DateSeparator : ContentControl
     {
         public DateSeparator(DateTime time)

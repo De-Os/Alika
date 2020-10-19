@@ -1,7 +1,6 @@
 ﻿using Alika.Libs;
 using System;
 using System.Linq;
-using System.Linq.Expressions;
 using Windows.UI.Core;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
@@ -147,7 +146,8 @@ namespace Alika.UI
         {
             public Menu(string title = null)
             {
-                if (title != null) this.Children.Add(new TextBlock {
+                if (title != null) this.Children.Add(new TextBlock
+                {
                     Margin = new Thickness(5, 0, 0, 2),
                     Text = Utils.LocString(title),
                     FontWeight = FontWeights.SemiLight,
