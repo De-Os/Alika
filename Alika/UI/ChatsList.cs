@@ -3,6 +3,7 @@ using Alika.Libs.VK.Responses;
 using Alika.Misc;
 using Alika.UI.Misc;
 using Microsoft.UI.Xaml.Media;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -218,13 +219,17 @@ namespace Alika.UI
                     {
                         Action = () => this.FoundChats.Visibility = Visibility.Visible
                     });
-                    foreach (var conv in convs.conversations)
+
+                    App.UILoop.AddAction(new UITask
                     {
-                        App.UILoop.AddAction(new UITask
+                        Action = () =>
                         {
-                            Action = () => this.FoundChats.Items.Add(new ChatsList.ChatItem(conv.peer.id))
-                        });
-                    }
+                            foreach (var conv in convs.conversations)
+                            {
+                                this.FoundChats.Items.Add(new ChatsList.ChatItem(conv.peer.id));
+                            }
+                        }
+                    });
                 }
             });
         }
@@ -265,7 +270,7 @@ namespace Alika.UI
                       {
                           App.UILoop.RunAction(new UITask
                           {
-                              Action = () => this.Items.Add(new ChatItem(conv.conversation.peer.id, conv.last_message)),
+                              Action = () => this.Items.Add(new ChatItem(conv.conversation.peer.id, conv.last_message, unread: conv.conversation.unread_count)),
                               Priority = CoreDispatcherPriority.High
                           });
                       }
@@ -334,7 +339,7 @@ namespace Alika.UI
                 Height = 10,
                 Width = 10,
                 VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Right,
+                HorizontalAlignment = HorizontalAlignment.Center,
                 Margin = new Thickness(5, 0, 5, 0),
                 Visibility = Visibility.Collapsed
             };
@@ -367,8 +372,52 @@ namespace Alika.UI
                 }
             }
             private MenuFlyout Flyout = new MenuFlyout();
+            private Border _unreadCount = new Border
+            {
+                BorderThickness = new Thickness(0),
+                Background = Coloring.InvertedTransparent.Percent(20),
+                CornerRadius = new CornerRadius(10),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Child = new TextBlock
+                {
+                    Margin = new Thickness(5, 2, 5, 2),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Text = "0",
+                    FontSize = 12.5
+                },
+                Visibility = Visibility.Collapsed,
+                MinWidth = 20
+            };
+            private int UnreadCount
+            {
+                get
+                {
+                    return int.Parse((this._unreadCount.Child as TextBlock).Text);
+                }
+                set
+                {
+                    (this._unreadCount.Child as TextBlock).Text = value.ToString();
+                    this._unreadCount.Visibility = value == 0 ? Visibility.Collapsed : Visibility.Visible;
+                }
+            }
+            private TextBlock Date = new TextBlock
+            {
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            private Image ReadState = new Image
+            {
+                Width = 15,
+                Height = 15,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Source = new SvgImageSource(new Uri(Utils.AssetTheme("check.svg"))),
+                Visibility = Visibility.Collapsed
+            };
 
-            public ChatItem(int peer_id, Message last_msg, bool pinned = false)
+            public ChatItem(int peer_id, Message last_msg, bool pinned = false, int unread = 0)
             {
                 this.peer_id = peer_id;
                 this._pinned = pinned;
@@ -376,6 +425,7 @@ namespace Alika.UI
                 this.Render();
 
                 this.UpdateMsg(last_msg);
+                this.UnreadCount = unread;
 
                 App.lp.OnNewMessage += this.OnNewMessage;
                 App.lp.OnMessageEdition += (m) =>
@@ -386,6 +436,30 @@ namespace Alika.UI
                         {
                             Action = () => this.UpdateMsg(m),
                             Priority = CoreDispatcherPriority.Low
+                        });
+                    }
+                };
+                App.lp.OnNewMessage += (a) =>
+                {
+                    if (a.peer_id == this.peer_id && a.from_id != App.vk.user_id) App.UILoop.AddAction(new UITask
+                    {
+                        Action = () => this.UnreadCount++
+                    });
+                };
+                App.lp.OnReadMessage += (a) =>
+                {
+                    if (a.peer_id == this.peer_id)
+                    {
+                        App.UILoop.AddAction(new UITask
+                        {
+                            Action = () =>
+                            {
+                                if (this.message.id <= a.msg_id)
+                                {
+                                    this.ReadState.Source = new SvgImageSource(new Uri(Utils.AssetTheme("double_check.svg")));
+                                }
+                                this.UnreadCount = a.unread;
+                            }
                         });
                     }
                 };
@@ -440,9 +514,38 @@ namespace Alika.UI
                 this.textGrid.Children.Add(this.nameBlock);
                 this.textGrid.Children.Add(this.textBlock);
                 Grid.SetColumn(this.textGrid, 1);
-                Grid.SetColumn(this.PinImage, 2);
                 this.grid.Children.Add(this.textGrid);
-                this.grid.Children.Add(this.PinImage);
+
+                var indicators = new StackPanel
+                {
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    Margin = new Thickness(2.5, 0, 0, 0)
+                };
+                var topIndicators = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    Margin = new Thickness(0, 2.5, 0, 2.5)
+                };
+                var bottomIndicators = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    Margin = new Thickness(0, 2.5, 0, 2.5)
+                };
+
+                topIndicators.Children.Add(this.ReadState);
+                topIndicators.Children.Add(this.Date);
+                bottomIndicators.Children.Add(this._unreadCount);
+                bottomIndicators.Children.Add(this.PinImage);
+
+                indicators.Children.Add(topIndicators);
+                indicators.Children.Add(bottomIndicators);
+                Grid.SetColumn(indicators, 2);
+                this.grid.Children.Add(indicators);
                 this.Content = this.grid;
 
                 if (this._pinned) this.PinImage.Visibility = Visibility.Visible;
@@ -505,6 +608,30 @@ namespace Alika.UI
                 this.message = msg;
                 string text = this.FormatName(msg.from_id) + ": ";
                 this.textBlock.Text = text + this.message.ToCompactText();
+
+                var date = msg.date.ToDateTime();
+                var now = DateTime.Now;
+                string d = "";
+                if (date.Date == now.Date)
+                {
+                    d = date.ToString("HH:mm");
+                }
+                else
+                {
+                    if (now.Date.AddDays(-7) <= date)
+                    {
+                        d = date.ToString("ddd");
+                    }
+                    else d = date.ToString("dd.MM.yy");
+                }
+                this.Date.Text = d;
+
+                if (msg.from_id == App.vk.user_id)
+                {
+                    this.ReadState.Visibility = Visibility.Visible;
+                    this.ReadState.Source = new SvgImageSource(new Uri(Utils.AssetTheme(msg.read_state == 1 ? "double_check.svg" : "check.svg")));
+                }
+                else this.ReadState.Visibility = Visibility.Collapsed;
             }
 
             private string FormatName(int id)

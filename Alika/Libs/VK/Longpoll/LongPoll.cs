@@ -161,7 +161,8 @@ namespace Alika.Libs.VK.Longpoll
                 var readStates = updates.Where(i => (int)i[0] == (int)Updates.READ_IN_MESSAGES || (int)i[0] == (int)Updates.READ_OUT_MESSAGES).Select(i => new LPEvents.ReadState
                 {
                     peer_id = (int)i[1],
-                    msg_id = (int)i[2]
+                    msg_id = (int)i[2],
+                    unread = (int)i[3]
                 }).ToList();
                 if (readStates.Count > 0) foreach (var rs in readStates) this.OnReadMessage?.Invoke(rs);
             });
@@ -214,6 +215,7 @@ namespace Alika.Libs.VK.Longpoll
         {
             public int peer_id;
             public int msg_id;
+            public int unread;
         }
 
         public struct OnlineState
