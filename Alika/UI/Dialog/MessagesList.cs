@@ -1,5 +1,6 @@
 ﻿using Alika.Libs;
 using Alika.Libs.VK.Responses;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
@@ -44,7 +45,45 @@ namespace Alika.UI.Dialog
                 (this.Parent as ScrollViewer).ChangeView(null, double.MaxValue, null);
                 this.Messages.SizeChanged += (c, d) => this.NewMessageScroll();
                 this.SizeChanged += (c, d) => this.NewMessageScroll();
+                this.AddReadScroll();
             };
+        }
+
+        public void AddReadScroll()
+        {
+            if (this.Parent is ScrollViewer scroll)
+            {
+                scroll.ViewChanging += (a, b) =>
+                {
+                    var msgs = this.Messages.Items.Where(i =>
+                        i is SwipeControl s
+                        && s.Content is MessageBox msg
+                        && msg.message.textBubble.message.from_id != App.vk.user_id
+                        && !msg.Read).Select(i => (i as SwipeControl).Content as MessageBox).ToList();
+                    if (msgs.Count > 0)
+                    {
+                        msgs.Reverse();
+                        foreach (var msg in msgs)
+                        {
+                            if (scroll.IsElementVisible(msg))
+                            {
+                                try
+                                {
+                                    if (App.vk.Messages.MarkAsRead(this.peer_id, new System.Collections.Generic.List<int> { msg.message.textBubble.message.id }) == 1)
+                                    {
+                                        msg.Read = true;
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    System.Diagnostics.Debug.WriteLine(e.Message);
+                                }
+                                return;
+                            }
+                        }
+                    }
+                };
+            }
         }
 
         private void NewMessageScroll()

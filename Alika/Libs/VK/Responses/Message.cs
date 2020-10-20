@@ -36,7 +36,7 @@ namespace Alika.Libs.VK.Responses
         [JsonProperty("date")]
         public int date { get; set; }
         [JsonProperty("read_state")]
-        public int read_state { get; set; }
+        public int read_state { get; set; } = 0;
         [JsonProperty("text")]
         public string text { get; set; }
         [JsonProperty("fwd_messages")]
@@ -44,7 +44,7 @@ namespace Alika.Libs.VK.Responses
         [JsonProperty("reply_message")]
         public Message reply_message { get; set; }
         [JsonProperty("out")]
-        public int isOut { get; set; }
+        public int isOut { get; set; } = 0;
         [JsonProperty("attachments")]
         public List<Attachment> attachments { get; set; }
         [JsonProperty("important")]

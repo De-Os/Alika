@@ -24,6 +24,7 @@ namespace Alika.UI
     public class MessageBox : ContentControl
     {
         public MessageGrid message { get; set; }
+        public bool Read = false;
 
         public MessageBox(Message msg, int peer_id, bool isStatic = false)
         {
@@ -32,6 +33,8 @@ namespace Alika.UI
 
             this.message = new MessageGrid(msg, peer_id, isStatic);
             this.Content = this.message;
+
+            this.Read = msg.read_state == 1;
         }
 
         /// <summary>

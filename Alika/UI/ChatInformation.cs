@@ -943,7 +943,7 @@ namespace Alika.UI
                         Margin = new Thickness(10)
                     });
                     this.LoadImage();
-                    this.Loaded += (a, b) => this.Load();
+                    this.Load();
                 }
 
                 public void Load()

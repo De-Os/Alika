@@ -122,6 +122,9 @@ namespace Alika.Libs.VK.Methods
             return response;
         }
 
+        /// <summary>
+        /// messages.getConversationMembers
+        /// </summary>
         public GetConversationMembersResponse GetConversationMembers(int peer_id, string fields = "")
         {
             var request = new Dictionary<string, dynamic>
@@ -225,6 +228,9 @@ namespace Alika.Libs.VK.Methods
             }
         }
 
+        /// <summary>
+        /// messages.getHistoryAttachments
+        /// </summary>
         public GetHistoryAttachmentsResponse GetHistoryAttachments(int peer_id, string type, string start_from = null, int count = 50)
         {
             var request = new Dictionary<string, dynamic>
@@ -237,6 +243,9 @@ namespace Alika.Libs.VK.Methods
             return this._vk.Call<GetHistoryAttachmentsResponse>("messages.getHistoryAttachments", request);
         }
 
+        /// <summary>
+        /// messages.removeChatUser
+        /// </summary>
         public int RemoveChatUser(int peer_id, int member_id)
         {
             if (peer_id > Limits.Messages.PEERSTART) peer_id -= Limits.Messages.PEERSTART;
@@ -247,6 +256,9 @@ namespace Alika.Libs.VK.Methods
             });
         }
 
+        /// <summary>
+        /// messages.setMemberRole
+        /// </summary>
         public int SetMemberRole(bool admin, int member_id, int peer_id)
         {
             return this._vk.Call<int>("messages.setMemberRole", new Dictionary<string, dynamic>
@@ -257,6 +269,9 @@ namespace Alika.Libs.VK.Methods
             });
         }
 
+        /// <summary>
+        /// messages.deleteChatPhoto
+        /// </summary>
         public ChangeChatPhotoResponse DeleteChatPhoto(int peer_id)
         {
             if (peer_id > Limits.Messages.PEERSTART) peer_id -= Limits.Messages.PEERSTART;
@@ -265,6 +280,9 @@ namespace Alika.Libs.VK.Methods
             });
         }
 
+        /// <summary>
+        /// messages.editChat
+        /// </summary>
         public int EditTitle(int peer_id, string title)
         {
             if (peer_id > Limits.Messages.PEERSTART) peer_id -= Limits.Messages.PEERSTART;
@@ -274,6 +292,9 @@ namespace Alika.Libs.VK.Methods
             });
         }
 
+        /// <summary>
+        /// photos.getChatUploadServer
+        /// </summary>
         public ChangeChatPhotoResponse SetChatPhoto(int peer_id, byte[] bytes)
         {
             RestRequest request = new RestRequest();
@@ -281,6 +302,9 @@ namespace Alika.Libs.VK.Methods
             return this.SetChatPhoto(request, peer_id);
         }
 
+        /// <summary>
+        /// photos.getChatUploadServer
+        /// </summary>
         public async Task<ChangeChatPhotoResponse> SetChatPhoto(StorageFile file, int peer_id)
         {
             RestRequest request = new RestRequest();
@@ -301,6 +325,9 @@ namespace Alika.Libs.VK.Methods
                 });
         }
 
+        /// <summary>
+        /// messages.searchConversations
+        /// </summary>
         public GetConversationsByIdResponse SearchConversations(string query, int count = 20, string fields = "")
         {
             var request = new Dictionary<string, dynamic>
@@ -319,6 +346,17 @@ namespace Alika.Libs.VK.Methods
             App.cache.Update(response.profiles);
             App.cache.Update(response.groups);
             return response;
+        }
+
+        /// <summary>
+        /// messages.markAsRead
+        /// </summary>
+        public int MarkAsRead(int peer_id, List<int> messages)
+        {
+            return this._vk.Call<int>("messages.markAsRead", new Dictionary<string, dynamic> {
+                {"peer_id", peer_id},
+                {"message_ids", String.Join(",", messages)}
+            });
         }
     }
 }

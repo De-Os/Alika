@@ -309,7 +309,7 @@ namespace Alika.UI.Dialog
         public void StickerSuggestion(object sender, TextChangedEventArgs e)
         {
             if (App.cache.StickerDictionary == null) return;
-            string text = this.send_text.Text;
+            string text = this.send_text.Text.ToLower();
             int peer_id = this.peer_id;
             if (App.cache.StickerDictionary.ContainsKey(text) && App.cache.StickerDictionary[text].Count > 0)
             {
