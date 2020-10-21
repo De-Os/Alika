@@ -410,12 +410,11 @@ namespace Alika.Misc
                         if (calend.HasValue)
                         {
                             var date = calend.Value.DateTime.Date;
-                            System.Diagnostics.Debug.WriteLine(date.ToUnixTime());
                             if (result.Count > 0)
                             {
-                                result.RemoveAll(i => !(i.date >= date.ToUnixTime() && i.date <= date.AddDays(1).ToUnixTime()));
+                                result.RemoveAll(i => i.date.ToDateTime().Date != date.Date);
                             }
-                            else result.AddRange(messages.Where(i => i.date >= date.ToUnixTime() && i.date <= date.AddDays(1).ToUnixTime()));
+                            else result.AddRange(messages.Where(i => i.date.ToDateTime().Date == date.Date));
                         }
 
                         App.UILoop.AddAction(new UITask

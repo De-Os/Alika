@@ -13,6 +13,7 @@ using Windows.UI.Core;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
@@ -24,7 +25,7 @@ namespace Alika.UI
         /// <summary>
         /// Photo holder
         /// </summary>
-        [Windows.UI.Xaml.Data.Bindable]
+        [Bindable]
         public class Photo : Grid
         {
             public Attachment.Photo Picture { get; set; }
@@ -54,7 +55,7 @@ namespace Alika.UI
         /// <summary>
         /// Document holder
         /// </summary>
-        [Windows.UI.Xaml.Data.Bindable]
+        [Bindable]
         public class Document : Button
         {
             public Attachment.Document document { get; set; }
@@ -135,7 +136,7 @@ namespace Alika.UI
         /// <summary>
         /// Sticker holder
         /// </summary>
-        [Windows.UI.Xaml.Data.Bindable]
+        [Bindable]
         public class Sticker : Grid
         {
             public Attachment.Sticker StickerSource;
@@ -179,7 +180,7 @@ namespace Alika.UI
         /// <summary>
         /// Voice message holder
         /// </summary>
-        [Windows.UI.Xaml.Data.Bindable]
+        [Bindable]
         public class AudioMessage : StackPanel
         {
             public MediaPlayer media = new MediaPlayer
@@ -373,7 +374,7 @@ namespace Alika.UI
             }
         }
 
-        [Windows.UI.Xaml.Data.Bindable]
+        [Bindable]
         public class Graffiti : Grid
         {
             public Image Image = new Image
@@ -395,10 +396,32 @@ namespace Alika.UI
             }
         }
 
+        [Bindable]
+        public class Gift : ContentControl
+        {
+            public Gift(Attachment.Gift gift) => this.Load(gift);
+
+            private async void Load(Attachment.Gift gift)
+            {
+                this.Content = new Border
+                {
+                    CornerRadius = new CornerRadius(10),
+                    Child = new Image
+                    {
+                        Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(gift.thumb_256))
+                    },
+                    BorderThickness = new Thickness(1),
+                    Width = 256,
+                    Height = 256,
+                    Margin = new Thickness(10, 10, 10, 0)
+                };
+            }
+        }
+
         /// <summary>
         /// Uploaded file holder
         /// </summary>
-        [Windows.UI.Xaml.Data.Bindable]
+        [Bindable]
         public class Uploaded : Grid
         {
             public Button Remove = new Button

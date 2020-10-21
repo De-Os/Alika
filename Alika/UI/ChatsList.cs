@@ -263,6 +263,7 @@ namespace Alika.UI
         {
             Task.Factory.StartNew(() =>
               {
+                  if (start_msg_id > 0) offset++;
                   var conversations = App.vk.Messages.GetConversations(count: count, offset: offset, fields: "photo_200,online_info", start_message_id: start_msg_id).conversations;
                   foreach (var conv in conversations)
                   {
@@ -409,12 +410,13 @@ namespace Alika.UI
             };
             private Image ReadState = new Image
             {
-                Width = 15,
-                Height = 15,
+                Width = 12.5,
+                Height = 12.5,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
                 Source = new SvgImageSource(new Uri(Utils.AssetTheme("check.svg"))),
-                Visibility = Visibility.Collapsed
+                Visibility = Visibility.Collapsed,
+                Margin = new Thickness(0, 0, 5, 0)
             };
 
             public ChatItem(int peer_id, Message last_msg, bool pinned = false, int unread = 0)
@@ -618,7 +620,7 @@ namespace Alika.UI
                 }
                 else
                 {
-                    if (now.Date.AddDays(-7) <= date)
+                    if (date >= now.Date.AddDays(-7))
                     {
                         d = date.ToString("ddd");
                     }

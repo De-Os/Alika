@@ -284,8 +284,16 @@ namespace Alika.UI
                         this.Children.Add(reply);
                     }
 
-                    if (this.message.text == null || this.message.text.Length > 0) this.LoadText();
-                    this.LoadAttachments();
+                    if (this.message.attachments != null && this.message.attachments.Count > 0 && this.message.attachments.Any(i => i.gift != null))
+                    {
+                        this.LoadAttachments();
+                        this.LoadText();
+                    }
+                    else
+                    {
+                        this.LoadText();
+                        this.LoadAttachments();
+                    }
 
                     if (this.message.fwd_messages?.Count > 0)
                     {
@@ -323,84 +331,82 @@ namespace Alika.UI
 
                 private void LoadText()
                 {
+                    if (this.message.text == null && this.message.text.Length == 0) return;
                     Task.Factory.StartNew(() =>
                     {
-                        if (this.message.text != null)
+                        List<Match> markdown = new List<Match>();
+
+                        MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(this.message.text);
+                        MatchCollection links = new Regex(@"((http|https)\:\/\/)?[\w]*\.[a-zA-Z]{1,6}(\/[\w\?\-\=\&.]*)*").Matches(this.message.text);
+                        if (pushes.Count > 0) markdown.AddRange(pushes);
+                        if (links.Count > 0) markdown.AddRange(links);
+
+                        var parsed = new List<ParsedText>();
+
+                        if (markdown.Count > 0)
                         {
-                            List<Match> markdown = new List<Match>();
-
-                            MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(this.message.text);
-                            MatchCollection links = new Regex(@"((http|https)\:\/\/)?[\w]*\.[a-zA-Z]{1,6}(\/[\w\?\-\=\&.]*)*").Matches(this.message.text);
-                            if (pushes.Count > 0) markdown.AddRange(pushes);
-                            if (links.Count > 0) markdown.AddRange(links);
-
-                            var parsed = new List<ParsedText>();
-
-                            if (markdown.Count > 0)
+                            for (int i = 0; i < markdown.Count; i++)
                             {
-                                for (int i = 0; i < markdown.Count; i++)
+                                var m = markdown[i];
+                                if (i == 0 && !this.message.text.StartsWith(m.Value)) parsed.Add(new ParsedText { Text = this.message.text.Substring(0, m.Index) });
+                                if (i > 0 && markdown[i - 1].Index != m.Index)
                                 {
-                                    var m = markdown[i];
-                                    if (i == 0 && !this.message.text.StartsWith(m.Value)) parsed.Add(new ParsedText { Text = this.message.text.Substring(0, m.Index) });
-                                    if (i > 0 && markdown[i - 1].Index != m.Index)
-                                    {
-                                        try
-                                        {
-                                            Match prev = markdown[i - 1];
-                                            int start = prev.Index + prev.Length;
-                                            parsed.Add(new ParsedText { Text = this.message.text.Substring(start, m.Index - start) });
-                                        }
-                                        catch { }
-                                    }
-                                    // TODO: Fix crash on some messages
                                     try
                                     {
-                                        if (!m.Value.Contains("["))
-                                        {
-                                            string link = m.Value;
-                                            if (!link.StartsWith("http://") && !link.StartsWith("https://")) link = "http://" + link;
-                                            parsed.Add(new ParsedText
-                                            {
-                                                Text = m.Value,
-                                                Link = true,
-                                                Url = link
-                                            });
-                                        }
-                                        else
-                                        {
-                                            parsed.Add(new ParsedText
-                                            {
-                                                Text = m.Value.Split("|")[1].Replace("]", ""),
-                                                Link = true,
-                                                Url = "https://vk.com/" + m.Value.Split("|")[0].Replace("[", "")
-                                            });
-                                        }
+                                        Match prev = markdown[i - 1];
+                                        int start = prev.Index + prev.Length;
+                                        parsed.Add(new ParsedText { Text = this.message.text.Substring(start, m.Index - start) });
                                     }
                                     catch { }
-                                    if (i == markdown.Count - 1 && !this.message.text.EndsWith(m.Value)) parsed.Add(new ParsedText { Text = this.message.text.Substring(m.Index + m.Length) });
                                 }
-                            }
-                            else parsed.Add(new ParsedText { Text = this.message.text });
-
-                            App.UILoop.AddAction(new UITask
-                            {
-                                Action = () =>
+                                // TODO: Fix crash on some messages
+                                try
                                 {
-                                    Paragraph p = new Paragraph();
-                                    foreach (var t in parsed)
+                                    if (!m.Value.Contains("["))
                                     {
-                                        if (t.Link)
+                                        string link = m.Value;
+                                        if (!link.StartsWith("http://") && !link.StartsWith("https://")) link = "http://" + link;
+                                        parsed.Add(new ParsedText
                                         {
-                                            Hyperlink link = new Hyperlink { NavigateUri = new Uri(t.Url) };
-                                            link.Inlines.Add(new Run { Text = t.Text });
-                                            p.Inlines.Add(link);
-                                        }
-                                        else p.Inlines.Add(new Run { Text = t.Text });
+                                            Text = m.Value,
+                                            Link = true,
+                                            Url = link
+                                        });
                                     }
-                                    this.Text.Blocks.Add(p);
+                                    else
+                                    {
+                                        parsed.Add(new ParsedText
+                                        {
+                                            Text = m.Value.Split("|")[1].Replace("]", ""),
+                                            Link = true,
+                                            Url = "https://vk.com/" + m.Value.Split("|")[0].Replace("[", "")
+                                        });
+                                    }
                                 }
-                            });
+                                catch { }
+                                if (i == markdown.Count - 1 && !this.message.text.EndsWith(m.Value)) parsed.Add(new ParsedText { Text = this.message.text.Substring(m.Index + m.Length) });
+                            }
                         }
+                        else parsed.Add(new ParsedText { Text = this.message.text });
+
+                        App.UILoop.AddAction(new UITask
+                        {
+                            Action = () =>
+                            {
+                                Paragraph p = new Paragraph();
+                                foreach (var t in parsed)
+                                {
+                                    if (t.Link)
+                                    {
+                                        Hyperlink link = new Hyperlink { NavigateUri = new Uri(t.Url) };
+                                        link.Inlines.Add(new Run { Text = t.Text });
+                                        p.Inlines.Add(link);
+                                    }
+                                    else p.Inlines.Add(new Run { Text = t.Text });
+                                }
+                                this.Text.Blocks.Add(p);
+                            }
+                        });
                     });
                     this.Children.Add(this.Text);
                 }
@@ -430,6 +436,9 @@ namespace Alika.UI
                                     break;
                                 case "graffiti":
                                     attach = new MessageAttachment.Graffiti(att.graffiti);
+                                    break;
+                                case "gift":
+                                    attach = new MessageAttachment.Gift(att.gift);
                                     break;
                             }
                             if (attach != null)
@@ -505,6 +514,7 @@ namespace Alika.UI
                     public ForwardGrid(Message msg)
                     {
                         this.Orientation = Orientation.Horizontal;
+                        this.Margin = new Thickness(2.5, 0, 7.5, 0);
 
                         var content = new StackPanel();
 

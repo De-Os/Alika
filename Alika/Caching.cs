@@ -30,11 +30,7 @@ namespace Alika
                 {
                     us = this.Users.Find(u => u.user_id == user.user_id);
                     this.Users.RemoveAll(u => u.user_id == user.user_id);
-                    foreach (var field in typeof(User).GetFields())
-                    {
-                        var value = field.GetValue(user);
-                        if (value != null) field.SetValue(us, value);
-                    }
+                    this.Users.Add(this.Update(user, us));
                 }
                 else us = user;
                 this.Users.Add(us);
@@ -54,11 +50,7 @@ namespace Alika
                 {
                     gr = this.Groups.Find(g => g.id == group.id);
                     this.Groups.RemoveAll(g => g.id == group.id);
-                    foreach (var field in typeof(Group).GetFields())
-                    {
-                        var value = field.GetValue(group);
-                        if (value != null) field.SetValue(gr, value);
-                    }
+                    this.Groups.Add(this.Update(group, gr));
                 }
                 else gr = group;
                 this.Groups.Add(gr);
@@ -88,11 +80,7 @@ namespace Alika
                 {
                     conv = this.Conversations.Find(c => c.peer.id == conversation.peer.id);
                     this.Conversations.RemoveAll(c => c.peer.id == conversation.peer.id);
-                    foreach (var field in typeof(ConversationResponse.ConversationInfo).GetFields())
-                    {
-                        var value = field.GetValue(conversation);
-                        if (value != null) field.SetValue(conv, value);
-                    }
+                    this.Conversations.Add(this.Update(conversation, conv));
                 }
                 else conv = conversation;
                 this.Conversations.Add(conv);
@@ -121,6 +109,23 @@ namespace Alika
                     }
                 });
             });
+        }
+        private Type Update<Type>(Type from, Type to)
+        {
+            var type = from.GetType();
+            foreach (var field in type.GetFields())
+            {
+                var val = field.GetValue(from);
+                if (val != null) field.SetValue(to, val);
+            }
+
+            foreach (var prop in type.GetProperties())
+            {
+                var val = prop.GetValue(from);
+                if (val != null) prop.SetValue(to, val);
+            }
+
+            return to;
         }
 
         public string GetAvatar(int peer_id)

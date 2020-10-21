@@ -27,7 +27,7 @@ namespace Alika.UI.Dialog
                 IsActive = true
             });
 
-            this.Loaded += (a, b) => this.Load();
+            this.Load();
         }
 
         private void Load()

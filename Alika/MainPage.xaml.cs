@@ -22,6 +22,7 @@ namespace Alika
                     if (old.peer_id == value) return;
                     this.dialog.PreviewKeyDown -= old.PreviewKeyEvent;
                     (old.stickers.Flyout as Flyout).Content = null; // Remove previous flyout to prevent crash on stickers opening
+                    App.cache.StickersSelector.StickerSent -= old.HideFlyout;
                     this.dialog.Children.Clear();
                 }
                 var list = new Dialog(value);

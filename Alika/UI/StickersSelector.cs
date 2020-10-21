@@ -21,6 +21,9 @@ namespace Alika.UI
     {
         public int peer_id { get; set; }
 
+        public delegate void Event();
+        public Event StickerSent;
+
         public TextBox Search = new TextBox
         {
             PlaceholderText = Utils.LocString("Search")
@@ -100,7 +103,10 @@ namespace Alika.UI
                 top.Children.Add(back);
                 top.Children.Add(title);
                 pack.Items.Add(top);
-                pack.Items.Add(new StickerSet((e.SourceItem.Item as StickerName).Pack));
+
+                var set = new StickerSet((e.SourceItem.Item as StickerName).Pack);
+                set.StickerSent += () => this.StickerSent?.Invoke();
+                pack.Items.Add(set);
                 (sender as SemanticZoom).ZoomedInView = pack;
                 App.cache.StickersSelector.Search.Visibility = Visibility.Collapsed;
             }
@@ -170,6 +176,9 @@ namespace Alika.UI
         {
             public GetStickersResponse.StickerPackInfo PackInfo;
 
+            public delegate void Event();
+            public Event StickerSent;
+
             public StickerSet(GetStickersResponse.StickerPackInfo pack)
             {
                 this.PackInfo = pack;
@@ -185,6 +194,7 @@ namespace Alika.UI
                         x++;
                     }
                     StickerHolder img = new StickerHolder(sticker);
+                    img.StickerSent += () => this.StickerSent?.Invoke();
                     Grid.SetColumn(img, grids[x].ColumnDefinitions.Count);
                     grids[x].ColumnDefinitions.Add(new ColumnDefinition { Width = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Auto) });
                     grids[x].Children.Add(img);
@@ -201,6 +211,9 @@ namespace Alika.UI
             [Windows.UI.Xaml.Data.Bindable]
             public class StickerHolder : Grid
             {
+                public delegate void Event();
+                public Event StickerSent;
+
                 public Attachment.Sticker Sticker;
                 public Image Image = new Image
                 {
@@ -214,7 +227,11 @@ namespace Alika.UI
                 {
                     this.Sticker = sticker;
                     this.CornerRadius = new CornerRadius(10);
-                    this.PointerPressed += (a, b) => Task.Factory.StartNew(() => App.vk.Messages.Send(App.cache.StickersSelector.peer_id, sticker_id: this.Sticker.sticker_id));
+                    this.PointerPressed += (a, b) =>
+                    {
+                        Task.Factory.StartNew(() => App.vk.Messages.Send(App.cache.StickersSelector.peer_id, sticker_id: this.Sticker.sticker_id));
+                        this.StickerSent?.Invoke();
+                    };
                     this.PointerEntered += (a, b) => this.Background = Coloring.Transparent.Percent(50); // Sticker "selection" by background color
                     this.PointerExited += (a, b) => this.Background = Coloring.Transparent.Full; // Remove selection
                     this.Children.Add(this.Image);
