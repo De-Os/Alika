@@ -1,4 +1,5 @@
 ﻿using Alika.Libs;
+using Alika.Libs.VK;
 using Alika.UI;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -106,7 +107,7 @@ namespace Alika
             request.AddParameter("client_secret", App.settings.vk.login.client_secret);
             request.AddParameter("username", number);
             request.AddParameter("scope", String.Join(",", App.settings.vk.login.scope));
-            request.AddParameter("v", App.settings.vk.api);
+            request.AddParameter("v", VK.API_VER);
             request.AddParameter("2fa_supported", 1);
             if (captcha_sid != null)
             {

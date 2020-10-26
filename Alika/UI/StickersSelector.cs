@@ -43,10 +43,27 @@ namespace Alika.UI
             this.Children.Add(this.Search);
 
             ListView names = new ListView();
-            stickers.FindAll(s => s.product.purchased == 1 && s.product.active == 1).ForEach((pack) =>
+            foreach (var pack in stickers.FindAll(s => s.product.purchased == 1 && s.product.base_id == 0))
             {
-                names.Items.Add(new StickerName(pack));
-            });
+                if (pack.product.style_ids != null)
+                {
+                    if (pack.product.active == 1
+                        || stickers.Any(i =>
+                            i.product.base_id == pack.product.id
+                            && i.product.purchased == 1
+                            && i.product.active == 1))
+                    {
+                        names.Items.Add(new StickerName(pack)
+                        {
+                            Styles = stickers.FindAll(i =>
+                                i.product.base_id == pack.product.id
+                                && i.product.purchased == 1
+                                && i.product.active == 1)
+                        });
+                    }
+                }
+                else if (pack.product.active == 1) names.Items.Add(new StickerName(pack));
+            }
             this.Semantic.ZoomedOutView = names;
             this.Semantic.IsZoomedInViewActive = false;
             this.Semantic.ViewChangeStarted += this.PackChoosed;
@@ -104,7 +121,8 @@ namespace Alika.UI
                 top.Children.Add(title);
                 pack.Items.Add(top);
 
-                var set = new StickerSet((e.SourceItem.Item as StickerName).Pack);
+                var item = e.SourceItem.Item as StickerName;
+                var set = new StickerSet(item.Pack, item.Styles);
                 set.StickerSent += () => this.StickerSent?.Invoke();
                 pack.Items.Add(set);
                 (sender as SemanticZoom).ZoomedInView = pack;
@@ -130,6 +148,7 @@ namespace Alika.UI
         public class StickerName : ListViewItem
         {
             public GetStickersResponse.StickerPackInfo Pack { get; set; }
+            public List<GetStickersResponse.StickerPackInfo> Styles { get; set; }
 
             public Image Image = new Image
             {
@@ -147,11 +166,16 @@ namespace Alika.UI
             public StickerName(GetStickersResponse.StickerPackInfo pack)
             {
                 this.Pack = pack;
-                Grid grid = new Grid();
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Auto) });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Star) });
+                this.Render();
+            }
 
-                this.Title.Text = pack.product.title;
+            private async void Render()
+            {
+                Grid grid = new Grid();
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+                this.Title.Text = this.Pack.product.title;
 
                 Grid.SetColumn(this.Image, 0);
                 Grid.SetColumn(this.Title, 1);
@@ -159,12 +183,8 @@ namespace Alika.UI
                 grid.Children.Add(this.Title);
                 this.Content = grid;
 
-                this.LoadImage();
-            }
-
-            public async void LoadImage()
-            {
                 this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.Pack.product.previews.Find(i => i.width == this.Pack.product.previews.Max(g => g.width)).url));
+
             }
         }
 
@@ -172,40 +192,54 @@ namespace Alika.UI
         /// Pack stickers 
         /// </summary>
         [Windows.UI.Xaml.Data.Bindable]
-        public class StickerSet : Grid
+        public class StickerSet : StackPanel
         {
             public GetStickersResponse.StickerPackInfo PackInfo;
+            public List<GetStickersResponse.StickerPackInfo> Styles;
 
             public delegate void Event();
             public Event StickerSent;
 
-            public StickerSet(GetStickersResponse.StickerPackInfo pack)
+            public StickerSet(GetStickersResponse.StickerPackInfo pack, List<GetStickersResponse.StickerPackInfo> styles = null)
             {
                 this.PackInfo = pack;
 
-                List<Grid> grids = new List<Grid> { new Grid() };
-                int x = 0;
-
-                this.PackInfo.product.stickers.ForEach((sticker) =>
+                var packs = new List<GetStickersResponse.StickerPackInfo>();
+                if (pack.product.active == 1 && styles?.Count == 0)
                 {
-                    if (grids[x].Children.Count == 4) // Limit to 4 stickers in one row
+                    packs.Add(pack);
+                }
+                else
+                {
+                    if (styles?.Count > 0 && styles.Any(i => i.product.purchased == 1))
                     {
-                        grids.Add(new Grid());
-                        x++;
+                        packs.AddRange(styles.FindAll(i => i.product.purchased == 1).OrderByDescending(i => i.product.active));
                     }
-                    StickerHolder img = new StickerHolder(sticker);
-                    img.StickerSent += () => this.StickerSent?.Invoke();
-                    Grid.SetColumn(img, grids[x].ColumnDefinitions.Count);
-                    grids[x].ColumnDefinitions.Add(new ColumnDefinition { Width = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Auto) });
-                    grids[x].Children.Add(img);
-                });
+                    packs.Add(pack);
+                }
 
-                grids.ForEach((grid) =>
+                foreach (var p in packs)
                 {
-                    Grid.SetRow(grid, this.RowDefinitions.Count);
-                    this.RowDefinitions.Add(new RowDefinition());
-                    this.Children.Add(grid);
-                });
+                    if (packs.Count > 1) this.Children.Add(new TextBlock
+                    {
+                        Text = p.product.title,
+                        FontWeight = FontWeights.Bold,
+                        Margin = new Thickness(5)
+                    });
+                    var temp = new StackPanel { Orientation = Orientation.Horizontal };
+                    foreach (var sticker in p.product.stickers)
+                    {
+                        if (temp.Children.Count == 4)
+                        {
+                            this.Children.Add(temp);
+                            temp = new StackPanel { Orientation = Orientation.Horizontal };
+                        }
+                        StickerHolder img = new StickerHolder(sticker);
+                        img.StickerSent += () => this.StickerSent?.Invoke();
+                        temp.Children.Add(img);
+                    }
+                    if (temp.Children.Count > 0) this.Children.Add(temp);
+                }
             }
 
             [Windows.UI.Xaml.Data.Bindable]

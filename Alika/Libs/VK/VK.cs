@@ -11,6 +11,7 @@ namespace Alika.Libs.VK
 {
     public partial class VK
     {
+        public const string API_VER = "5.140";
 
         public int user_id;
         public string domain
@@ -35,7 +36,6 @@ namespace Alika.Libs.VK
                 this._http.Proxy = value;
             }
         }
-        public string api_ver;
 
         private readonly string token;
         private RestClient _http = new RestClient();
@@ -43,7 +43,6 @@ namespace Alika.Libs.VK
         public VK(Settings settings)
         {
             this.token = settings.Token;
-            this.api_ver = settings.ApiVer;
             this.domain = settings.ApiDomain;
 
             this.user_id = this.Users.Get(new List<int>(), "photo_200, online_info")[0].user_id; // Getting current user's user_id & adding it's photo to cache
@@ -79,7 +78,7 @@ namespace Alika.Libs.VK
         {
             var request = new RestRequest(method);
             request.AddOrUpdateParameter("access_token", this.token);
-            request.AddOrUpdateParameter("v", this.api_ver);
+            request.AddOrUpdateParameter("v", API_VER);
 
             if (fields != null && fields.Count > 0)
             {
@@ -112,7 +111,6 @@ namespace Alika.Libs.VK
         public class Settings
         {
             public string ApiDomain { get; set; } = "https://api.vk.com/method";
-            public string ApiVer { get; set; } = "5.129";
             public string Token { get; set; }
         }
     }

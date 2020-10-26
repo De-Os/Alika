@@ -429,6 +429,9 @@ namespace Alika.UI
                 this.UpdateMsg(last_msg);
                 this.UnreadCount = unread;
 
+                var conv = App.cache.GetConversation(peer_id);
+                if (conv.last_message_id >= last_msg.id && last_msg.id <= (conv.out_read > conv.in_read ? conv.out_read : conv.in_read)) this.ReadState.Source = new SvgImageSource(new Uri(Utils.AssetTheme("double_check.svg")));
+
                 App.lp.OnNewMessage += this.OnNewMessage;
                 App.lp.OnMessageEdition += (m) =>
                 {
@@ -613,7 +616,7 @@ namespace Alika.UI
 
                 var date = msg.date.ToDateTime();
                 var now = DateTime.Now;
-                string d = "";
+                string d;
                 if (date.Date == now.Date)
                 {
                     d = date.ToString("HH:mm");

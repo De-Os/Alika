@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Alika.Libs.VK.Responses
 {
@@ -32,5 +33,11 @@ namespace Alika.Libs.VK.Responses
         [JsonProperty("is_closed")]
         public int is_closed { get; set; }
 
+    }
+
+    public class GroupsResponse
+    {
+        [JsonProperty("groups")]
+        public List<Group> groups { get; set; }
     }
 }

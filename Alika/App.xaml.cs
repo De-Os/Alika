@@ -93,7 +93,6 @@ namespace Alika
             var vault = new PasswordVault();
             App.vk = new VK(new VK.Settings
             {
-                ApiVer = App.settings.vk.api,
                 Token = vault.Retrieve(App.appName, "default").Password,
                 ApiDomain = App.settings.vk.domain
             });
@@ -107,9 +106,6 @@ namespace Alika
                 {
                     case "vk.domain":
                         App.vk.domain = App.settings.vk.domain;
-                        break;
-                    case "vk.api":
-                        App.vk.api_ver = App.settings.vk.api;
                         break;
                     case "proxy":
                         this.LoadProxy();

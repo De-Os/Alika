@@ -23,8 +23,6 @@ namespace Alika
 
         public class VK
         {
-            [JsonProperty("api")]
-            public string api { get; set; } // Api version
             [JsonProperty("domain")]
             public string domain { get; set; } // Domain url
             [JsonProperty("ping_url")]

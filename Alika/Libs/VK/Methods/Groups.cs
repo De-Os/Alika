@@ -22,7 +22,7 @@ namespace Alika.Libs.VK.Methods
                 request.Add("group_ids", String.Join(",", group_ids));
             }
             if (fields.Length > 0) request.Add("fields", fields);
-            List<Group> groups = this._vk.Call<List<Group>>("groups.getById", request);
+            List<Group> groups = this._vk.Call<GroupsResponse>("groups.getById", request).groups;
             App.cache.Update(groups);
             return groups;
         }

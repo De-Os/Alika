@@ -35,22 +35,32 @@ namespace Alika.Libs.VK.Responses
             {
                 [JsonProperty("id")]
                 public int id { get; set; }
+                [JsonProperty("base_id")]
+                public int base_id { get; set; }
                 [JsonProperty("type")]
                 public string type { get; set; }
                 [JsonProperty("purchased")]
                 public int purchased { get; set; }
                 [JsonProperty("active")]
                 public int active { get; set; }
+                [JsonProperty("style_ids")]
+                public List<int> style_ids { get; set; }
                 [JsonProperty("title")]
                 public string title { get; set; }
                 [JsonProperty("icon")]
-                public List<Attachment.Photo.Size> icons { get; set; }
+                public Icons icons { get; set; }
                 [JsonProperty("previews")]
                 public List<Attachment.Photo.Size> previews { get; set; }
                 [JsonProperty("url")]
                 public string url { get; set; }
                 [JsonProperty("stickers")]
                 public List<Attachment.Sticker> stickers { get; set; }
+
+                public struct Icons
+                {
+                    [JsonProperty("base_url")]
+                    public string base_url;
+                }
             }
         }
     }
