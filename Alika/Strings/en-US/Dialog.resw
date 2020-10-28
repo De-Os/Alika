@@ -247,6 +247,9 @@
     <value>Save</value>
     <comment>Save button text</comment>
   </data>
+  <data name="SelectChat" xml:space="preserve">
+    <value>Select chat...</value>
+  </data>
   <data name="Send" xml:space="preserve">
     <value>Send</value>
     <comment>Send</comment>

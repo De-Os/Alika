@@ -186,6 +186,7 @@
     <Content Include="Assets\UI\Dark\back.svg" />
     <Content Include="Assets\UI\Dark\call.svg" />
     <Content Include="Assets\UI\Dark\camera.svg" />
+    <Content Include="Assets\UI\Dark\chat.svg" />
     <Content Include="Assets\UI\Dark\check.svg" />
     <Content Include="Assets\UI\Dark\clip.svg" />
     <Content Include="Assets\UI\Dark\close.svg" />
@@ -214,6 +215,7 @@
     <Content Include="Assets\UI\Light\back.svg" />
     <Content Include="Assets\UI\Light\call.svg" />
     <Content Include="Assets\UI\Light\camera.svg" />
+    <Content Include="Assets\UI\Light\chat.svg" />
     <Content Include="Assets\UI\Light\check.svg" />
     <Content Include="Assets\UI\Light\clip.svg" />
     <Content Include="Assets\UI\Light\close.svg" />
