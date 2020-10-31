@@ -82,4 +82,12 @@ namespace Alika.Libs.VK.Responses
             public List<Attachment.Sticker> promoted_stickers { get; set; }
         }
     }
+
+    public class GetRecentStickersResponse
+    {
+        [JsonProperty("count")]
+        public int count { get; set; }
+        [JsonProperty("items")]
+        public List<Attachment.Sticker> stickers { get; set; }
+    }
 }

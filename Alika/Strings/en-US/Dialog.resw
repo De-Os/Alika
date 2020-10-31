@@ -235,6 +235,9 @@
     <value>Promote user</value>
     <comment>Promote user</comment>
   </data>
+  <data name="RecentStickers" xml:space="preserve">
+    <value>Recent</value>
+  </data>
   <data name="RemovePhoto" xml:space="preserve">
     <value>Remove  photo</value>
     <comment>Remove chat photo</comment>

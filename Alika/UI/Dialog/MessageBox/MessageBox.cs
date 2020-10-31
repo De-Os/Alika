@@ -361,8 +361,8 @@ namespace Alika.UI
                                         }
                                         catch { }
                                     }
-                                // TODO: Fix crash on some messages
-                                try
+                                    // TODO: Fix crash on some messages
+                                    try
                                     {
                                         if (!m.Value.Contains("["))
                                         {

@@ -60,7 +60,6 @@ namespace Alika.UI.Dialog
         public Dialog(int peer_id)
         {
             this.peer_id = peer_id;
-            if (App.cache.StickersSelector != null) App.cache.StickersSelector.peer_id = this.peer_id;
 
             this.Render();
 

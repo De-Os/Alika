@@ -3,7 +3,6 @@ using Alika.UI;
 using Alika.UI.Dialog;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.UI.Text;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
@@ -25,18 +24,22 @@ namespace Alika
 
                 this._peer_id = value;
 
-                if(this.dialog.Children.Count > 0)
+                if (this.dialog.Children.Count > 0)
                 {
-                    if(this.dialog.Children.Any(i => i is Dialog))
+                    if (this.dialog.Children.Any(i => i is Dialog))
                     {
                         var old = this.dialog.Children.First(i => i is Dialog) as Dialog;
                         if (old.peer_id != value)
                         {
                             this.dialog.PreviewKeyDown -= old.PreviewKeyEvent;
-                            (old.stickers.Flyout as Flyout).Content = null; // Remove previous flyout to prevent crash on stickers opening
-                            App.cache.StickersSelector.StickerSent -= old.HideFlyout;
+                            if (old.stickers.Flyout is Flyout oldFlyout)
+                            {
+                                oldFlyout.Content = null; // Remove previous flyout to prevent crash on stickers opening
+                                App.cache.StickersSelector.StickerSent -= old.HideFlyout;
+                            }
                             this.dialog.Children.Clear();
-                        } else return;
+                        }
+                        else return;
                     }
                     this.dialog.Children.Clear();
                 }
@@ -44,7 +47,7 @@ namespace Alika
                 if (value == 0)
                 {
                     this.dialog.Children.Add(this.NoChatSelected);
-                    if(this.chats_grid.Content is ChatsHolder holder)
+                    if (this.chats_grid.Content is ChatsHolder holder)
                     {
                         holder.PinnedChats.SelectedItem = null;
                         holder.Chats.SelectedItem = null;
@@ -79,7 +82,8 @@ namespace Alika
                 Height = 100,
                 HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Center
             });
-            this.NoChatSelected.Children.Add(new TextBlock { 
+            this.NoChatSelected.Children.Add(new TextBlock
+            {
                 Text = Utils.LocString("Dialog/SelectChat"),
                 HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Center,
                 Margin = new Windows.UI.Xaml.Thickness(0, 10, 0, 0),
@@ -88,18 +92,20 @@ namespace Alika
             });
             this.NoChatSelected.Transitions.Add(new PopupThemeTransition());
             this.dialog.Children.Add(this.NoChatSelected);
-            this.dialog.PreviewKeyDown += (a, b) => {
+            this.dialog.PreviewKeyDown += (a, b) =>
+            {
                 if (b.Key == Windows.System.VirtualKey.Escape) this.peer_id = 0;
             };
 
             // Updating stickers cache on app startup
             Task.Factory.StartNew(() =>
             {
+                var recent = App.vk.Messages.GetRecentStickers().stickers;
                 var stickers = App.vk.GetStickers();
                 if (stickers?.items == null || stickers.items.Count == 0) return;
                 App.UILoop.AddAction(new UITask
                 {
-                    Action = () => App.cache.Update(stickers.items),
+                    Action = () => App.cache.Update(stickers.items, recent),
                     Priority = Windows.UI.Core.CoreDispatcherPriority.Low
                 });
             });

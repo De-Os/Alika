@@ -29,12 +29,15 @@ namespace Alika.UI.Dialog
             this.attach_button.Click += this.AttachSelection;
             this.Loaded += (object s, RoutedEventArgs e) => this.send_text.Focus(FocusState.Pointer);
 
-            var flyout = new Flyout { Content = App.cache.StickersSelector };
-            App.cache.StickersSelector.StickerSent += this.HideFlyout;
-            this.stickers.Flyout = flyout;
+            if (App.cache.StickersSelector != null)
+            {
+                var flyout = new Flyout { Content = App.cache.StickersSelector };
+                App.cache.StickersSelector.StickerSent += this.HideFlyout;
+                this.stickers.Flyout = flyout;
+            }
         }
 
-        public void HideFlyout() => (this.stickers.Flyout as Flyout).Hide();
+        public void HideFlyout(Attachment.Sticker sticker) => (this.stickers.Flyout as Flyout).Hide();
 
         // Attach photo from Clipboard
         private async void TextPaste(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)

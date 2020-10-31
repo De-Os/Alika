@@ -13,6 +13,7 @@ namespace Alika
         public List<Group> Groups { get; set; } = new List<Group>();
         public List<ConversationResponse.ConversationInfo> Conversations { get; set; } = new List<ConversationResponse.ConversationInfo>();
         public List<GetStickersResponse.StickerPackInfo> StickerPacks { get; set; }
+        public List<Attachment.Sticker> RecentStickers { get; set; }
         public StickersSelector StickersSelector;
         public Dictionary<string, List<Attachment.Sticker>> StickerDictionary { get; set; }
         public Caching() { }
@@ -87,10 +88,11 @@ namespace Alika
             }
             catch { }
         }
-        public void Update(List<GetStickersResponse.StickerPackInfo> stickers)
+        public void Update(List<GetStickersResponse.StickerPackInfo> stickers, List<Attachment.Sticker> recent)
         {
             this.StickerPacks = stickers;
-            this.StickersSelector = new StickersSelector(this.StickerPacks);
+            this.RecentStickers = recent;
+            this.StickersSelector = new StickersSelector(this.StickerPacks, recent);
         }
         public void Update(List<GetStickersKeywordsResponse.Dictionary> dictionaries)
         {

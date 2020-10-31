@@ -358,5 +358,7 @@ namespace Alika.Libs.VK.Methods
                 {"message_ids", String.Join(",", messages)}
             });
         }
+
+        public GetRecentStickersResponse GetRecentStickers() => this._vk.Call<GetRecentStickersResponse>("messages.getRecentStickers");
     }
 }

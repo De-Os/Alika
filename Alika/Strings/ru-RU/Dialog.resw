@@ -222,6 +222,9 @@
   <data name="Promote" xml:space="preserve">
     <value>Назначить администратором</value>
   </data>
+  <data name="RecentStickers" xml:space="preserve">
+    <value>Недавние</value>
+  </data>
   <data name="RemovePhoto" xml:space="preserve">
     <value>Удалить фотографию</value>
   </data>

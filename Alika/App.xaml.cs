@@ -121,7 +121,6 @@ namespace Alika
             if (!App.settings.proxy.enabled)
             {
                 if (App.vk != null) App.vk.proxy = null;
-                if (App.lp != null) App.lp.proxy = null;
                 return;
             }
             var testClient = new RestClient(App.settings.vk.ping_url)
