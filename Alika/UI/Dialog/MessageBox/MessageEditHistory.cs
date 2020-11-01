@@ -25,24 +25,24 @@ namespace Alika.UI.Dialog
                     CornerRadius = new Windows.UI.Xaml.CornerRadius(10),
                     Content = new TextBlock
                     {
-                        Text = msg.update_time.ToDateTime().ToString("HH:mm:ss, dd.MM.yy"),
+                        Text = msg.UpdateTime.ToDateTime().ToString("HH:mm:ss, dd.MM.yy"),
                         VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Center,
                         FontSize = 20
                     },
                     Background = Coloring.Transparent.Full
                 };
-                item.Click += (a, b) => App.main_page.popup.Children.Add(new Popup
+                item.Click += (a, b) => App.MainPage.Popup.Children.Add(new Popup
                 {
                     Content = new ScrollViewer
                     {
                         HorizontalScrollMode = ScrollMode.Disabled,
                         VerticalScrollMode = ScrollMode.Auto,
-                        Content = new MessageBox.MessageGrid(msg, msg.peer_id, true)
+                        Content = new MessageBox.MessageGrid(msg, msg.PeerId, true)
                         {
                             MaxWidth = 500
                         }
                     },
-                    Title = msg.update_time.ToDateTime().ToString("HH:mm:ss, dd.MM.yy")
+                    Title = msg.UpdateTime.ToDateTime().ToString("HH:mm:ss, dd.MM.yy")
                 });
                 list.Children.Add(item);
             }

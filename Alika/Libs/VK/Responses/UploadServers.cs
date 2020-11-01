@@ -4,55 +4,51 @@ namespace Alika.Libs.VK.Responses
 {
     public class UploadServers
     {
-        public class PhotoMessages
+        public class PhotoMessages : UploadServerBase
         {
             [JsonProperty("album_id")]
-            public int album_id { get; set; }
-            [JsonProperty("upload_url")]
-            public string upload_url { get; set; }
+            public int AlbumId;
             [JsonProperty("user_id")]
-            public int user_id { get; set; }
+            public int UserId;
             [JsonProperty("group_id")]
-            public int group_id { get; set; }
+            public int GroupId;
 
             public class UploadResult
             {
                 [JsonProperty("server")]
-                public int server { get; set; }
+                public int Server;
                 [JsonProperty("photo")]
-                public string photo { get; set; }
+                public string Photo;
                 [JsonProperty("hash")]
-                public string hash { get; set; }
+                public string Hash;
             }
         }
-        public class DocumentMessages
+        public class DocumentMessages : UploadServerBase
         {
-            [JsonProperty("upload_url")]
-            public string upload_url { get; set; }
             public class UploadResult
             {
                 [JsonProperty("file")]
-                public string file { get; set; }
+                public string File;
             }
 
             public class SaveResult
             {
                 [JsonProperty("type")]
-                public string type { get; set; }
+                public string Type;
                 [JsonProperty("doc")]
-                public Attachment.Document document { get; set; }
+                public Attachment.DocumentAtt Document;
                 [JsonProperty("graffiti")]
-                public Attachment.Graffiti graffiti { get; set; }
+                public Attachment.GraffitiAtt Graffiti;
                 [JsonProperty("audio_message")]
-                public Attachment.AudioMessage audio_message { get; set; }
+                public Attachment.AudioMessageAtt AudioMessage;
 
             }
         }
 
-        public class ChatPhoto
+        public class UploadServerBase
         {
             [JsonProperty("upload_url")]
-            public string upload_url { get; set; }
+            public string UploadUrl;
         }
     }
 }

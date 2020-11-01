@@ -30,7 +30,7 @@ namespace Alika.UI
         {
             this.OnSave += () => this.popup.Hide();
 
-            this.GenerateSettings(App.settings.GetType().GetProperties().ToList(), 5, App.settings, "");
+            this.GenerateSettings(App.Settings.GetType().GetProperties().ToList(), 5, App.Settings, "");
             this.Show();
         }
 
@@ -73,7 +73,7 @@ namespace Alika.UI
                         this.OnSave += () =>
                         {
                             set.SetValue(parent, int.Parse((input as NumberBox).Text));
-                            App.settings.CallUpdateEvent(finalName);
+                            App.Settings.CallUpdateEvent(finalName);
                         };
                     }
                     else if (set.PropertyType == typeof(string))
@@ -86,7 +86,7 @@ namespace Alika.UI
                         this.OnSave += () =>
                         {
                             set.SetValue(parent, (input as TextBox).Text);
-                            App.settings.CallUpdateEvent(finalName);
+                            App.Settings.CallUpdateEvent(finalName);
                         };
                     }
                     else if (set.PropertyType.IsGenericType)
@@ -99,7 +99,7 @@ namespace Alika.UI
                         this.OnSave += () =>
                         {
                             set.SetValue(parent, (input as TextBox).Text.Split(",").ToList());
-                            App.settings.CallUpdateEvent(finalName);
+                            App.Settings.CallUpdateEvent(finalName);
                         };
                     }
                     else if (set.PropertyType == typeof(bool))
@@ -114,7 +114,7 @@ namespace Alika.UI
                         this.OnSave += () =>
                         {
                             set.SetValue(parent, ((input as ContentControl).Content as ToggleSwitch).IsOn);
-                            App.settings.CallUpdateEvent(finalName);
+                            App.Settings.CallUpdateEvent(finalName);
                         };
                     }
 
@@ -160,18 +160,18 @@ namespace Alika.UI
             save.Click += async (a, b) =>
             {
                 this.OnSave?.Invoke();
-                await ApplicationData.Current.LocalFolder.WriteTextToFileAsync(JsonConvert.SerializeObject(App.settings), "settings.json");
+                await ApplicationData.Current.LocalFolder.WriteTextToFileAsync(JsonConvert.SerializeObject(App.Settings), "settings.json");
             };
             Grid.SetRow(save, 1);
             content.Children.Add(save);
             this.popup.Content = content;
-            if (App.main_page is MainPage page)
+            if (App.MainPage is MainPage page)
             {
-                page.popup.Children.Add(this.popup);
+                page.Popup.Children.Add(this.popup);
             }
-            else if (App.login_page is LoginPage login)
+            else if (App.LoginPage is LoginPage login)
             {
-                login.popup.Children.Add(popup);
+                login.Popup.Children.Add(popup);
             }
         }
     }

@@ -8,336 +8,317 @@ namespace Alika.Libs.VK.Responses
     public struct Attachment
     {
         [JsonProperty("type")]
-        public string type;
+        public string Type;
         [JsonProperty("photo")]
-        public Photo photo;
+        public PhotoAtt Photo;
         [JsonProperty("video")]
-        public Video video;
+        public VideoAtt Video;
         [JsonProperty("audio")]
-        public Audio audio;
+        public AudioAtt Audio;
         [JsonProperty("doc")]
-        public Document document;
+        public DocumentAtt Document;
         [JsonProperty("graffiti")]
-        public Graffiti graffiti;
+        public GraffitiAtt Graffiti;
         [JsonProperty("audio_message")]
-        public AudioMessage audio_message;
+        public AudioMessageAtt AudioMessage;
         [JsonProperty("link")]
-        public Link link;
+        public LinkAtt Link;
         [JsonProperty("wall")]
-        public Wall wall;
+        public WallAtt Wall;
         [JsonProperty("wall_reply")]
-        public WallReply wall_reply;
+        public WallReplyAtt WallReply;
         [JsonProperty("sticker")]
-        public Sticker sticker;
+        public StickerAtt Sticker;
         [JsonProperty("gift")]
-        public Gift gift;
+        public GiftAtt Gift;
 
-        public class Photo : AttachBase
+        public class PhotoAtt : AttachBase
         {
             [JsonProperty("album_id")]
-            public int album_id { get; set; }
+            public int AlbumId;
             [JsonProperty("user_id")]
-            public int user_id { get; set; }
+            public int UserId;
             [JsonProperty("text")]
-            public string text { get; set; }
+            public string Text;
             [JsonProperty("date")]
-            public int dateUnix { get; set; }
+            public int Date;
             [JsonProperty("sizes")]
-            public List<Size> sizes { get; set; }
+            public List<Size> Sizes;
 
-            public Size GetBestQuality() => this.sizes.OrderByDescending(i => i.width).ThenByDescending(i => i.height).First();
+            public Size GetBestQuality() => this.Sizes.OrderByDescending(i => i.Width).ThenByDescending(i => i.Height).First();
 
             public override string ToAttachFormat() => "photo" + base.ToAttachFormat();
 
             public class Size
             {
                 [JsonProperty("type")]
-                public string type { get; set; }
+                public string Type;
                 [JsonProperty("url")]
-                public string url { get; set; }
+                public string Url;
                 [JsonProperty("width")]
-                public int width { get; set; }
+                public int Width;
                 [JsonProperty("height")]
-                public int height { get; set; }
+                public int Height;
 
             }
         }
-        public class Video : AttachBase
+        public class VideoAtt : AttachBase
         {
             [JsonProperty("title")]
-            public string title { get; set; }
+            public string Title;
             [JsonProperty("description")]
-            public string description { get; set; }
+            public string Description;
             [JsonProperty("duration")]
-            public int duration { get; set; }
+            public int Duration;
             [JsonProperty("photo_130")]
-            public string photo_130 { get; set; }
+            public string Photo130;
             [JsonProperty("photo_320")]
-            public string photo_320 { get; set; }
+            public string Photo320;
             [JsonProperty("photo_640")]
-            public string photo_640 { get; set; }
+            public string Photo640;
             [JsonProperty("photo_800")]
-            public string photo_800 { get; set; }
+            public string Photo800;
             [JsonProperty("photo_1280")]
-            public string photo_1280 { get; set; }
+            public string Photo1280;
             [JsonProperty("first_frame_130")]
-            public string first_frame_130 { get; set; }
+            public string FirstFrame130;
             [JsonProperty("first_frame_320")]
-            public string first_frame_320 { get; set; }
+            public string FirstFrame320;
             [JsonProperty("first_frame_640")]
-            public string first_frame_640 { get; set; }
+            public string FirstFrame640;
             [JsonProperty("first_frame_800")]
-            public string first_frame_800 { get; set; }
+            public string FirstFrame800;
             [JsonProperty("first_frame_1280")]
-            public string first_frame_1280 { get; set; }
+            public string FirstFrame1280;
             [JsonProperty("date")]
-            public int date { get; set; }
+            public int Date;
             [JsonProperty("adding_date")]
-            public int adding_date { get; set; }
+            public int AddingDate;
             [JsonProperty("views")]
-            public int views { get; set; }
+            public int Views;
             [JsonProperty("comments")]
-            public int comments { get; set; }
+            public int Comments;
             [JsonProperty("player")]
-            public string player { get; set; }
+            public string Player;
             [JsonProperty("platform")]
-            public string platform { get; set; }
+            public string Platform;
             [JsonProperty("can_edit")]
-            public int can_edit { get; set; }
+            public int CanEdit;
             [JsonProperty("can_add")]
-            public int can_add { get; set; }
+            public int CanAdd;
             [JsonProperty("is_private")]
-            public int is_private { get; set; }
+            public int IsPrivate;
             [JsonProperty("processing")]
-            public int processing { get; set; }
+            public int Processing;
             [JsonProperty("live")]
-            public int live { get; set; }
+            public int Live;
             [JsonProperty("upcoming")]
-            public int upcoming { get; set; }
+            public int Upcoming;
             [JsonProperty("is_favorite")]
-            public bool is_favorite { get; set; }
+            public bool IsFavorite;
 
             public override string ToAttachFormat() => "video" + base.ToAttachFormat();
         }
-        public class Audio : AttachBase
+        public class AudioAtt : AttachBase
         {
             [JsonProperty("artist")]
-            public string artist { get; set; }
+            public string Artist;
             [JsonProperty("title")]
-            public string title { get; set; }
+            public string Title;
             [JsonProperty("duration")]
-            public int duration { get; set; }
+            public int Duration;
             [JsonProperty("url")]
-            public string url { get; set; }
+            public string Url;
             [JsonProperty("lyrics_id")]
-            public int lyrics_id { get; set; }
+            public int LyricsId;
             [JsonProperty("album_id")]
-            public int album_id { get; set; }
+            public int AlbumId;
             [JsonProperty("genre_id")]
-            public int genre_id { get; set; }
+            public int GenreId;
             [JsonProperty("date")]
-            public int date { get; set; }
+            public int Date;
             [JsonProperty("no_search")]
-            public int no_search { get; set; }
+            public int NoSearch;
             [JsonProperty("is_hq")]
-            public int is_hq { get; set; }
+            public int IsHQ;
 
             public override string ToAttachFormat() => "audio" + base.ToAttachFormat();
         }
-        public class Document : AttachBase
+        public class DocumentAtt : AttachBase
         {
             [JsonProperty("title")]
-            public string title { get; set; }
+            public string Title;
             [JsonProperty("size")]
-            public int size { get; set; }
+            public int Size;
             [JsonProperty("ext")]
-            public string extension { get; set; }
+            public string Extension;
             [JsonProperty("url")]
-            public string url { get; set; }
+            public string Url;
             [JsonProperty("date")]
-            public string date { get; set; }
+            public string Date;
             [JsonProperty("type")]
-            public string type { get; set; }
+            public string Type;
             [JsonProperty("preview")]
-            public Preview preview { get; set; }
+            public DocPreview Preview;
 
             public override string ToAttachFormat() => "doc" + base.ToAttachFormat();
 
-            public class Preview
+            public class DocPreview
             {
                 [JsonProperty("photo")]
-                public Photo photo { get; set; }
+                public PhotoAtt Photo;
                 [JsonProperty("graffiti")]
-                public Graffiti graffiti { get; set; }
-                [JsonProperty("audio_message ")]
-                public AudioMessage audio_message { get; set; }
+                public GraffitiAtt Graffiti;
+                [JsonProperty("audio_message")]
+                public AudioMessageAtt AudioMessage;
             }
         }
-        public class Graffiti : AttachBase
+        public class GraffitiAtt : AttachBase
         {
             [JsonProperty("url")]
-            public string url { get; set; }
+            public string Url;
             [JsonProperty("width")]
-            public int width { get; set; }
+            public int Width;
             [JsonProperty("height")]
-            public int height { get; set; }
+            public int Height;
 
             public override string ToAttachFormat() => "doc" + base.ToAttachFormat();
         }
-        public class AudioMessage : AttachBase
+        public class AudioMessageAtt : AttachBase
         {
             [JsonProperty("duration")]
-            public int duration { get; set; }
+            public int Duration;
             [JsonProperty("waveform")]
-            public List<int> waveform { get; set; }
+            public List<int> Waveform;
             [JsonProperty("link_ogg")]
-            public string link_ogg { get; set; }
+            public string LinkOGG;
             [JsonProperty("link_mp3")]
-            public string link_mp3 { get; set; }
+            public string LinkMP3;
             [JsonProperty("transcript")]
-            public string transcript { get; set; }
+            public string Transcript;
             [JsonProperty("transcript_state")]
-            public string transcript_state { get; set; }
+            public string TranscriptState;
 
             public override string ToAttachFormat() => "doc" + base.ToAttachFormat();
         }
-        public class Link
+        public class LinkAtt
         {
             [JsonProperty("url")]
-            public string url { get; set; }
+            public string Url;
             [JsonProperty("title")]
-            public string title { get; set; }
+            public string Title;
             [JsonProperty("caption ")]
-            public string caption { get; set; }
+            public string Caption;
             [JsonProperty("description")]
-            public string description { get; set; }
+            public string Description;
             [JsonProperty("photo")]
-            public Photo photo { get; set; }
+            public PhotoAtt Photo;
 
         }
-        public class Wall
+        public class WallAtt
         {
             [JsonProperty("id")]
-            public int id { get; set; }
+            public int Id;
             [JsonProperty("owner_id")]
-            public int owner_id { get; set; }
+            public int OwnerId;
             [JsonProperty("to_id")]
-            public int to_id { get; set; }
+            public int ToId;
             [JsonProperty("from_id")]
-            public int from_id { get; set; }
+            public int FromId;
             [JsonProperty("date")]
-            public int date { get; set; }
+            public int Date;
             [JsonProperty("text")]
-            public string text { get; set; }
+            public string Text;
             [JsonProperty("reply_owner_id")]
-            public int reply_owner_id { get; set; }
+            public int ReplyOwnerId;
             [JsonProperty("reply_post_id")]
-            public int reply_post_id { get; set; }
+            public int ReplyPostId;
             [JsonProperty("friends_only")]
-            public int friends_only { get; set; }
+            public int FriendsOnly;
         }
-        public class WallReply
+        public class WallReplyAtt
         {
             [JsonProperty("id")]
-            public int id { get; set; }
+            public int Id;
             [JsonProperty("from_id")]
-            public int from_id { get; set; }
+            public int FromId;
             [JsonProperty("post_id")]
-            public int post_id { get; set; }
+            public int PostId;
             [JsonProperty("owner_id")]
-            public int owner_id { get; set; }
+            public int OwnerId;
             [JsonProperty("date")]
-            public int date { get; set; }
+            public int Date;
             [JsonProperty("text")]
-            public string text { get; set; }
+            public string Text;
             [JsonProperty("reply_to_user")]
-            public int reply_to_user { get; set; }
+            public int ReplyToUser;
             [JsonProperty("reply_to_comment")]
-            public int reply_to_comment { get; set; }
+            public int ReplyToComment;
         }
-        public class Sticker
+        public class StickerAtt
         {
             [JsonProperty("product_id")]
-            public int product_id { get; set; }
+            public int ProductId;
             [JsonProperty("sticker_id")]
-            public int sticker_id { get; set; }
+            public int StickerId;
             [JsonProperty("images")]
-            public List<Image> images { get; set; }
+            public List<Image> Images;
             [JsonProperty("images_with_background")]
-            public List<Image> images_with_background { get; set; }
+            public List<Image> ImagesWithBackground;
             [JsonProperty("animation_url")]
-            public string animation_url { get; set; }
+            public string AnimationUrl;
             [JsonProperty("is_allowed")]
-            public bool is_allowed { get; set; }
+            public bool IsAllowed;
 
-            public string GetBestQuality(bool background = false)
-            {
-                List<Image> sizes = background ? this.images_with_background : this.images;
-                int width = 0;
-                int height = 0;
-                string url = "";
-                sizes.ForEach((Image s) =>
-                {
-                    if (s.width >= width && s.height >= height) url = s.url;
-                });
-                return url;
-
-            }
+            public string GetBestQuality(bool background = false) => (background ? this.ImagesWithBackground : this.Images).OrderByDescending(i => i.Width).ThenByDescending(i => i.Height).First().Url;
 
             public class Image
             {
                 [JsonProperty("url")]
-                public string url { get; set; }
+                public string Url;
                 [JsonProperty("width")]
-                public int width { get; set; }
+                public int Width;
                 [JsonProperty("height")]
-                public int height { get; set; }
+                public int Height;
             }
         }
-        public class Gift
+        public class GiftAtt
         {
             [JsonProperty("id")]
-            public int id { get; set; }
+            public int Id;
             [JsonProperty("thumb_256")]
-            public string thumb_256 { get; set; }
+            public string Thumb256;
             [JsonProperty("thumb_96")]
-            public string thumb_96 { get; set; }
+            public string Thumb96;
             [JsonProperty("thumb_48")]
-            public string thumb_48 { get; set; }
+            public string Thumb48;
         }
-
         public abstract class AttachBase
         {
             [JsonProperty("id")]
-            public int id { get; set; }
+            public int Id;
             [JsonProperty("owner_id")]
-            public int owner_id { get; set; }
+            public int OwnerId;
             [JsonProperty("access_key")]
-            public string access_key { get; set; }
+            public string AccessKey;
 
-            public virtual string ToAttachFormat() => owner_id.ToString() + "_" + id.ToString() + (access_key?.Length > 0 ? "_" + access_key : "");
+            public virtual string ToAttachFormat() => this.OwnerId.ToString() + "_" + this.Id.ToString() + (this.AccessKey?.Length > 0 ? "_" + this.AccessKey : "");
         }
     }
 
-    public class GetHistoryAttachmentsResponse
+    public class GetHistoryAttachmentsResponse : ItemsResponse<GetHistoryAttachmentsResponse.AttachmentElement>
     {
-        [JsonProperty("items")]
-        public List<AttachmentElement> items { get; set; }
         [JsonProperty("next_from")]
-        public string next_from { get; set; }
-        [JsonProperty("profiles")]
-        public List<User> profiles { get; set; }
-        [JsonProperty("groups")]
-        public List<Group> groups { get; set; }
+        public string NextFrom;
 
         public class AttachmentElement
         {
             [JsonProperty("message_id")]
-            public int message_id { get; set; }
+            public int MessageId;
             [JsonProperty("from_id")]
-            public int from_id { get; set; }
+            public int FromId;
             [JsonProperty("attachment")]
-            public Attachment attachment { get; set; }
+            public Attachment Attachment;
         }
     }
 }

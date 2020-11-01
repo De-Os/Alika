@@ -7,7 +7,7 @@ namespace Alika.Libs.VK.Responses
     {
         private int _id;
         [JsonProperty("id")]
-        public int id
+        public int Id
         {
             get
             {
@@ -19,25 +19,25 @@ namespace Alika.Libs.VK.Responses
             }
         }
         [JsonProperty("name")]
-        public string name { get; set; }
+        public string Name;
         [JsonProperty("screen_name")]
-        public string screen_name { get; set; }
+        public string ScreenName;
         [JsonProperty("verified")]
-        public int verified { get; set; }
+        public int Verified;
         [JsonProperty("photo_50")]
-        public string photo_50 { get; set; }
+        public string Photo50;
         [JsonProperty("photo_100")]
-        public string photo_100 { get; set; }
+        public string Photo100;
         [JsonProperty("photo_200")]
-        public string photo_200 { get; set; }
+        public string Photo200;
         [JsonProperty("is_closed")]
-        public int is_closed { get; set; }
+        public int IsClosed;
 
     }
 
     public class GroupsResponse
     {
         [JsonProperty("groups")]
-        public List<Group> groups { get; set; }
+        public List<Group> Groups;
     }
 }

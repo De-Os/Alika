@@ -36,7 +36,7 @@ namespace Alika.Libs.VK.Longpoll
         private readonly VK vk;
         private bool stop;
 
-        public WebProxy proxy
+        public WebProxy Proxy
         {
             get
             {
@@ -82,15 +82,15 @@ namespace Alika.Libs.VK.Longpoll
                 {"lp_version", 10},
                 {"need_pts", 0}
             });
-            this._http = new RestClient("https://" + lp.server) { Proxy = this._proxy };
+            this._http = new RestClient("https://" + lp.Server) { Proxy = this._proxy };
             this.request = new RestRequest("");
             request.AddParameter("act", "a_check");
-            request.AddParameter("key", lp.key);
-            request.AddParameter("ts", lp.ts);
+            request.AddParameter("key", lp.Key);
+            request.AddParameter("ts", lp.Ts);
             request.AddParameter("wait", 50);
             request.AddParameter("mode", 2);
             request.AddParameter("version", 10);
-            this.ts = lp.ts;
+            this.ts = lp.Ts;
             this.stop = false;
         }
 
@@ -147,10 +147,10 @@ namespace Alika.Libs.VK.Longpoll
                 var advanced = msgs.Where(i => !basic.Contains(i)).ToList();
                 if (advanced.Count > 0)
                 {
-                    var messages = this.vk.Messages.GetById(advanced.Select(i => (int)i[1]).ToList()).messages;
+                    var messages = this.vk.Messages.GetById(advanced.Select(i => (int)i[1]).ToList()).Items;
                     foreach (var msg in advanced)
                     {
-                        var message = messages.Find(i => i.id == (int)msg[1]);
+                        var message = messages.Find(i => i.Id == (int)msg[1]);
                         if ((int)msg[0] == (int)Updates.NEW_MESSAGE) this.OnNewMessage?.Invoke(message); else this.OnMessageEdition?.Invoke(message);
                     }
                 }
@@ -160,9 +160,9 @@ namespace Alika.Libs.VK.Longpoll
             {
                 var readStates = updates.Where(i => (int)i[0] == (int)Updates.READ_IN_MESSAGES || (int)i[0] == (int)Updates.READ_OUT_MESSAGES).Select(i => new LPEvents.ReadState
                 {
-                    peer_id = (int)i[1],
-                    msg_id = (int)i[2],
-                    unread = (int)i[3]
+                    PeerId = (int)i[1],
+                    MsgId = (int)i[2],
+                    Unread = (int)i[3]
                 }).ToList();
                 if (readStates.Count > 0) foreach (var rs in readStates) this.OnReadMessage?.Invoke(rs);
             });
@@ -171,8 +171,8 @@ namespace Alika.Libs.VK.Longpoll
             {
                 var onlines = updates.Where(i => (int)i[0] == (int)Updates.FRIEND_ONLINE).Select(i => new LPEvents.OnlineState
                 {
-                    user_id = -(int)i[1],
-                    timestamp = (int)i[3]
+                    UserId = -(int)i[1],
+                    Timestamp = (int)i[3]
                 }).ToList();
                 if (onlines.Count > 0) foreach (var online in onlines) this.UserOnline?.Invoke(online);
             });
@@ -181,8 +181,8 @@ namespace Alika.Libs.VK.Longpoll
             {
                 var offlines = updates.Where(i => (int)i[0] == (int)Updates.FRIEND_OFFLINE).Select(i => new LPEvents.OnlineState
                 {
-                    user_id = -(int)i[1],
-                    timestamp = (int)i[3]
+                    UserId = -(int)i[1],
+                    Timestamp = (int)i[3]
                 }).ToList();
                 if (offlines.Count > 0) foreach (var offline in offlines) this.UserOffline?.Invoke(offline);
             });
@@ -191,8 +191,8 @@ namespace Alika.Libs.VK.Longpoll
             {
                 var typings = updates.Where(i => (int)i[0] == (int)Updates.TYPING).Select(i => new LPEvents.TypeState
                 {
-                    peer_id = (int)i[1],
-                    user_ids = i[2].ToObject<List<int>>()
+                    Peerid = (int)i[1],
+                    UserIds = i[2].ToObject<List<int>>()
                 }).ToList();
                 if (typings.Count > 0) foreach (var type in typings) this.Typing?.Invoke(type);
             });
@@ -202,32 +202,32 @@ namespace Alika.Libs.VK.Longpoll
     public class LPResponse
     {
         [JsonProperty("key")]
-        public string key { get; set; }
+        public string Key;
         [JsonProperty("server")]
-        public string server { get; set; }
+        public string Server;
         [JsonProperty("ts")]
-        public int ts { get; set; }
+        public int Ts;
     }
 
     public class LPEvents
     {
         public struct ReadState
         {
-            public int peer_id;
-            public int msg_id;
-            public int unread;
+            public int PeerId;
+            public int MsgId;
+            public int Unread;
         }
 
         public struct OnlineState
         {
-            public int user_id;
-            public int timestamp;
+            public int UserId;
+            public int Timestamp;
         }
 
         public struct TypeState
         {
-            public List<int> user_ids;
-            public int peer_id;
+            public List<int> UserIds;
+            public int Peerid;
         }
     }
 }

@@ -13,8 +13,8 @@ namespace Alika.Libs.VK
     {
         public const string API_VER = "5.140";
 
-        public int user_id;
-        public string domain
+        public int UserId;
+        public string Domain
         {
             get
             {
@@ -25,7 +25,7 @@ namespace Alika.Libs.VK
                 this._http = new RestClient(value);
             }
         }
-        public WebProxy proxy
+        public WebProxy Proxy
         {
             get
             {
@@ -37,15 +37,14 @@ namespace Alika.Libs.VK
             }
         }
 
-        private readonly string token;
+        private readonly string Token;
         private RestClient _http = new RestClient();
 
         public VK(Settings settings)
         {
-            this.token = settings.Token;
-            this.domain = settings.ApiDomain;
-
-            this.user_id = this.Users.Get(new List<int>(), "photo_200, online_info")[0].user_id; // Getting current user's user_id & adding it's photo to cache
+            this.Token = settings.Token;
+            this.Domain = settings.ApiDomain;
+            this.UserId = this.Users.Get(new List<int>(), "photo_200, online_info")[0].UserId; // Getting current user's user_id & adding it's photo to cache
         }
 
         public LongPoll GetLP() => new LongPoll(this);
@@ -61,11 +60,11 @@ namespace Alika.Libs.VK
         {
             var result = this.CallMethod(method, fields);
             BasicResponse<Type> job = JsonConvert.DeserializeObject<BasicResponse<Type>>(result);
-            if (job == null || job?.error != null)
+            if (job == null || job?.Error != null)
             {
-                throw new Exception(method + ": " + (job == null ? result : job.error.message));
+                throw new Exception(method + ": " + (job == null ? result : job.Error.Message));
             }
-            else return job.response;
+            else return job.Response;
         }
 
         /// <summary>
@@ -77,7 +76,7 @@ namespace Alika.Libs.VK
         public string CallMethod(string method, Dictionary<string, dynamic> fields = null)
         {
             var request = new RestRequest(method);
-            request.AddOrUpdateParameter("access_token", this.token);
+            request.AddOrUpdateParameter("access_token", this.Token);
             request.AddOrUpdateParameter("v", API_VER);
 
             if (fields != null && fields.Count > 0)
@@ -91,10 +90,7 @@ namespace Alika.Libs.VK
         /// <summary>
         /// store.getStockItems with type=stickers
         /// </summary>
-        public GetStickersResponse GetStickers()
-        {
-            return this.Call<GetStickersResponse>("store.getStockItems", new Dictionary<string, dynamic> { { "type", "stickers" } });
-        }
+        public ItemsResponse<StickerPackInfo> GetStickers() => this.Call<ItemsResponse<StickerPackInfo>>("store.getStockItems", new Dictionary<string, dynamic> { { "type", "stickers" } });
 
         /// <summary>
         /// store.getStickersKeywords

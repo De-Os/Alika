@@ -28,10 +28,10 @@ namespace Alika.UI
         [Bindable]
         public class Photo : Grid
         {
-            public Attachment.Photo Picture { get; set; }
+            public Attachment.PhotoAtt Picture;
             public Image Preview = new Image();
 
-            public Photo(Attachment.Photo photo)
+            public Photo(Attachment.PhotoAtt photo)
             {
                 this.Picture = photo;
 
@@ -39,8 +39,8 @@ namespace Alika.UI
 
                 this.PointerPressed += (a, b) => new MediaViewer(new Attachment
                 {
-                    type = "photo",
-                    photo = this.Picture
+                    Type = "photo",
+                    Photo = this.Picture
                 });
 
                 this.LoadPreview();
@@ -48,7 +48,7 @@ namespace Alika.UI
 
             public async void LoadPreview()
             {
-                this.Preview.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.Picture.GetBestQuality().url));
+                this.Preview.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.Picture.GetBestQuality().Url));
             }
         }
 
@@ -58,11 +58,11 @@ namespace Alika.UI
         [Bindable]
         public class Document : Button
         {
-            public Attachment.Document document { get; set; }
+            public Attachment.DocumentAtt Doc;
 
-            public Document(Attachment.Document doc)
+            public Document(Attachment.DocumentAtt doc)
             {
-                this.document = doc;
+                this.Doc = doc;
 
                 this.Margin = new Thickness(5);
                 this.Background = Coloring.Transparent.Full;
@@ -92,7 +92,7 @@ namespace Alika.UI
 
                 TextBlock name = new TextBlock
                 {
-                    Text = this.document.title,
+                    Text = this.Doc.Title,
                     VerticalAlignment = VerticalAlignment.Center,
                     FontWeight = FontWeights.Bold,
                     TextTrimming = TextTrimming.CharacterEllipsis
@@ -102,7 +102,7 @@ namespace Alika.UI
 
                 TextBlock desc = new TextBlock
                 {
-                    Text = Utils.FormatSize(this.document.size, 2) + " • " + this.document.extension,
+                    Text = Utils.FormatSize(this.Doc.Size, 2) + " • " + this.Doc.Extension,
                     VerticalAlignment = VerticalAlignment.Center,
                     TextTrimming = TextTrimming.CharacterEllipsis
                 };
@@ -121,13 +121,13 @@ namespace Alika.UI
             {
                 var savePicker = new Windows.Storage.Pickers.FileSavePicker();
                 savePicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Downloads;
-                savePicker.FileTypeChoices.Add(this.document.extension.ToUpper(), new List<string>() { "." + this.document.extension });
-                savePicker.SuggestedFileName = this.document.title;
+                savePicker.FileTypeChoices.Add(this.Doc.Extension.ToUpper(), new List<string>() { "." + this.Doc.Extension });
+                savePicker.SuggestedFileName = this.Doc.Title;
                 StorageFile file = await savePicker.PickSaveFileAsync();
                 if (file != null)
                 {
                     CachedFileManager.DeferUpdates(file);
-                    await FileIO.WriteBytesAsync(file, new RestClient(new Uri(this.document.url)).DownloadData(new RestRequest()));
+                    await FileIO.WriteBytesAsync(file, new RestClient(new Uri(this.Doc.Url)).DownloadData(new RestRequest()));
                     await CachedFileManager.CompleteUpdatesAsync(file);
                 }
             }
@@ -139,11 +139,11 @@ namespace Alika.UI
         [Bindable]
         public class Sticker : Grid
         {
-            public Attachment.Sticker StickerSource;
+            public Attachment.StickerAtt StickerSource;
 
             public UIElement Image;
 
-            public Sticker(Attachment.Sticker sticker)
+            public Sticker(Attachment.StickerAtt sticker)
             {
                 this.StickerSource = sticker;
 
@@ -156,13 +156,13 @@ namespace Alika.UI
 
             public async void LoadSticker()
             {
-                if (this.StickerSource.animation_url != null)
+                if (this.StickerSource.AnimationUrl != null)
                 {
                     this.Image = new AnimatedVisualPlayer
                     {
                         Source = new LottieVisualSource
                         {
-                            UriSource = new Uri(App.systemDarkTheme ? this.StickerSource.animation_url.Replace(".json", "b.json") : this.StickerSource.animation_url)
+                            UriSource = new Uri(App.DarkTheme ? this.StickerSource.AnimationUrl.Replace(".json", "b.json") : this.StickerSource.AnimationUrl)
                         }
                     };
                 }
@@ -170,7 +170,7 @@ namespace Alika.UI
                 {
                     this.Image = new Image
                     {
-                        Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.StickerSource.GetBestQuality(App.systemDarkTheme)))
+                        Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.StickerSource.GetBestQuality(App.DarkTheme)))
                     };
                 }
                 this.Children.Add(this.Image);
@@ -188,7 +188,7 @@ namespace Alika.UI
                 AutoPlay = false,
                 Volume = 100
             };
-            public Attachment.AudioMessage audio;
+            public Attachment.AudioMessageAtt Audio;
 
             public Image image = new Image
             {
@@ -233,12 +233,12 @@ namespace Alika.UI
                 }
             }
 
-            public AudioMessage(Attachment.AudioMessage audio)
+            public AudioMessage(Attachment.AudioMessageAtt audio)
             {
-                while (audio.waveform.Count < 128) audio.waveform.Add(0);
-                this.audio = audio;
+                while (audio.Waveform.Count < 128) audio.Waveform.Add(0);
+                this.Audio = audio;
 
-                this.media.Source = MediaSource.CreateFromUri(new Uri(this.audio.link_mp3));
+                this.media.Source = MediaSource.CreateFromUri(new Uri(this.Audio.LinkMP3));
 
                 var TopPanel = new StackPanel
                 {
@@ -252,7 +252,7 @@ namespace Alika.UI
 
                 this.Children.Add(TopPanel);
 
-                if (this.audio.transcript_state != null && this.audio.transcript_state == "done")
+                if (this.Audio.TranscriptState != null && this.Audio.TranscriptState == "done")
                 {
                     var trans_btn = new Button
                     {
@@ -270,7 +270,7 @@ namespace Alika.UI
                     };
                     var trans_text = new TextBlock
                     {
-                        Text = this.audio.transcript,
+                        Text = this.Audio.Transcript,
                         Visibility = Visibility.Collapsed,
                         TextWrapping = TextWrapping.Wrap
                     };
@@ -284,7 +284,7 @@ namespace Alika.UI
                 this.Padding = new Thickness(5);
                 this.CornerRadius = new CornerRadius(10);
 
-                this.time.Text = TimeSpan.FromSeconds(this.audio.duration).ToString(@"m\:ss");
+                this.time.Text = TimeSpan.FromSeconds(this.Audio.Duration).ToString(@"m\:ss");
                 this.GenerateWaveforms();
 
                 this.wave.PointerEntered += (a, b) => this._onWaves = true;
@@ -321,10 +321,10 @@ namespace Alika.UI
 
             public void GenerateWaveforms()
             {
-                var partTime = TimeSpan.FromSeconds((double)decimal.Divide(this.audio.duration, 128));
+                var partTime = TimeSpan.FromSeconds((double)decimal.Divide(this.Audio.Duration, 128));
                 for (int x = 0; x < 128; x++)
                 {
-                    int wave = this.audio.waveform[x];
+                    int wave = this.Audio.Waveform[x];
                     var wv = new WaveHolder(wave, partTime * x);
                     wv.Rectangle.PointerPressed += (a, b) => this.media.PlaybackSession.Position = wv.Time; //TODO: Vertically stretch for better controls
                     this.media.PlaybackSession.PositionChanged += (a, b) => wv.ChangeFill(a.Position);
@@ -346,7 +346,7 @@ namespace Alika.UI
                     VerticalAlignment = VerticalAlignment.Stretch
                 };
 
-                public Brush FillColor = App.systemDarkTheme ? Coloring.MessageBox.VoiceMessage.Light : Coloring.MessageBox.VoiceMessage.Dark;
+                public Brush FillColor = App.DarkTheme ? Coloring.MessageBox.VoiceMessage.Light : Coloring.MessageBox.VoiceMessage.Dark;
                 public Brush NoFillColor = Coloring.Transparent.Percent(100);
 
                 public WaveHolder(int wave, TimeSpan time)
@@ -381,10 +381,10 @@ namespace Alika.UI
             {
                 Margin = new Thickness(5)
             };
-            public Attachment.Graffiti Attachment;
-            public Graffiti(Attachment.Graffiti att)
+            public Attachment.GraffitiAtt Graf;
+            public Graffiti(Attachment.GraffitiAtt att)
             {
-                this.Attachment = att;
+                this.Graf = att;
                 this.Children.Add(this.Image);
 
                 this.LoadImage();
@@ -392,23 +392,23 @@ namespace Alika.UI
 
             public async void LoadImage()
             {
-                this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.Attachment.url));
+                this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.Graf.Url));
             }
         }
 
         [Bindable]
         public class Gift : ContentControl
         {
-            public Gift(Attachment.Gift gift) => this.Load(gift);
+            public Gift(Attachment.GiftAtt gift) => this.Load(gift);
 
-            private async void Load(Attachment.Gift gift)
+            private async void Load(Attachment.GiftAtt gift)
             {
                 this.Content = new Border
                 {
                     CornerRadius = new CornerRadius(10),
                     Child = new Image
                     {
-                        Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(gift.thumb_256))
+                        Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(gift.Thumb256))
                     },
                     BorderThickness = new Thickness(1),
                     Width = 256,
@@ -440,12 +440,12 @@ namespace Alika.UI
 
             public Grid Preview = new Grid();
 
-            public Attachment.Photo Picture;
-            public Attachment.Document Document;
+            public Attachment.PhotoAtt Picture;
+            public Attachment.DocumentAtt Document;
 
-            public string Attach { get; set; }
+            public string Attach;
 
-            public Uploaded(Attachment.Photo pic = null, Attachment.Document doc = null)
+            public Uploaded(Attachment.PhotoAtt pic = null, Attachment.DocumentAtt doc = null)
             {
                 this.Picture = pic;
                 this.Document = doc;
@@ -481,7 +481,7 @@ namespace Alika.UI
             }
             public async void LoadImageSource()
             {
-                (this.Preview.Children[0] as Image).Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.Picture.GetBestQuality().url));
+                (this.Preview.Children[0] as Image).Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.Picture.GetBestQuality().Url));
             }
 
             public void LoadDocument()
@@ -501,11 +501,11 @@ namespace Alika.UI
                     Source = new SvgImageSource(new Uri(Utils.AssetTheme("document.svg")))
                 };
                 grid.Children.Add(img);
-                if (this.Document.title != null)
+                if (this.Document.Title != null)
                 {
                     TextBlock text = new TextBlock
                     {
-                        Text = this.Document.title,
+                        Text = this.Document.Title,
                         HorizontalAlignment = HorizontalAlignment.Center,
                         VerticalAlignment = VerticalAlignment.Bottom,
                         TextAlignment = TextAlignment.Center,
@@ -519,10 +519,10 @@ namespace Alika.UI
 
             public class ImageViewer : ContentDialog
             {
-                public Attachment.Photo Picture { get; set; }
+                public Attachment.PhotoAtt Picture;
                 public Image Image = new Image();
 
-                public ImageViewer(Attachment.Photo pic)
+                public ImageViewer(Attachment.PhotoAtt pic)
                 {
 
                     this.Picture = pic;
@@ -567,7 +567,7 @@ namespace Alika.UI
 
                 public async void LoadImage()
                 {
-                    this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.Picture.GetBestQuality().url));
+                    this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.Picture.GetBestQuality().Url));
 
                 }
             }

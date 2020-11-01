@@ -36,7 +36,7 @@ namespace Alika.Libs.VK.Methods
         /// <summary>
         /// messages.getConversations
         /// </summary>
-        public GetConversationsResponse GetConversations(int offset = 0, int count = 20, string filter = "all", int start_message_id = 0, string fields = "")
+        public ItemsResponse<ConversationResponse> GetConversations(int offset = 0, int count = 20, string filter = "all", int start_message_id = 0, string fields = "")
         {
             var request = new Dictionary<string, dynamic>
             {
@@ -51,17 +51,17 @@ namespace Alika.Libs.VK.Methods
                 request.Add("fields", fields);
                 request.Add("extended", 1);
             }
-            GetConversationsResponse response = this._vk.Call<GetConversationsResponse>("messages.getConversations", request);
-            App.cache.Update(response.conversations);
-            App.cache.Update(response.profiles);
-            App.cache.Update(response.groups);
+            var response = this._vk.Call<ItemsResponse<ConversationResponse>>("messages.getConversations", request);
+            App.Cache.Update(response.Items);
+            App.Cache.Update(response.Profiles);
+            App.Cache.Update(response.Groups);
             return response;
         }
 
         /// <summary>
         /// messages.getConversationsById
         /// </summary>
-        public GetConversationsByIdResponse GetConversationsById(List<int> peer_ids, string fields = "")
+        public ItemsResponse<ConversationInfo> GetConversationsById(List<int> peer_ids, string fields = "")
         {
             var request = new Dictionary<string, dynamic>();
             if (fields.Length > 0)
@@ -71,17 +71,17 @@ namespace Alika.Libs.VK.Methods
                 request.Add("extended", 1);
             }
             request.Add("peer_ids", String.Join(",", peer_ids));
-            GetConversationsByIdResponse response = this._vk.Call<GetConversationsByIdResponse>("messages.getConversationsById", request);
-            App.cache.Update(response.conversations);
-            App.cache.Update(response.profiles);
-            App.cache.Update(response.groups);
+            var response = this._vk.Call<ItemsResponse<ConversationInfo>>("messages.getConversationsById", request);
+            App.Cache.Update(response.Items);
+            App.Cache.Update(response.Profiles);
+            App.Cache.Update(response.Groups);
             return response;
         }
 
         /// <summary>
         /// messages.getHistory
         /// </summary>
-        public GetHistoryResponse GetHistory(int peer_id, int offset = 0, int count = 20, int start_message_id = 0, bool rev = false, string fields = "")
+        public ItemsResponse<Message> GetHistory(int peer_id, int offset = 0, int count = 20, int start_message_id = 0, bool rev = false, string fields = "")
         {
             var request = new Dictionary<string, dynamic>
             {
@@ -97,16 +97,16 @@ namespace Alika.Libs.VK.Methods
                 request.Add("extended", 1);
                 request.Add("fields", fields);
             }
-            GetHistoryResponse response = this._vk.Call<GetHistoryResponse>("messages.getHistory", request);
-            App.cache.Update(response.profiles);
-            App.cache.Update(response.groups);
+            var response = this._vk.Call<ItemsResponse<Message>>("messages.getHistory", request);
+            App.Cache.Update(response.Profiles);
+            App.Cache.Update(response.Groups);
             return response;
         }
 
         /// <summary>
         /// messages.getByid
         /// </summary>
-        public GetHistoryResponse GetById(List<int> msg_ids, string fields = "")
+        public ItemsResponse<Message> GetById(List<int> msg_ids, string fields = "")
         {
             var request = new Dictionary<string, dynamic>();
             if (fields.Length > 0)
@@ -116,16 +116,16 @@ namespace Alika.Libs.VK.Methods
                 request.Add("extended", 1);
             }
             request.Add("message_ids", String.Join(",", msg_ids));
-            GetHistoryResponse response = this._vk.Call<GetHistoryResponse>("messages.getById", request);
-            App.cache.Update(response.profiles);
-            App.cache.Update(response.groups);
+            var response = this._vk.Call<ItemsResponse<Message>>("messages.getById", request);
+            App.Cache.Update(response.Profiles);
+            App.Cache.Update(response.Groups);
             return response;
         }
 
         /// <summary>
         /// messages.getConversationMembers
         /// </summary>
-        public GetConversationMembersResponse GetConversationMembers(int peer_id, string fields = "")
+        public ItemsResponse<ConversationMember> GetConversationMembers(int peer_id, string fields = "")
         {
             var request = new Dictionary<string, dynamic>
             {
@@ -136,16 +136,16 @@ namespace Alika.Libs.VK.Methods
                 if (!fields.Contains("online_info")) fields += ",online_info";
                 request.Add("fields", fields);
             }
-            var response = this._vk.Call<GetConversationMembersResponse>("messages.getConversationMembers", request);
-            App.cache.Update(response.profiles);
-            App.cache.Update(response.groups);
+            var response = this._vk.Call<ItemsResponse<ConversationMember>>("messages.getConversationMembers", request);
+            App.Cache.Update(response.Profiles);
+            App.Cache.Update(response.Groups);
             return response;
         }
 
         /// <summary>
         /// Uploading photo from bytes (for uploading from Clipboard)
         /// </summary>
-        public Attachment.Photo UploadPhoto(byte[] bytes, int peer_id)
+        public Attachment.PhotoAtt UploadPhoto(byte[] bytes, int peer_id)
         {
             RestRequest request = new RestRequest();
             request.AddFile("photo", bytes, "image.jpg");
@@ -155,24 +155,24 @@ namespace Alika.Libs.VK.Methods
         /// <summary>
         /// Uploading StorageFile photo
         /// </summary>
-        public async Task<Attachment.Photo> UploadPhoto(StorageFile file, int peer_id)
+        public async Task<Attachment.PhotoAtt> UploadPhoto(StorageFile file, int peer_id)
         {
             RestRequest request = new RestRequest();
             request.AddFile("photo", await file.ReadBytesAsync(), file.Name, file.ContentType);
             return this.UploadPhoto(request, peer_id);
         }
 
-        private Attachment.Photo UploadPhoto(RestRequest request, int peer_id)
+        private Attachment.PhotoAtt UploadPhoto(RestRequest request, int peer_id)
         {
             RestClient http = new RestClient(this._vk.Call<UploadServers.PhotoMessages>("photos.getMessagesUploadServer", new Dictionary<string, dynamic> {
                     {"peer_id", peer_id}
-                }).upload_url);
+                }).UploadUrl);
             var upload = http.Post(request);
             var response = JsonConvert.DeserializeObject<UploadServers.PhotoMessages.UploadResult>(upload.Content);
-            return this._vk.Call<List<Attachment.Photo>>("photos.saveMessagesPhoto", new Dictionary<string, dynamic> {
-                    {"hash", response.hash},
-                    {"photo", response.photo},
-                    {"server", response.server }
+            return this._vk.Call<List<Attachment.PhotoAtt>>("photos.saveMessagesPhoto", new Dictionary<string, dynamic> {
+                    {"hash", response.Hash},
+                    {"photo", response.Photo},
+                    {"server", response.Server}
                 })[0];
         }
 
@@ -208,23 +208,23 @@ namespace Alika.Libs.VK.Methods
             RestClient http = new RestClient(this._vk.Call<UploadServers.DocumentMessages>("docs.getMessagesUploadServer", new Dictionary<string, dynamic> {
                     {"peer_id", peer_id},
                     {"type", type}
-                }).upload_url);
+                }).UploadUrl);
             var upload = http.Post(request);
             var response = JsonConvert.DeserializeObject<UploadServers.DocumentMessages.UploadResult>(upload.Content);
             var result = this._vk.Call<UploadServers.DocumentMessages.SaveResult>("docs.save", new Dictionary<string, dynamic> {
-                    {"file", response.file}
+                    {"file", response.File}
                 });
             if (type == "graffiti")
             {
-                return result.graffiti;
+                return result.Graffiti;
             }
             else if (type == "audio_message")
             {
-                return result.audio_message;
+                return result.AudioMessage;
             }
             else
             {
-                return result.document;
+                return result.Document;
             }
         }
 
@@ -315,20 +315,20 @@ namespace Alika.Libs.VK.Methods
         private ChangeChatPhotoResponse SetChatPhoto(RestRequest request, int peer_id)
         {
             if (peer_id > Limits.Messages.PEERSTART) peer_id -= Limits.Messages.PEERSTART;
-            RestClient http = new RestClient(this._vk.Call<UploadServers.ChatPhoto>("photos.getChatUploadServer", new Dictionary<string, dynamic> {
+            RestClient http = new RestClient(this._vk.Call<UploadServers.UploadServerBase>("photos.getChatUploadServer", new Dictionary<string, dynamic> {
                     {"chat_id", peer_id}
-                }).upload_url);
+                }).UploadUrl);
             var upload = http.Post(request);
             var response = JsonConvert.DeserializeObject<BasicResponse<string>>(upload.Content);
             return this._vk.Call<ChangeChatPhotoResponse>("messages.setChatPhoto", new Dictionary<string, dynamic> {
-                    {"file", response.response}
+                    {"file", response.Response}
                 });
         }
 
         /// <summary>
         /// messages.searchConversations
         /// </summary>
-        public GetConversationsByIdResponse SearchConversations(string query, int count = 20, string fields = "")
+        public ItemsResponse<ConversationInfo> SearchConversations(string query, int count = 20, string fields = "")
         {
             var request = new Dictionary<string, dynamic>
             {
@@ -341,10 +341,10 @@ namespace Alika.Libs.VK.Methods
                 request.Add("fields", fields);
                 request.Add("extended", 1);
             }
-            GetConversationsByIdResponse response = this._vk.Call<GetConversationsByIdResponse>("messages.searchConversations", request);
-            App.cache.Update(response.conversations);
-            App.cache.Update(response.profiles);
-            App.cache.Update(response.groups);
+            var response = this._vk.Call<ItemsResponse<ConversationInfo>>("messages.searchConversations", request);
+            App.Cache.Update(response.Items);
+            App.Cache.Update(response.Profiles);
+            App.Cache.Update(response.Groups);
             return response;
         }
 
@@ -359,6 +359,6 @@ namespace Alika.Libs.VK.Methods
             });
         }
 
-        public GetRecentStickersResponse GetRecentStickers() => this._vk.Call<GetRecentStickersResponse>("messages.getRecentStickers");
+        public ItemsResponse<Attachment.StickerAtt> GetRecentStickers() => this._vk.Call<ItemsResponse<Attachment.StickerAtt>>("messages.getRecentStickers");
     }
 }

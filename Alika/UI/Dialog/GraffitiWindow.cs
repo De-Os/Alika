@@ -80,8 +80,8 @@ namespace Alika.UI.Dialog
                 byte[] bytes = await this.Canvas.ToByteArray();
                 if (bytes != null)
                 {
-                    App.vk.Messages.Send(App.main_page.peer_id, attachments: new List<string> {
-                        (App.vk.Messages.UploadDocument(bytes, App.main_page.peer_id, "graffiti") as Attachment.Graffiti).ToAttachFormat()
+                    App.VK.Messages.Send(App.MainPage.PeerId, attachments: new List<string> {
+                        (App.VK.Messages.UploadDocument(bytes, App.MainPage.PeerId, "graffiti") as Attachment.GraffitiAtt).ToAttachFormat()
                     });
                 }
             }
@@ -109,8 +109,8 @@ namespace Alika.UI.Dialog
                     byte[] bytes = await file.ReadBytesAsync();
                     if (bytes != null)
                     {
-                        App.vk.Messages.Send(App.main_page.peer_id, attachments: new List<string> {
-                        (App.vk.Messages.UploadDocument(bytes, App.main_page.peer_id, "graffiti") as Attachment.Graffiti).ToAttachFormat()
+                        App.VK.Messages.Send(App.MainPage.PeerId, attachments: new List<string> {
+                        (App.VK.Messages.UploadDocument(bytes, App.MainPage.PeerId, "graffiti") as Attachment.GraffitiAtt).ToAttachFormat()
                     });
                     }
                 }

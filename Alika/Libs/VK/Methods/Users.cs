@@ -24,7 +24,7 @@ namespace Alika.Libs.VK.Methods
                 request.Add("fields", fields);
             }
             List<User> users = this._vk.Call<List<User>>("users.get", request);
-            App.cache.Update(users);
+            App.Cache.Update(users);
             return users;
         }
     }

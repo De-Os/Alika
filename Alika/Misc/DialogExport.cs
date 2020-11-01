@@ -94,7 +94,7 @@ namespace Alika.Misc
             {
                 Action = () =>
                 {
-                    var export = (App.main_page.chats_grid.Content as ChatsHolder).MsgExport;
+                    var export = (App.MainPage.Chats.Content as ChatsHolder).MsgExport;
                     export.Visibility = Windows.UI.Xaml.Visibility.Visible;
                     export.Flyout = new Flyout
                     {
@@ -120,29 +120,29 @@ namespace Alika.Misc
             };
             int offset = 0;
 
-            var data = App.vk.Messages.GetHistory(this.PeerId, rev: true, count: 200);
-            while (data.messages.Count > 0)
+            var data = App.VK.Messages.GetHistory(this.PeerId, rev: true, count: 200);
+            while (data.Items.Count > 0)
             {
                 try
                 {
-                    foreach (var msg in data.messages)
+                    foreach (var msg in data.Items)
                     {
-                        if (!final.messages.Any(x => x.id == msg.id))
+                        if (!final.messages.Any(x => x.Id == msg.Id))
                         {
                             if (this.Mode != ExportMode.ATTACHMENTS) final.messages.Add(msg);
-                            if (this.Mode != ExportMode.MESSAGES && msg.attachments?.Count > 0)
+                            if (this.Mode != ExportMode.MESSAGES && msg.Attachments?.Count > 0)
                             {
-                                foreach (var att in msg.attachments)
+                                foreach (var att in msg.Attachments)
                                 {
-                                    switch (att.type)
+                                    switch (att.Type)
                                     {
                                         case "photo":
-                                            var photo = await attachs.photos.CreateFileAsync(att.photo.ToAttachFormat() + ".jpg");
-                                            await FileIO.WriteBytesAsync(photo, new RestClient(new Uri(att.photo.GetBestQuality().url)).DownloadData(new RestRequest()));
+                                            var photo = await attachs.photos.CreateFileAsync(att.Photo.ToAttachFormat() + ".jpg");
+                                            await FileIO.WriteBytesAsync(photo, new RestClient(new Uri(att.Photo.GetBestQuality().Url)).DownloadData(new RestRequest()));
                                             break;
                                         case "audio_message":
-                                            var voice = await attachs.voice_messages.CreateFileAsync(att.audio_message.ToAttachFormat() + ".mp3");
-                                            await FileIO.WriteBytesAsync(voice, new RestClient(new Uri(att.audio_message.link_mp3)).DownloadData(new RestRequest()));
+                                            var voice = await attachs.voice_messages.CreateFileAsync(att.AudioMessage.ToAttachFormat() + ".mp3");
+                                            await FileIO.WriteBytesAsync(voice, new RestClient(new Uri(att.AudioMessage.LinkMP3)).DownloadData(new RestRequest()));
                                             break;
                                     }
                                 }
@@ -153,13 +153,13 @@ namespace Alika.Misc
                     {
                         Action = () =>
                         {
-                            (((App.main_page.chats_grid.Content as ChatsHolder).MsgExport.Flyout as Flyout).Content as TextBlock).Text = Utils.LocString("Dialog/Exporting").Replace("%chat%", this.PeerId.ToString()).Replace("%ready%", final.messages.Count.ToString()).Replace("%total%", data.count.ToString());
+                            (((App.MainPage.Chats.Content as ChatsHolder).MsgExport.Flyout as Flyout).Content as TextBlock).Text = Utils.LocString("Dialog/Exporting").Replace("%chat%", this.PeerId.ToString()).Replace("%ready%", final.messages.Count.ToString()).Replace("%total%", data.Count.ToString());
                         },
                         Priority = Windows.UI.Core.CoreDispatcherPriority.Low
                     });
-                    offset += data.messages.Count;
+                    offset += data.Items.Count;
                     Thread.Sleep(TimeSpan.FromSeconds(0.5));
-                    data = App.vk.Messages.GetHistory(this.PeerId, rev: true, offset: offset, count: 200);
+                    data = App.VK.Messages.GetHistory(this.PeerId, rev: true, offset: offset, count: 200);
                 }
                 catch
                 {
@@ -174,7 +174,7 @@ namespace Alika.Misc
             {
                 Action = async () =>
                 {
-                    (App.main_page.chats_grid.Content as ChatsHolder).MsgExport.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                    (App.MainPage.Chats.Content as ChatsHolder).MsgExport.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
 
                     var savePicker = new Windows.Storage.Pickers.FileSavePicker
                     {
@@ -264,7 +264,7 @@ namespace Alika.Misc
                         IsActive = true
                     }
                 };
-                App.main_page.popup.Children.Add(loading);
+                App.MainPage.Popup.Children.Add(loading);
                 _ = Task.Factory.StartNew(async () =>
                 {
                     try
@@ -303,7 +303,7 @@ namespace Alika.Misc
                                     };
                                     search.Click += (a, b) =>
                                     {
-                                        App.main_page.popup.Children.Add(new Popup
+                                        App.MainPage.Popup.Children.Add(new Popup
                                         {
                                             Content = new ViewerWithSearch(json.messages)
                                         });
@@ -313,7 +313,7 @@ namespace Alika.Misc
                                     Grid.SetRow(search, 1);
                                     content.Children.Add(scroll);
                                     content.Children.Add(search);
-                                    App.main_page.popup.Children.Add(new Popup
+                                    App.MainPage.Popup.Children.Add(new Popup
                                     {
                                         Content = content,
                                         Title = Utils.LocString("Dialog/ExportInfo").Replace("%chat%", json.peer_id.ToString()).Replace("%date%", json.export_time.ToDateTime().ToString("f"))
@@ -406,15 +406,15 @@ namespace Alika.Misc
                     Task.Factory.StartNew(() =>
                     {
                         var result = new List<Message>();
-                        if (text?.Length > 0) result.AddRange(messages.Where(i => i.text != null && Regex.IsMatch(i.text, text, RegexOptions.IgnoreCase)));
+                        if (text?.Length > 0) result.AddRange(messages.Where(i => i.Text != null && Regex.IsMatch(i.Text, text, RegexOptions.IgnoreCase)));
                         if (calend.HasValue)
                         {
                             var date = calend.Value.DateTime.Date;
                             if (result.Count > 0)
                             {
-                                result.RemoveAll(i => i.date.ToDateTime().Date != date.Date);
+                                result.RemoveAll(i => i.Date.ToDateTime().Date != date.Date);
                             }
-                            else result.AddRange(messages.Where(i => i.date.ToDateTime().Date == date.Date));
+                            else result.AddRange(messages.Where(i => i.Date.ToDateTime().Date == date.Date));
                         }
 
                         App.UILoop.AddAction(new UITask
@@ -444,10 +444,10 @@ namespace Alika.Misc
                 this.Margin = new Windows.UI.Xaml.Thickness(10);
                 this.Messages = messages;
 
-                var users = messages.Select(i => i.from_id).Where(i => i > 0).Distinct().ToList();
-                var groups = messages.Select(i => i.from_id).Where(i => i < 0).Select(i => -i).Distinct().ToList();
-                if (users.Count > 0) App.vk.Users.Get(users, fields: "photo_200");
-                if (groups.Count > 0) App.vk.Groups.GetById(groups, fields: "photo_200");
+                var users = messages.Select(i => i.FromId).Where(i => i > 0).Distinct().ToList();
+                var groups = messages.Select(i => i.FromId).Where(i => i < 0).Select(i => -i).Distinct().ToList();
+                if (users.Count > 0) App.VK.Users.Get(users, fields: "photo_200");
+                if (groups.Count > 0) App.VK.Groups.GetById(groups, fields: "photo_200");
 
                 this.LoadMessages(500);
             }
@@ -460,24 +460,24 @@ namespace Alika.Misc
                 while (offset < count)
                 {
                     var msg = this.Messages[offset];
-                    var message = new MessageBox(msg, msg.peer_id, true);
+                    var message = new MessageBox(msg, msg.PeerId, true);
 
                     if (this.Items.Count > 0 && this.Items.Last() is MessageBox prev)
                     {
-                        if (prev.message.textBubble.message.date.ToDateTime().Date != msg.date.ToDateTime().Date)
+                        if (prev.Message.Bubble.Message.Date.ToDateTime().Date != msg.Date.ToDateTime().Date)
                         {
-                            this.Items.Add(new DateSeparator(msg.date.ToDateTime()));
+                            this.Items.Add(new DateSeparator(msg.Date.ToDateTime()));
                         }
                         else
                         {
-                            if (prev.message.textBubble.message.from_id == msg.from_id)
+                            if (prev.Message.Bubble.Message.FromId == msg.FromId)
                             {
-                                prev.message.avatar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                                message.message.textBubble.name.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                                prev.Message.Ava.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                                message.Message.Bubble.UserName.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                             }
                         }
                     }
-                    else this.Items.Add(new DateSeparator(msg.date.ToDateTime()));
+                    else this.Items.Add(new DateSeparator(msg.Date.ToDateTime()));
 
                     this.Items.Add(message);
                     offset++;

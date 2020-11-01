@@ -24,7 +24,7 @@ namespace Alika.UI
     {
         public int peer_id { get; set; }
 
-        public delegate void Event(Attachment.Sticker sticker);
+        public delegate void Event(Attachment.StickerAtt sticker);
         public Event StickerSent;
 
         public TextBox Search = new TextBox
@@ -39,7 +39,7 @@ namespace Alika.UI
 
         public RecentStickerName Recent;
 
-        public StickersSelector(List<GetStickersResponse.StickerPackInfo> stickers, List<Attachment.Sticker> recents)
+        public StickersSelector(List<StickerPackInfo> stickers, List<Attachment.StickerAtt> recents)
         {
             this.VerticalAlignment = VerticalAlignment.Stretch;
             this.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
@@ -54,26 +54,26 @@ namespace Alika.UI
             this.StickerSent += this.UpdateRecents;
 
             names.Items.Add(this.Recent);
-            foreach (var pack in stickers.FindAll(s => s.product.purchased == 1 && s.product.base_id == 0))
+            foreach (var pack in stickers.FindAll(s => s.Product.Purchased == 1 && s.Product.BaseId == 0))
             {
-                if (pack.product.style_ids != null)
+                if (pack.Product.StyleIds != null)
                 {
-                    if (pack.product.active == 1
+                    if (pack.Product.Active == 1
                         || stickers.Any(i =>
-                            i.product.base_id == pack.product.id
-                            && i.product.purchased == 1
-                            && i.product.active == 1))
+                            i.Product.BaseId == pack.Product.Id
+                            && i.Product.Purchased == 1
+                            && i.Product.Active == 1))
                     {
                         names.Items.Add(new StickerName(pack)
                         {
                             Styles = stickers.FindAll(i =>
-                                i.product.base_id == pack.product.id
-                                && i.product.purchased == 1
-                                && i.product.active == 1)
+                                i.Product.BaseId == pack.Product.Id
+                                && i.Product.Purchased == 1
+                                && i.Product.Active == 1)
                         });
                     }
                 }
-                else if (pack.product.active == 1) names.Items.Add(new StickerName(pack));
+                else if (pack.Product.Active == 1) names.Items.Add(new StickerName(pack));
             }
             this.Semantic.ZoomedOutView = names;
             this.Semantic.IsZoomedInViewActive = false;
@@ -84,9 +84,9 @@ namespace Alika.UI
             this.Search.TextChanged += this.SearchChanged;
         }
 
-        private void UpdateRecents(Attachment.Sticker sticker)
+        private void UpdateRecents(Attachment.StickerAtt sticker)
         {
-            if (this.Recent.Stickers.Any(i => i.sticker_id == sticker.sticker_id)) this.Recent.Stickers.RemoveAll(i => i.sticker_id == sticker.sticker_id);
+            if (this.Recent.Stickers.Any(i => i.StickerId == sticker.StickerId)) this.Recent.Stickers.RemoveAll(i => i.StickerId == sticker.StickerId);
             this.Recent.Stickers.Insert(0, sticker);
             if (this.Recent.Stickers.Count > Limits.Messages.MAX_RECENT_STICKERS_COUNT) this.Recent.Stickers.RemoveRange(Limits.Messages.MAX_RECENT_STICKERS_COUNT, this.Recent.Stickers.Count - Limits.Messages.MAX_RECENT_STICKERS_COUNT);
         }
@@ -97,7 +97,7 @@ namespace Alika.UI
             {
                 if (item is StickerName pack)
                 {
-                    pack.Visibility = Regex.IsMatch(pack.Pack.product.title, this.Search.Text, RegexOptions.IgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+                    pack.Visibility = Regex.IsMatch(pack.Pack.Product.Title, this.Search.Text, RegexOptions.IgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
                 }
                 else if (item is RecentStickerName recent) recent.Visibility = (sender as TextBox).Text.Length > 0 ? Visibility.Collapsed : Visibility.Visible;
             }
@@ -143,7 +143,7 @@ namespace Alika.UI
                 StickerSet set;
                 if (e.SourceItem.Item is StickerName stickerPack)
                 {
-                    title.Text = stickerPack.Pack.product.title;
+                    title.Text = stickerPack.Pack.Product.Title;
                     set = new StickerSet(stickerPack.Pack, stickerPack.Styles);
                     set.StickerSent += (sticker) => this.StickerSent?.Invoke(sticker);
                     pack.Items.Add(set);
@@ -173,8 +173,8 @@ namespace Alika.UI
         [Bindable]
         public class StickerName : ListViewItem
         {
-            public GetStickersResponse.StickerPackInfo Pack { get; set; }
-            public List<GetStickersResponse.StickerPackInfo> Styles { get; set; }
+            public StickerPackInfo Pack { get; set; }
+            public List<StickerPackInfo> Styles { get; set; }
 
             public Image Image = new Image
             {
@@ -189,7 +189,7 @@ namespace Alika.UI
                 FontWeight = FontWeights.Bold,
                 TextTrimming = TextTrimming.CharacterEllipsis
             };
-            public StickerName(GetStickersResponse.StickerPackInfo pack)
+            public StickerName(StickerPackInfo pack)
             {
                 this.Pack = pack;
                 this.Render();
@@ -201,7 +201,7 @@ namespace Alika.UI
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-                this.Title.Text = this.Pack.product.title;
+                this.Title.Text = this.Pack.Product.Title;
 
                 Grid.SetColumn(this.Image, 0);
                 Grid.SetColumn(this.Title, 1);
@@ -209,16 +209,16 @@ namespace Alika.UI
                 grid.Children.Add(this.Title);
                 this.Content = grid;
 
-                this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.Pack.product.previews.Find(i => i.width == this.Pack.product.previews.Max(g => g.width)).url));
+                this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.Pack.Product.Previes.Find(i => i.Width == this.Pack.Product.Previes.Max(g => g.Width)).Url));
 
             }
         }
         [Bindable]
         public class RecentStickerName : ListViewItem
         {
-            public List<Attachment.Sticker> Stickers;
+            public List<Attachment.StickerAtt> Stickers;
 
-            public RecentStickerName(List<Attachment.Sticker> stickers)
+            public RecentStickerName(List<Attachment.StickerAtt> stickers)
             {
                 this.Stickers = stickers;
 
@@ -248,26 +248,26 @@ namespace Alika.UI
         [Bindable]
         public class StickerSet : StackPanel
         {
-            public GetStickersResponse.StickerPackInfo PackInfo;
-            public List<GetStickersResponse.StickerPackInfo> Styles;
+            public StickerPackInfo PackInfo;
+            public List<StickerPackInfo> Styles;
 
-            public delegate void Event(Attachment.Sticker sticker);
+            public delegate void Event(Attachment.StickerAtt sticker);
             public Event StickerSent;
 
-            public StickerSet(GetStickersResponse.StickerPackInfo pack, List<GetStickersResponse.StickerPackInfo> styles = null)
+            public StickerSet(StickerPackInfo pack, List<StickerPackInfo> styles = null)
             {
                 this.PackInfo = pack;
 
-                var packs = new List<GetStickersResponse.StickerPackInfo>();
-                if (pack.product.active == 1 && styles?.Count == 0)
+                var packs = new List<StickerPackInfo>();
+                if (pack.Product.Active == 1 && styles?.Count == 0)
                 {
                     packs.Add(pack);
                 }
                 else
                 {
-                    if (styles?.Count > 0 && styles.Any(i => i.product.purchased == 1))
+                    if (styles?.Count > 0 && styles.Any(i => i.Product.Purchased == 1))
                     {
-                        packs.AddRange(styles.FindAll(i => i.product.purchased == 1).OrderByDescending(i => i.product.active));
+                        packs.AddRange(styles.FindAll(i => i.Product.Purchased == 1).OrderByDescending(i => i.Product.Active));
                     }
                     packs.Add(pack);
                 }
@@ -276,12 +276,12 @@ namespace Alika.UI
                 {
                     if (packs.Count > 1) this.Children.Add(new TextBlock
                     {
-                        Text = p.product.title,
+                        Text = p.Product.Title,
                         FontWeight = FontWeights.Bold,
                         Margin = new Thickness(5)
                     });
                     var temp = new StackPanel { Orientation = Orientation.Horizontal };
-                    foreach (var sticker in p.product.stickers)
+                    foreach (var sticker in p.Product.Stickers)
                     {
                         if (temp.Children.Count == 4)
                         {
@@ -296,7 +296,7 @@ namespace Alika.UI
                 }
             }
 
-            public StickerSet(List<Attachment.Sticker> recent)
+            public StickerSet(List<Attachment.StickerAtt> recent)
             {
                 var temp = new StackPanel { Orientation = Orientation.Horizontal };
                 foreach (var sticker in recent)
@@ -316,10 +316,10 @@ namespace Alika.UI
             [Bindable]
             public class StickerHolder : Grid
             {
-                public delegate void Event(Attachment.Sticker sticker);
+                public delegate void Event(Attachment.StickerAtt sticker);
                 public Event StickerSent;
 
-                public Attachment.Sticker Sticker;
+                public Attachment.StickerAtt Sticker;
                 public Image Image = new Image
                 {
                     HorizontalAlignment = HorizontalAlignment.Center,
@@ -328,13 +328,13 @@ namespace Alika.UI
                     Width = 90,
                     Margin = new Thickness(5)
                 };
-                public StickerHolder(Attachment.Sticker sticker)
+                public StickerHolder(Attachment.StickerAtt sticker)
                 {
                     this.Sticker = sticker;
                     this.CornerRadius = new CornerRadius(10);
                     this.PointerPressed += (a, b) =>
                     {
-                        Task.Factory.StartNew(() => App.vk.Messages.Send(App.main_page.peer_id, sticker_id: this.Sticker.sticker_id));
+                        Task.Factory.StartNew(() => App.VK.Messages.Send(App.MainPage.PeerId, sticker_id: this.Sticker.StickerId));
                         this.StickerSent?.Invoke(sticker);
                     };
                     this.PointerEntered += (a, b) => this.Background = Coloring.Transparent.Percent(50); // Sticker "selection" by background color
@@ -345,7 +345,7 @@ namespace Alika.UI
 
                 public async void LoadImage()
                 {
-                    this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri((App.systemDarkTheme ? this.Sticker.images_with_background : this.Sticker.images).Find(s => s.width == 128).url));
+                    this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri((App.DarkTheme ? this.Sticker.ImagesWithBackground : this.Sticker.Images).Find(s => s.Width == 128).Url));
                 }
             }
         }
@@ -357,7 +357,7 @@ namespace Alika.UI
     [Bindable]
     public class StickerSuggestionHolder : Grid // TODO: Non-static images for animated stickers
     {
-        public Attachment.Sticker Sticker { get; set; }
+        public Attachment.StickerAtt Sticker { get; set; }
         public Image Image { get; set; } = new Image
         {
             VerticalAlignment = VerticalAlignment.Center,
@@ -378,7 +378,7 @@ namespace Alika.UI
                 this.Background = value ? this.Background = Coloring.Transparent.Percent(75) : Coloring.Transparent.Full;
             }
         }
-        public StickerSuggestionHolder(Attachment.Sticker sticker)
+        public StickerSuggestionHolder(Attachment.StickerAtt sticker)
         {
             this.Sticker = sticker;
 
@@ -394,7 +394,7 @@ namespace Alika.UI
         }
         public async void LoadImage()
         {
-            this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri((App.systemDarkTheme ? this.Sticker.images_with_background : this.Sticker.images).Find(s => s.width == 128).url));
+            this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri((App.DarkTheme ? this.Sticker.ImagesWithBackground : this.Sticker.Images).Find(s => s.Width == 128).Url));
         }
     }
 }

@@ -24,9 +24,9 @@ namespace Alika.UI
                 return new SolidColorBrush(new Windows.UI.Color
                 {
                     A = Convert.ToByte(Math.Round(255 * percent)),
-                    R = (byte)(App.systemDarkTheme ? 0 : 255),
-                    G = (byte)(App.systemDarkTheme ? 0 : 255),
-                    B = (byte)(App.systemDarkTheme ? 0 : 255)
+                    R = (byte)(App.DarkTheme ? 0 : 255),
+                    G = (byte)(App.DarkTheme ? 0 : 255),
+                    B = (byte)(App.DarkTheme ? 0 : 255)
                 });
             }
 
@@ -54,9 +54,9 @@ namespace Alika.UI
                 return new SolidColorBrush(new Color
                 {
                     A = Convert.ToByte(Math.Round(255 * percent)),
-                    R = (byte)(App.systemDarkTheme ? 255 : 0),
-                    G = (byte)(App.systemDarkTheme ? 255 : 0),
-                    B = (byte)(App.systemDarkTheme ? 255 : 0)
+                    R = (byte)(App.DarkTheme ? 255 : 0),
+                    G = (byte)(App.DarkTheme ? 255 : 0),
+                    B = (byte)(App.DarkTheme ? 255 : 0)
                 });
             }
 

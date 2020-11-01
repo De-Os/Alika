@@ -11,13 +11,13 @@ namespace Alika.UI.Dialog
     [Windows.UI.Xaml.Data.Bindable]
     public class MessagesList : Grid
     {
-        public int peer_id;
+        public int PeerId;
 
         public MessagesListView Messages;
 
         public MessagesList(int peer_id)
         {
-            this.peer_id = peer_id;
+            this.PeerId = peer_id;
             this.Children.Add(new ProgressRing
             {
                 Height = 50,
@@ -32,7 +32,7 @@ namespace Alika.UI.Dialog
 
         private void Load()
         {
-            this.Messages = new MessagesListView(this.peer_id)
+            this.Messages = new MessagesListView(this.PeerId)
             {
                 SelectionMode = ListViewSelectionMode.None,
                 VerticalAlignment = VerticalAlignment.Bottom
@@ -58,7 +58,7 @@ namespace Alika.UI.Dialog
                     var msgs = this.Messages.Items.Where(i =>
                         i is SwipeControl s
                         && s.Content is MessageBox msg
-                        && msg.message.textBubble.message.from_id != App.vk.user_id
+                        && msg.Message.Bubble.Message.FromId != App.VK.UserId
                         && !msg.Read).Select(i => (i as SwipeControl).Content as MessageBox).ToList();
                     if (msgs.Count > 0)
                     {
@@ -69,7 +69,7 @@ namespace Alika.UI.Dialog
                             {
                                 try
                                 {
-                                    if (App.vk.Messages.MarkAsRead(this.peer_id, new System.Collections.Generic.List<int> { msg.message.textBubble.message.id }) == 1)
+                                    if (App.VK.Messages.MarkAsRead(this.PeerId, new System.Collections.Generic.List<int> { msg.Message.Bubble.Message.Id }) == 1)
                                     {
                                         msg.Read = true;
                                     }
@@ -104,18 +104,18 @@ namespace Alika.UI.Dialog
         [Windows.UI.Xaml.Data.Bindable]
         public class MessagesListView : ListView
         {
-            public int peer_id;
+            public int PeerId;
 
             public delegate void MessageAdded(bool isNew);
             public event MessageAdded OnNewMessage;
 
             public MessagesListView(int peer_id)
             {
-                this.peer_id = peer_id;
+                this.PeerId = peer_id;
 
                 Task.Factory.StartNew(() =>
                 {
-                    var messages = App.vk.Messages.GetHistory(this.peer_id).messages;
+                    var messages = App.VK.Messages.GetHistory(this.PeerId).Items;
                     messages.Reverse();
                     App.UILoop.AddAction(new UITask
                     {
@@ -126,9 +126,9 @@ namespace Alika.UI.Dialog
                     });
                 });
 
-                App.lp.OnNewMessage += (msg) =>
+                App.LP.OnNewMessage += (msg) =>
                 {
-                    if (msg.peer_id == this.peer_id) this.AddNewMessage(msg);
+                    if (msg.PeerId == this.PeerId) this.AddNewMessage(msg);
                 };
             }
 
@@ -138,29 +138,29 @@ namespace Alika.UI.Dialog
                 {
                     Action = () =>
                     {
-                        var msg = new MessageBox(message, this.peer_id);
+                        var msg = new MessageBox(message, this.PeerId);
                         msg.Loaded += (a, b) => this.OnNewMessage?.Invoke(true);
                         if (this.Items.Count > 0)
                         {
                             if ((this.Items.Last(i => i is SwipeControl) as SwipeControl).Content is MessageBox prev)
                             {
-                                if (prev.message.textBubble.message.date.ToDateTime().Date != message.date.ToDateTime().Date)
+                                if (prev.Message.Bubble.Message.Date.ToDateTime().Date != message.Date.ToDateTime().Date)
                                 {
                                     this.Items.Add(new ListViewItem
                                     {
-                                        Content = new DateSeparator(message.date.ToDateTime()),
+                                        Content = new DateSeparator(message.Date.ToDateTime()),
                                         HorizontalAlignment = HorizontalAlignment.Center,
                                         HorizontalContentAlignment = HorizontalAlignment.Center
                                     });
                                 }
-                                if (prev.message.textBubble.message.from_id == message.from_id && this.Items.Last() is SwipeControl)
+                                if (prev.Message.Bubble.Message.FromId == message.FromId && this.Items.Last() is SwipeControl)
                                 {
-                                    prev.message.avatar.Visibility = Visibility.Collapsed;
-                                    Thickness prevMargin = prev.message.textBubble.border.Margin;
+                                    prev.Message.Ava.Visibility = Visibility.Collapsed;
+                                    Thickness prevMargin = prev.Message.Bubble.Border.Margin;
                                     prevMargin.Bottom = 2.5;
-                                    prev.message.textBubble.border.Margin = prevMargin;
-                                    CornerRadius corners = prev.message.textBubble.border.CornerRadius;
-                                    CornerRadius msg_corners = msg.message.textBubble.border.CornerRadius;
+                                    prev.Message.Bubble.Border.Margin = prevMargin;
+                                    CornerRadius corners = prev.Message.Bubble.Border.CornerRadius;
+                                    CornerRadius msg_corners = msg.Message.Bubble.Border.CornerRadius;
                                     if (prev.HorizontalContentAlignment == HorizontalAlignment.Left)
                                     {
                                         corners.BottomLeft = 0;
@@ -171,10 +171,10 @@ namespace Alika.UI.Dialog
                                         corners.BottomRight = 0;
                                         msg_corners.TopRight = 0;
                                     }
-                                    prev.message.textBubble.border.CornerRadius = corners;
-                                    msg.message.textBubble.border.CornerRadius = msg_corners;
-                                    msg.message.textBubble.name.Visibility = Visibility.Collapsed;
-                                    msg.message.textBubble.border.Margin = new Thickness(10, 2.5, 10, 5);
+                                    prev.Message.Bubble.Border.CornerRadius = corners;
+                                    msg.Message.Bubble.Border.CornerRadius = msg_corners;
+                                    msg.Message.Bubble.UserName.Visibility = Visibility.Collapsed;
+                                    msg.Message.Bubble.Border.Margin = new Thickness(10, 2.5, 10, 5);
                                 }
                             }
                         }
@@ -189,19 +189,19 @@ namespace Alika.UI.Dialog
                 {
                     Action = () =>
                     {
-                        var msg = new MessageBox(message, this.peer_id);
+                        var msg = new MessageBox(message, this.PeerId);
                         if (this.Items.Count > 0)
                         {
-                            if ((this.Items.First(i => i is SwipeControl) as SwipeControl).Content is MessageBox next && next.message.textBubble.message.from_id == message.from_id)
+                            if ((this.Items.First(i => i is SwipeControl) as SwipeControl).Content is MessageBox next && next.Message.Bubble.Message.FromId == message.FromId)
                             {
-                                next.message.avatar.Visibility = Visibility.Visible;
-                                next.message.textBubble.name.Visibility = Visibility.Collapsed;
-                                msg.message.avatar.Visibility = Visibility.Collapsed;
-                                Thickness prevMargin = next.message.textBubble.border.Margin;
+                                next.Message.Ava.Visibility = Visibility.Visible;
+                                next.Message.Bubble.UserName.Visibility = Visibility.Collapsed;
+                                msg.Message.Ava.Visibility = Visibility.Collapsed;
+                                Thickness prevMargin = next.Message.Bubble.Border.Margin;
                                 prevMargin.Top = 2.5;
-                                next.message.textBubble.border.Margin = prevMargin;
-                                CornerRadius corners = next.message.textBubble.border.CornerRadius;
-                                CornerRadius msg_corner = msg.message.textBubble.border.CornerRadius;
+                                next.Message.Bubble.Border.Margin = prevMargin;
+                                CornerRadius corners = next.Message.Bubble.Border.CornerRadius;
+                                CornerRadius msg_corner = msg.Message.Bubble.Border.CornerRadius;
                                 if (next.HorizontalContentAlignment == HorizontalAlignment.Left)
                                 {
                                     corners.TopLeft = 0;
@@ -212,9 +212,9 @@ namespace Alika.UI.Dialog
                                     corners.TopRight = 0;
                                     msg_corner.BottomRight = 0;
                                 }
-                                msg.message.textBubble.border.CornerRadius = msg_corner;
-                                next.message.textBubble.border.CornerRadius = corners;
-                                msg.message.textBubble.border.Margin = new Thickness(10, 5, 10, 2.5);
+                                msg.Message.Bubble.Border.CornerRadius = msg_corner;
+                                next.Message.Bubble.Border.CornerRadius = corners;
+                                msg.Message.Bubble.Border.Margin = new Thickness(10, 5, 10, 2.5);
                             }
                         }
                         msg.Loaded += (a, b) => this.OnNewMessage?.Invoke(false);
@@ -241,9 +241,9 @@ namespace Alika.UI.Dialog
                 };
                 item.Invoked += (a, b) =>
                     {
-                        var reply = (App.main_page.dialog.Children[0] as Dialog).reply_grid;
-                        var message = msg.message.textBubble.message;
-                        if (reply.Content is Dialog.ReplyMessage prev && prev.Message.id == message.id) return;
+                        var reply = (App.MainPage.Dialog.Children[0] as Dialog).ReplyGrid;
+                        var message = msg.Message.Bubble.Message;
+                        if (reply.Content is Dialog.ReplyMessage prev && prev.Message.Id == message.Id) return;
                         reply.Content = new Dialog.ReplyMessage(message);
                     };
                 leftItems.Add(item);
@@ -276,9 +276,9 @@ namespace Alika.UI.Dialog
                     };
                     item.Invoked += (a, b) =>
                     {
-                        var reply = (App.main_page.dialog.Children[0] as Dialog).reply_grid;
-                        var msg = message.message.textBubble.message;
-                        if (reply.Content is Dialog.ReplyMessage prev && prev.Message.id == msg.id) return;
+                        var reply = (App.MainPage.Dialog.Children[0] as Dialog).ReplyGrid;
+                        var msg = message.Message.Bubble.Message;
+                        if (reply.Content is Dialog.ReplyMessage prev && prev.Message.Id == msg.Id) return;
                         reply.Content = new Dialog.ReplyMessage(msg);
                     };
                     leftItems.Add(item);

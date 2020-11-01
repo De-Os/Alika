@@ -2,7 +2,6 @@
 using Alika.Libs.VK;
 using Alika.Libs.VK.Responses;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,29 +21,29 @@ namespace Alika.UI.Dialog
     {
         public void RegisterEvents()
         {
-            this.send_button.Click += this.Send;
-            this.send_text.PreviewKeyDown += this.TextBoxPreviewKeyDown;
-            this.send_text.PreviewKeyDown += this.TextPaste;
-            this.send_text.TextChanged += this.StickerSuggestion;
-            this.attach_button.Click += this.AttachSelection;
-            this.Loaded += (object s, RoutedEventArgs e) => this.send_text.Focus(FocusState.Pointer);
+            this.SendButton.Click += this.Send;
+            this.SendText.PreviewKeyDown += this.TextBoxPreviewKeyDown;
+            this.SendText.PreviewKeyDown += this.TextPaste;
+            this.SendText.TextChanged += this.StickerSuggestion;
+            this.AttachButton.Click += this.AttachSelection;
+            this.Loaded += (object s, RoutedEventArgs e) => this.SendText.Focus(FocusState.Pointer);
 
-            if (App.cache.StickersSelector != null)
+            if (App.Cache.StickersSelector != null)
             {
-                var flyout = new Flyout { Content = App.cache.StickersSelector };
-                App.cache.StickersSelector.StickerSent += this.HideFlyout;
-                this.stickers.Flyout = flyout;
+                var flyout = new Flyout { Content = App.Cache.StickersSelector };
+                App.Cache.StickersSelector.StickerSent += this.HideFlyout;
+                this.Stickers.Flyout = flyout;
             }
         }
 
-        public void HideFlyout(Attachment.Sticker sticker) => (this.stickers.Flyout as Flyout).Hide();
+        public void HideFlyout(Attachment.StickerAtt sticker) => (this.Stickers.Flyout as Flyout).Hide();
 
         // Attach photo from Clipboard
         private async void TextPaste(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
         {
             if (e.Key == VirtualKey.V && Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down))
             {
-                if (this.attach_grid.Children.Count < Limits.Messages.MAX_ATTACHMENTS)
+                if (this.AttachGrid.Children.Count < Limits.Messages.MAX_ATTACHMENTS)
                 {
                     DataPackageView dataPackageView = Clipboard.GetContent();
                     if (dataPackageView.Contains(StandardDataFormats.Bitmap))
@@ -82,21 +81,21 @@ namespace Alika.UI.Dialog
             if (e.Key == VirtualKey.Enter)
             {
                 // Send if any sticker choosen on stickers suggestion
-                if (this.stickers_suggestions.Visibility == Visibility.Visible)
+                if (this.StickerSuggestions.Visibility == Visibility.Visible)
                 {
                     e.Handled = true;
-                    foreach (StickerSuggestionHolder holder in ((this.stickers_suggestions.Children[0] as ScrollViewer).Content as Grid).Children)
+                    foreach (StickerSuggestionHolder holder in ((this.StickerSuggestions.Children[0] as ScrollViewer).Content as Grid).Children)
                     {
                         if (holder.Selected)
                         {
                             var reply_id = 0;
-                            if (this.reply_grid.Content is ReplyMessage reply)
+                            if (this.ReplyGrid.Content is ReplyMessage reply)
                             {
-                                this.reply_grid.Content = null;
-                                reply_id = reply.Message.id;
+                                this.ReplyGrid.Content = null;
+                                reply_id = reply.Message.Id;
                             }
-                            Task.Factory.StartNew(() => App.vk.Messages.Send(this.peer_id, sticker_id: holder.Sticker.sticker_id, reply_to: reply_id));
-                            this.send_text.Text = "";
+                            Task.Factory.StartNew(() => App.VK.Messages.Send(this.PeerId, sticker_id: holder.Sticker.StickerId, reply_to: reply_id));
+                            this.SendText.Text = "";
                             return;
                         }
                     }
@@ -104,8 +103,8 @@ namespace Alika.UI.Dialog
                 // Send || add line to TextBox
                 if (Window.Current.CoreWindow.GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down))
                 {
-                    this.send_text.Text += Environment.NewLine;
-                    this.send_text.SelectionStart = this.send_text.Text.Length;
+                    this.SendText.Text += Environment.NewLine;
+                    this.SendText.SelectionStart = this.SendText.Text.Length;
                 }
                 else this.Send(null, null);
                 e.Handled = true;
@@ -113,9 +112,9 @@ namespace Alika.UI.Dialog
             else if (e.Key == VirtualKey.Tab)
             {
                 // Tab focusing on stickers suggestion
-                if (this.stickers_suggestions.Visibility == Visibility.Visible)
+                if (this.StickerSuggestions.Visibility == Visibility.Visible)
                 {
-                    ScrollViewer scroll = this.stickers_suggestions.Children[0] as ScrollViewer;
+                    ScrollViewer scroll = this.StickerSuggestions.Children[0] as ScrollViewer;
                     Grid stickers = scroll.Content as Grid;
                     bool selection = true;
                     for (int x = 0; x < stickers.Children.Count; x++)
@@ -135,20 +134,20 @@ namespace Alika.UI.Dialog
             }
             else if (e.Key == VirtualKey.Left || e.Key == VirtualKey.Right)
             {
-                if (this.stickers_suggestions.Visibility == Visibility.Visible)
+                if (this.StickerSuggestions.Visibility == Visibility.Visible)
                 {
                     /*
                      * Arrow navigation on stickers suggestion
                      * Animation on scrolling disabled due to bugs on fast switching
                      */
-                    Grid stickers = (this.stickers_suggestions.Children[0] as ScrollViewer).Content as Grid;
+                    Grid stickers = (this.StickerSuggestions.Children[0] as ScrollViewer).Content as Grid;
                     double scroll = 0;
                     for (int x = 0; x < stickers.Children.Count; x++)
                     {
                         StickerSuggestionHolder holder = stickers.Children[x] as StickerSuggestionHolder;
                         if (holder.Selected)
                         {
-                            ScrollViewer scroller = this.stickers_suggestions.Children[0] as ScrollViewer;
+                            ScrollViewer scroller = this.StickerSuggestions.Children[0] as ScrollViewer;
                             if (e.Key == VirtualKey.Left)
                             {
                                 if (x > 0)
@@ -183,14 +182,14 @@ namespace Alika.UI.Dialog
         // Focusing on message TextBox when char/digit key pressed
         public void PreviewKeyEvent(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
         {
-            if (this.send_text.FocusState == FocusState.Unfocused && e.Key != VirtualKey.Enter)
+            if (this.SendText.FocusState == FocusState.Unfocused && e.Key != VirtualKey.Enter)
             {
                 bool shift = Window.Current.CoreWindow.GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down);
                 if (e.Key.IsCharKey(shift) != null)
                 {
-                    this.send_text.Focus(FocusState.Keyboard);
-                    this.send_text.Text += e.Key.GetCharsFromKeys(shift, Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down));
-                    this.send_text.SelectionStart = this.send_text.Text.Length;
+                    this.SendText.Focus(FocusState.Keyboard);
+                    this.SendText.Text += e.Key.GetCharsFromKeys(shift, Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down));
+                    this.SendText.SelectionStart = this.SendText.Text.Length;
                 }
                 e.Handled = true;
             }
@@ -200,32 +199,26 @@ namespace Alika.UI.Dialog
         // Send message
         public void Send(object sender, RoutedEventArgs e)
         {
-            string text = this.send_text.Text.Replace("\r\n", "\n").Replace("\r", "\n"); // i hate \r\n
+            string text = this.SendText.Text.Replace("\r\n", "\n").Replace("\r", "\n"); // i hate \r\n
             int reply = 0;
-            if (this.reply_grid.Content is ReplyMessage rep) reply = rep.Message.id;
-            this.send_text.Text = "";
-            this.reply_grid.Content = null;
-            List<string> attachments = new List<String>();
-            if (this.attach_grid.Children.Count > 0)
-            {
-                for (int x = 0; x < this.attach_grid.Children.Count; x++)
-                {
-                    attachments.Add((this.attach_grid.Children[x] as MessageAttachment.Uploaded).Attach);
-                }
-                this.attach_grid.Children.Clear();
-            }
+            if (this.ReplyGrid.Content is ReplyMessage rep) reply = rep.Message.Id;
+            var attachments = this.AttachGrid.Children.Select(i => (i as MessageAttachment.Uploaded).Attach).ToList();
+
+            this.SendText.Text = "";
+            this.ReplyGrid.Content = null;
+            this.AttachGrid.Children.Clear();
             Task.Factory.StartNew(() =>
             {
                 if (text.Length > 0 || attachments.Count > 0)
                 {
                     string temptext;
                     // Send multiple messages if text length > 4096
-                    while (text.Length > 0 || attachments.Count > 0)
+                    while (text.Length > 0)
                     {
                         temptext = text.Substring(0, text.Length > Limits.Messages.MAX_LENGTH ? Limits.Messages.MAX_LENGTH : text.Length);
-                        try { App.vk.Messages.Send(this.peer_id, text: temptext, attachments: attachments.Count > 0 ? attachments : null, reply_to: reply); } catch { break; }
+                        try { App.VK.Messages.Send(this.PeerId, text: temptext, attachments: attachments.Count > 0 ? attachments : null, reply_to: reply); } catch { break; }
                         text = text.Substring(temptext.Length);
-                        attachments = new List<string>();
+                        attachments.Clear();
                     }
                 }
             });
@@ -239,7 +232,7 @@ namespace Alika.UI.Dialog
             {
                 if (this.msg_scroll.VerticalOffset == 0)
                 {
-                    List<Message> messages = App.vk.Messages.GetHistory(this.peer_id, start_message_id: (this.messages.Items[0] as MessageBox).message.textBubble.message.id).messages;
+                    List<Message> messages = App.vk.Messages.GetHistory(this.PeerId, start_message_id: (this.messages.Items[0] as MessageBox).message.textBubble.message.id).messages;
                     messages.ForEach((Message msg) => this.AddMessage(msg, false));
                     this.msg_scroll.ChangeView(null, 0, null, true);
                 }
@@ -273,12 +266,12 @@ namespace Alika.UI.Dialog
         public void AttachUploadByteImage(byte[] bytes)
         {
             Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Wait, 0);
-            var photo = App.vk.Messages.UploadPhoto(bytes, this.peer_id);
+            var photo = App.VK.Messages.UploadPhoto(bytes, this.PeerId);
             var upl = new MessageAttachment.Uploaded(photo);
-            Grid.SetColumn(upl, this.attach_grid.ColumnDefinitions.Count);
-            upl.Remove.Click += (object s, RoutedEventArgs e) => this.attach_grid.Children.Remove(upl);
-            this.attach_grid.ColumnDefinitions.Add(new ColumnDefinition());
-            this.attach_grid.Children.Add(upl);
+            Grid.SetColumn(upl, this.AttachGrid.ColumnDefinitions.Count);
+            upl.Remove.Click += (object s, RoutedEventArgs e) => this.AttachGrid.Children.Remove(upl);
+            this.AttachGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            this.AttachGrid.Children.Add(upl);
             Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
         }
 
@@ -292,18 +285,18 @@ namespace Alika.UI.Dialog
                 MessageAttachment.Uploaded upl = null;
                 if (Limits.Messages.PHOTO_TYPES.Contains(file.FileType))
                 {
-                    var photo = await App.vk.Messages.UploadPhoto(file, this.peer_id);
+                    var photo = await App.VK.Messages.UploadPhoto(file, this.PeerId);
                     upl = new MessageAttachment.Uploaded(pic: photo);
                 }
                 else
                 {
-                    var doc = await App.vk.Messages.UploadDocument(file, this.peer_id) as Attachment.Document;
+                    var doc = await App.VK.Messages.UploadDocument(file, this.PeerId) as Attachment.DocumentAtt;
                     upl = new MessageAttachment.Uploaded(doc: doc);
                 }
-                Grid.SetColumn(upl, this.attach_grid.ColumnDefinitions.Count);
-                upl.Remove.Click += (object s, RoutedEventArgs e) => this.attach_grid.Children.Remove(upl);
-                this.attach_grid.ColumnDefinitions.Add(new ColumnDefinition());
-                this.attach_grid.Children.Add(upl);
+                Grid.SetColumn(upl, this.AttachGrid.ColumnDefinitions.Count);
+                upl.Remove.Click += (object s, RoutedEventArgs e) => this.AttachGrid.Children.Remove(upl);
+                this.AttachGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                this.AttachGrid.Children.Add(upl);
                 Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
             }
             catch (Exception error)
@@ -316,28 +309,28 @@ namespace Alika.UI.Dialog
         // Sticker suggestion by word
         public void StickerSuggestion(object sender, TextChangedEventArgs e)
         {
-            if (App.cache.StickerDictionary == null) return;
-            string text = this.send_text.Text.ToLower();
-            int peer_id = this.peer_id;
-            if (App.cache.StickerDictionary.ContainsKey(text) && App.cache.StickerDictionary[text].Count > 0)
+            if (App.Cache.StickerDictionary == null) return;
+            string text = this.SendText.Text.ToLower();
+            int peer_id = this.PeerId;
+            if (App.Cache.StickerDictionary.ContainsKey(text) && App.Cache.StickerDictionary[text].Count > 0)
             {
                 try
                 {
                     Grid grid = new Grid();
                     grid.Transitions.Add(new EntranceThemeTransition { IsStaggeringEnabled = true });
-                    App.cache.StickerDictionary[text].ForEach((sticker) =>
+                    App.Cache.StickerDictionary[text].ForEach((sticker) =>
                     {
                         var holder = new StickerSuggestionHolder(sticker);
                         holder.PointerPressed += (a, m) =>
                         {
                             var reply_id = 0;
-                            if (this.reply_grid.Content is ReplyMessage reply)
+                            if (this.ReplyGrid.Content is ReplyMessage reply)
                             {
-                                this.reply_grid.Content = null;
-                                reply_id = reply.Message.id;
+                                this.ReplyGrid.Content = null;
+                                reply_id = reply.Message.Id;
                             }
-                            this.send_text.Text = "";
-                            Task.Factory.StartNew(() => App.vk.Messages.Send(peer_id, sticker_id: sticker.sticker_id, reply_to: reply_id));
+                            this.SendText.Text = "";
+                            Task.Factory.StartNew(() => App.VK.Messages.Send(peer_id, sticker_id: sticker.StickerId, reply_to: reply_id));
                         };
                         Grid.SetColumn(holder, grid.ColumnDefinitions.Count);
                         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
@@ -347,11 +340,11 @@ namespace Alika.UI.Dialog
                     {
                         Action = () =>
                         {
-                            (this.stickers_suggestions.Children[0] as ScrollViewer).Content = grid;
-                            (this.stickers_suggestions.Children[0] as ScrollViewer).ChangeView(0, null, null, true);
-                            this.stickers_suggestions.Margin = new Thickness(this.attach_button.ActualWidth + this.attach_button.Margin.Left + this.attach_button.Margin.Right + this.send_text.Margin.Left, 0, 0, this.bottom_menu.ActualHeight);
-                            this.stickers_suggestions.Width = this.send_text.ActualWidth;
-                            this.stickers_suggestions.Visibility = Visibility.Visible;
+                            (this.StickerSuggestions.Children[0] as ScrollViewer).Content = grid;
+                            (this.StickerSuggestions.Children[0] as ScrollViewer).ChangeView(0, null, null, true);
+                            this.StickerSuggestions.Margin = new Thickness(this.AttachButton.ActualWidth + this.AttachButton.Margin.Left + this.AttachButton.Margin.Right + this.SendText.Margin.Left, 0, 0, this.BottomMenu.ActualHeight);
+                            this.StickerSuggestions.Width = this.SendText.ActualWidth;
+                            this.StickerSuggestions.Visibility = Visibility.Visible;
                         },
                         Priority = CoreDispatcherPriority.High
                     });
@@ -365,7 +358,7 @@ namespace Alika.UI.Dialog
             {
                 App.UILoop.AddAction(new UITask
                 {
-                    Action = () => this.stickers_suggestions.Visibility = Visibility.Collapsed // Hide if word suggestions not found
+                    Action = () => this.StickerSuggestions.Visibility = Visibility.Collapsed // Hide if word suggestions not found
                 });
             }
         }

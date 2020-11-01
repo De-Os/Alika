@@ -12,7 +12,7 @@ namespace Alika
     public sealed partial class MainPage : Page
     {
         private int _peer_id;
-        public int peer_id
+        public int PeerId
         {
             get
             {
@@ -24,30 +24,30 @@ namespace Alika
 
                 this._peer_id = value;
 
-                if (this.dialog.Children.Count > 0)
+                if (this.Dialog.Children.Count > 0)
                 {
-                    if (this.dialog.Children.Any(i => i is Dialog))
+                    if (this.Dialog.Children.Any(i => i is Dialog))
                     {
-                        var old = this.dialog.Children.First(i => i is Dialog) as Dialog;
-                        if (old.peer_id != value)
+                        var old = this.Dialog.Children.First(i => i is Dialog) as Dialog;
+                        if (old.PeerId != value)
                         {
-                            this.dialog.PreviewKeyDown -= old.PreviewKeyEvent;
-                            if (old.stickers.Flyout is Flyout oldFlyout)
+                            this.Dialog.PreviewKeyDown -= old.PreviewKeyEvent;
+                            if (old.Stickers.Flyout is Flyout oldFlyout)
                             {
                                 oldFlyout.Content = null; // Remove previous flyout to prevent crash on stickers opening
-                                App.cache.StickersSelector.StickerSent -= old.HideFlyout;
+                                App.Cache.StickersSelector.StickerSent -= old.HideFlyout;
                             }
-                            this.dialog.Children.Clear();
+                            this.Dialog.Children.Clear();
                         }
                         else return;
                     }
-                    this.dialog.Children.Clear();
+                    this.Dialog.Children.Clear();
                 }
 
                 if (value == 0)
                 {
-                    this.dialog.Children.Add(this.NoChatSelected);
-                    if (this.chats_grid.Content is ChatsHolder holder)
+                    this.Dialog.Children.Add(this.NoChatSelected);
+                    if (this.Chats.Content is ChatsHolder holder)
                     {
                         holder.PinnedChats.SelectedItem = null;
                         holder.Chats.SelectedItem = null;
@@ -56,9 +56,9 @@ namespace Alika
                 else
                 {
                     var list = new Dialog(value);
-                    this.dialog.PreviewKeyDown += list.PreviewKeyEvent;
-                    this.dialog.Children.Add(list);
-                    this.dialog.Children.Add(list.stickers_suggestions);
+                    this.Dialog.PreviewKeyDown += list.PreviewKeyEvent;
+                    this.Dialog.Children.Add(list);
+                    this.Dialog.Children.Add(list.StickerSuggestions);
                 }
             }
         }
@@ -73,7 +73,7 @@ namespace Alika
         {
             this.InitializeComponent();
 
-            this.chats_grid.Content = new ChatsHolder();
+            this.Chats.Content = new ChatsHolder();
 
             this.NoChatSelected.Children.Add(new Image
             {
@@ -91,25 +91,25 @@ namespace Alika
                 TextAlignment = Windows.UI.Xaml.TextAlignment.Center
             });
             this.NoChatSelected.Transitions.Add(new PopupThemeTransition());
-            this.dialog.Children.Add(this.NoChatSelected);
-            this.dialog.PreviewKeyDown += (a, b) =>
+            this.Dialog.Children.Add(this.NoChatSelected);
+            this.Dialog.PreviewKeyDown += (a, b) =>
             {
-                if (b.Key == Windows.System.VirtualKey.Escape) this.peer_id = 0;
+                if (b.Key == Windows.System.VirtualKey.Escape) this.PeerId = 0;
             };
 
             // Updating stickers cache on app startup
             Task.Factory.StartNew(() =>
             {
-                var recent = App.vk.Messages.GetRecentStickers().stickers;
-                var stickers = App.vk.GetStickers();
-                if (stickers?.items == null || stickers.items.Count == 0) return;
+                var recent = App.VK.Messages.GetRecentStickers().Items;
+                var stickers = App.VK.GetStickers();
+                if (stickers?.Items == null || stickers.Items.Count == 0) return;
                 App.UILoop.AddAction(new UITask
                 {
-                    Action = () => App.cache.Update(stickers.items, recent),
+                    Action = () => App.Cache.Update(stickers.Items, recent),
                     Priority = Windows.UI.Core.CoreDispatcherPriority.Low
                 });
             });
-            Task.Factory.StartNew(() => App.cache.Update(App.vk.GetStickersKeywords().dictionary));
+            Task.Factory.StartNew(() => App.Cache.Update(App.VK.GetStickersKeywords().Dictionary));
 
         }
     }

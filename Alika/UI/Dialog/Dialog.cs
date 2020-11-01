@@ -17,20 +17,20 @@ namespace Alika.UI.Dialog
     [Windows.UI.Xaml.Data.Bindable]
     public partial class Dialog : Grid
     {
-        public int peer_id { get; set; }
-        public TopMenu top_menu;
+        public int PeerId;
+        public TopMenu TopMenu;
         public MessagesList MessagesList;
-        public Grid bottom_menu = new Grid();
-        public Grid attach_grid = new Grid
+        public Grid BottomMenu = new Grid();
+        public Grid AttachGrid = new Grid
         {
             MaxHeight = 100,
             HorizontalAlignment = HorizontalAlignment.Left
         };
-        public ContentControl reply_grid = new ContentControl
+        public ContentControl ReplyGrid = new ContentControl
         {
             HorizontalContentAlignment = HorizontalAlignment.Stretch
         };
-        public Grid stickers_suggestions = new Grid
+        public Grid StickerSuggestions = new Grid
         {
             Height = 100,
             Background = new AcrylicBrush
@@ -43,10 +43,10 @@ namespace Alika.UI.Dialog
             Visibility = Visibility.Collapsed,
             CornerRadius = new CornerRadius(10, 10, 0, 0)
         };
-        public Grid bottom_buttons_grid = new Grid();
-        public Button send_button = new Buttons.Send();
-        public Button stickers = new Buttons.Stickers();
-        public TextBox send_text = new TextBox
+        public Grid BottomButtonsGrid = new Grid();
+        public Button SendButton = new Buttons.Send();
+        public Button Stickers = new Buttons.Stickers();
+        public TextBox SendText = new TextBox
         {
             PlaceholderText = Utils.LocString("Dialog/TextBoxPlaceholder"),
             AcceptsReturn = true,
@@ -55,11 +55,11 @@ namespace Alika.UI.Dialog
             TextWrapping = TextWrapping.Wrap,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
-        public Button attach_button = new Buttons.Attachment();
+        public Button AttachButton = new Buttons.Attachment();
 
         public Dialog(int peer_id)
         {
-            this.peer_id = peer_id;
+            this.PeerId = peer_id;
 
             this.Render();
 
@@ -68,27 +68,27 @@ namespace Alika.UI.Dialog
 
         public void Render()
         {
-            this.top_menu = new TopMenu(this.peer_id);
-            this.MessagesList = new MessagesList(this.peer_id);
-            this.bottom_menu.Transitions.Add(new EntranceThemeTransition { IsStaggeringEnabled = true });
+            this.TopMenu = new TopMenu(this.PeerId);
+            this.MessagesList = new MessagesList(this.PeerId);
+            this.BottomMenu.Transitions.Add(new EntranceThemeTransition { IsStaggeringEnabled = true });
 
             this.Children.Add(new BlurView
             {
-                TopMenu = this.top_menu,
+                TopMenu = this.TopMenu,
                 Content = this.MessagesList,
-                BottomMenu = this.bottom_menu,
+                BottomMenu = this.BottomMenu,
             });
 
-            this.send_text.SetValue(ScrollViewer.HorizontalScrollBarVisibilityProperty, ScrollBarVisibility.Disabled);
-            this.send_text.SetValue(ScrollViewer.VerticalScrollBarVisibilityProperty, ScrollBarVisibility.Auto);
+            this.SendText.SetValue(ScrollViewer.HorizontalScrollBarVisibilityProperty, ScrollBarVisibility.Disabled);
+            this.SendText.SetValue(ScrollViewer.VerticalScrollBarVisibilityProperty, ScrollBarVisibility.Auto);
 
-            this.bottom_menu.RowDefinitions.Add(new RowDefinition());
-            this.bottom_menu.RowDefinitions.Add(new RowDefinition());
-            this.bottom_menu.RowDefinitions.Add(new RowDefinition());
+            this.BottomMenu.RowDefinitions.Add(new RowDefinition());
+            this.BottomMenu.RowDefinitions.Add(new RowDefinition());
+            this.BottomMenu.RowDefinitions.Add(new RowDefinition());
 
             ScrollViewer scroll = new ScrollViewer
             {
-                Content = attach_grid,
+                Content = this.AttachGrid,
                 VerticalScrollMode = ScrollMode.Disabled,
                 VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
                 HorizontalScrollMode = ScrollMode.Auto,
@@ -96,29 +96,29 @@ namespace Alika.UI.Dialog
             };
 
             Grid.SetRow(scroll, 0);
-            Grid.SetRow(this.reply_grid, 1);
-            Grid.SetRow(this.bottom_buttons_grid, 2);
+            Grid.SetRow(this.ReplyGrid, 1);
+            Grid.SetRow(this.BottomButtonsGrid, 2);
 
-            this.bottom_menu.Children.Add(scroll);
-            this.bottom_menu.Children.Add(this.reply_grid);
-            this.bottom_menu.Children.Add(this.bottom_buttons_grid);
+            this.BottomMenu.Children.Add(scroll);
+            this.BottomMenu.Children.Add(this.ReplyGrid);
+            this.BottomMenu.Children.Add(this.BottomButtonsGrid);
 
-            this.bottom_buttons_grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
-            this.bottom_buttons_grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            this.bottom_buttons_grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
-            this.bottom_buttons_grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+            this.BottomButtonsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+            this.BottomButtonsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            this.BottomButtonsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+            this.BottomButtonsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
 
-            Grid.SetColumn(this.attach_button, 0);
-            Grid.SetColumn(this.send_text, 1);
-            Grid.SetColumn(this.stickers, 2);
-            Grid.SetColumn(this.send_button, 3);
+            Grid.SetColumn(this.AttachButton, 0);
+            Grid.SetColumn(this.SendText, 1);
+            Grid.SetColumn(this.Stickers, 2);
+            Grid.SetColumn(this.SendButton, 3);
 
-            this.bottom_buttons_grid.Children.Add(this.attach_button);
-            this.bottom_buttons_grid.Children.Add(this.send_text);
-            this.bottom_buttons_grid.Children.Add(this.send_button);
-            this.bottom_buttons_grid.Children.Add(this.stickers);
+            this.BottomButtonsGrid.Children.Add(this.AttachButton);
+            this.BottomButtonsGrid.Children.Add(this.SendText);
+            this.BottomButtonsGrid.Children.Add(this.SendButton);
+            this.BottomButtonsGrid.Children.Add(this.Stickers);
 
-            this.stickers_suggestions.Children.Add(new ScrollViewer
+            this.StickerSuggestions.Children.Add(new ScrollViewer
             {
                 VerticalScrollMode = ScrollMode.Disabled,
                 VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
@@ -173,7 +173,7 @@ namespace Alika.UI.Dialog
                 {
                     VerticalAlignment = VerticalAlignment.Bottom,
                     TextTrimming = TextTrimming.CharacterEllipsis,
-                    Text = App.cache.GetName(this.Message.from_id),
+                    Text = App.Cache.GetName(this.Message.FromId),
                     FontWeight = FontWeights.Bold
                 };
                 Grid.SetRow(name, 0);

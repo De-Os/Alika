@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 
 namespace Alika.Libs.VK.Responses
@@ -28,107 +27,105 @@ namespace Alika.Libs.VK.Responses
         }
 
         [JsonProperty("id")]
-        public int id { get; set; }
+        public int Id;
         [JsonProperty("peer_id")]
-        public int peer_id { get; set; }
+        public int PeerId;
         [JsonProperty("from_id")]
-        public int from_id { get; set; }
+        public int FromId;
         [JsonProperty("date")]
-        public int date { get; set; }
+        public int Date;
         [JsonProperty("read_state")]
-        public int read_state { get; set; } = 0;
+        public int ReadState = 0;
         [JsonProperty("text")]
-        public string text { get; set; }
+        public string Text;
         [JsonProperty("fwd_messages")]
-        public List<Message> fwd_messages { get; set; }
+        public List<Message> FwdMessages;
         [JsonProperty("reply_message")]
-        public Message reply_message { get; set; }
+        public Message ReplyMessage;
         [JsonProperty("out")]
-        public int isOut { get; set; } = 0;
+        public int IsOut = 0;
         [JsonProperty("attachments")]
-        public List<Attachment> attachments { get; set; }
+        public List<Attachment> Attachments;
         [JsonProperty("important")]
-        public bool important { get; set; }
+        public bool Important;
         [JsonProperty("payload")]
-        public string payload { get; set; }
+        public string Payload;
         [JsonProperty("keyboard")]
-        public Keyboard keyboard { get; set; }
+        public MsgKeyboard Keyboard;
         [JsonProperty("action")]
-        public Action action { get; set; }
+        public MsgAction Action;
         [JsonProperty("update_time")]
-        public int update_time { get; set; }
+        public int UpdateTime;
 
         public Message() { }
         public Message(JToken message)
         {
             if (message != null)
             {
-                this.id = (int)message[1];
-                this.peer_id = (int)message[3];
-                this.from_id = this.peer_id;
-                this.date = (int)message[4];
-                this.text = ((string)message[5]).Replace("<br>", "\n");
+                this.Id = (int)message[1];
+                this.PeerId = (int)message[3];
+                this.FromId = this.PeerId;
+                this.Date = (int)message[4];
+                this.Text = ((string)message[5]).Replace("<br>", "\n");
                 if (message[6] != null && message[6].HasValues)
                 {
                     var additions = message[6];
-                    if (additions["keyboard"] != null) this.keyboard = additions["keyboard"].ToObject<Keyboard>();
-                    if (additions["payload"] != null) this.payload = (string)additions["payload"];
-                    if (additions["from"] != null) this.from_id = int.Parse((string)additions["from"]);
+                    if (additions["keyboard"] != null) this.Keyboard = additions["keyboard"].ToObject<MsgKeyboard>();
+                    if (additions["payload"] != null) this.Payload = (string)additions["payload"];
+                    if (additions["from"] != null) this.FromId = int.Parse((string)additions["from"]);
                 }
 
-                if ((message[2].ToObject<Flags>() & Flags.OUTBOX) != Flags.NONE) this.from_id = App.vk.user_id;
+                if ((message[2].ToObject<Flags>() & Flags.OUTBOX) != Flags.NONE) this.FromId = App.VK.UserId;
             }
         }
 
-        public DateTime GetFormattedDate() => new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(this.date).ToLocalTime();
-
-        public class Keyboard
+        public class MsgKeyboard
         {
             [JsonProperty("one_time")]
-            public bool one_time { get; set; }
+            public bool OneTime;
             [JsonProperty("inline")]
-            public bool inline { get; set; }
+            public bool Inline;
             [JsonProperty("buttons")]
-            public List<List<Button>> buttons { get; set; }
+            public List<List<Button>> Buttons;
             public class Button
             {
                 [JsonProperty("color")]
-                public string color { get; set; }
+                public string Color;
                 [JsonProperty("action")]
-                public Action action { get; set; }
+                public BtnAction Action;
 
-                public class Action
+                public class BtnAction
                 {
                     [JsonProperty("type")]
-                    public string type { get; set; }
+                    public string Type;
                     [JsonProperty("label")]
-                    public string label { get; set; }
+                    public string Label;
                     [JsonProperty("payload")]
-                    public string payload { get; set; }
+                    public string Payload;
 
                     [JsonProperty("url")]
-                    public string url { get; set; }
+                    public string Url;
                     [JsonProperty("hash")]
-                    public string hash { get; set; }
+                    public string Hash;
                     [JsonProperty("app_id")]
-                    public int app_id { get; set; }
+                    public int AppId;
                     [JsonProperty("owner_id")]
-                    public int owner_id { get; set; }
+                    public int OwnerId;
                 }
             }
         }
-        public class Action
+        public class MsgAction
         {
             [JsonProperty("type")]
-            public string type { get; set; }
+            public string Type;
             [JsonProperty("member_id")]
-            public int member_id { get; set; }
+            public int MemberId;
             [JsonProperty("text")]
-            public string text { get; set; }
+            public string Text;
             [JsonProperty("email")]
-            public string email { get; set; }
+            public string EMail;
             [JsonProperty("photo")]
-            public GetConversationsResponse.ConversationResponse.ConversationInfo.PeerSettings.PeerPhotos photo { get; set; }
+            public ConversationInfo.PeerSettings.PeerPhotos Photo;
         }
     }
 }
