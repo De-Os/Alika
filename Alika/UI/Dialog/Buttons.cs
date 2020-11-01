@@ -54,7 +54,7 @@ namespace Alika.UI.Dialog
                             Title = Utils.LocString("Attachments/Graffiti")
                         };
                         gw.OnClose += () => popup.Hide();
-                        App.main_page.popup.Children.Add(popup);
+                        App.MainPage.Popup.Children.Add(popup);
                     }
                 });
             }

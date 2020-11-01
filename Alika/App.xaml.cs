@@ -21,16 +21,15 @@ namespace Alika
 {
     sealed partial class App : Application
     {
-        public static bool systemDarkTheme = new UISettings().GetColorValue(UIColorType.Background).ToString() == "#FF000000"; // Bool for detecting system theme
-        public static Caching cache = new Caching(); // Global caching
-        public static Config settings;
+        public static bool DarkTheme = new UISettings().GetColorValue(UIColorType.Background).ToString() == "#FF000000"; // Bool for detecting system theme
+        public static Caching Cache = new Caching(); // Global caching
+        public static Config Settings;
         public static string appName = "alika.vk"; // Appname for password vault
         public static UITasksLoop UILoop = new UITasksLoop();
-        public static VK vk; // VK lib
-        public static MainPage main_page; // Main page
-        public static LongPoll lp; // LongPoll
-        public static LoginPage login_page; // Login page
-        public static double TitleBarHeight;
+        public static VK VK; // VK lib
+        public static MainPage MainPage; // Main page
+        public static LongPoll LP; // LongPoll
+        public static LoginPage LoginPage; // Login page
 
         public App()
         {
@@ -62,9 +61,9 @@ namespace Alika
                     }
                     else
                     {
-                        App.login_page = new LoginPage();
-                        login_page.OnSuccesful += this.LoadMain;
-                        rootFrame.Content = App.login_page;
+                        App.LoginPage = new LoginPage();
+                        LoginPage.OnSuccesful += this.LoadMain;
+                        rootFrame.Content = App.LoginPage;
                     }
                 }
                 Window.Current.Activate();
@@ -91,25 +90,21 @@ namespace Alika
         public void LoadMain()
         {
             var vault = new PasswordVault();
-            App.vk = new VK(new VK.Settings
+            App.VK = new VK(new VK.Settings
             {
-                ApiVer = App.settings.vk.api,
                 Token = vault.Retrieve(App.appName, "default").Password,
-                ApiDomain = App.settings.vk.domain
+                ApiDomain = App.Settings.vk.domain
             });
             this.LoadProxy();
-            App.lp = vk.GetLP();
-            App.main_page = new MainPage();
+            App.LP = App.VK.GetLP();
+            App.MainPage = new MainPage();
 
-            App.settings.OnSettingUpdated += (a) =>
+            App.Settings.OnSettingUpdated += (a) =>
             {
                 switch (a)
                 {
                     case "vk.domain":
-                        App.vk.domain = App.settings.vk.domain;
-                        break;
-                    case "vk.api":
-                        App.vk.api_ver = App.settings.vk.api;
+                        App.VK.Domain = App.Settings.vk.domain;
                         break;
                     case "proxy":
                         this.LoadProxy();
@@ -117,20 +112,19 @@ namespace Alika
                 }
             };
 
-            (Window.Current.Content as Frame).Content = App.main_page;
+            (Window.Current.Content as Frame).Content = App.MainPage;
         }
         private async void LoadProxy()
         {
-            if (App.settings?.proxy == null) return;
-            if (!App.settings.proxy.enabled)
+            if (App.Settings?.proxy == null) return;
+            if (!App.Settings.proxy.enabled)
             {
-                if (App.vk != null) App.vk.proxy = null;
-                if (App.lp != null) App.lp.proxy = null;
+                if (App.VK != null) App.VK.Proxy = null;
                 return;
             }
-            var testClient = new RestClient(App.settings.vk.ping_url)
+            var testClient = new RestClient(App.Settings.vk.ping_url)
             {
-                Proxy = App.settings.proxy.ToWebProxy(),
+                Proxy = App.Settings.proxy.ToWebProxy(),
                 Timeout = 15000
             };
             try
@@ -138,8 +132,7 @@ namespace Alika
                 var response = testClient.Get(new RestRequest());
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    if (App.vk != null) App.vk.proxy = App.settings.proxy.ToWebProxy();
-                    if (App.lp != null) App.lp.proxy = App.settings.proxy.ToWebProxy();
+                    if (App.VK != null) App.VK.Proxy = App.Settings.proxy.ToWebProxy();
                 }
                 else
                 {

@@ -26,21 +26,21 @@ namespace Alika.UI.Items
 
             Task.Factory.StartNew(() =>
             {
-                var user = App.cache.GetUser(this.UserId);
-                this.LastOnline = user.online_info.last_seen;
-                this.SetOnline(user.online_info.is_online);
+                var user = App.Cache.GetUser(this.UserId);
+                this.LastOnline = user.OnlineInfo.LastSeen;
+                this.SetOnline(user.OnlineInfo.IsOnline);
             });
             this.UpdateOffline();
 
-            App.lp.UserOnline += (a) =>
+            App.LP.UserOnline += (a) =>
             {
-                if (a.user_id == this.UserId) this.SetOnline(true);
+                if (a.UserId == this.UserId) this.SetOnline(true);
             };
-            App.lp.UserOffline += (a) =>
+            App.LP.UserOffline += (a) =>
             {
-                if (a.user_id == this.UserId)
+                if (a.UserId == this.UserId)
                 {
-                    this.LastOnline = a.timestamp;
+                    this.LastOnline = a.Timestamp;
                     this.SetOnline(false);
                 }
             };
@@ -109,9 +109,9 @@ namespace Alika.UI.Items
                 while (true)
                 {
                     Thread.Sleep(TimeSpan.FromMinutes(3));
-                    var user = App.vk.Users.Get(new System.Collections.Generic.List<int> { this.UserId }, fields: "online_info")[0];
-                    this.LastOnline = user.online_info.last_seen;
-                    this.SetOnline(user.online_info.is_online);
+                    var user = App.VK.Users.Get(new System.Collections.Generic.List<int> { this.UserId }, fields: "online_info")[0];
+                    this.LastOnline = user.OnlineInfo.LastSeen;
+                    this.SetOnline(user.OnlineInfo.IsOnline);
                 }
             });
         }

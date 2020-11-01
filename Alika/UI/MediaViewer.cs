@@ -50,7 +50,7 @@ namespace Alika.UI
         {
             this.attachment = attachment;
 
-            switch (attachment.type)
+            switch (attachment.Type)
             {
                 case "photo":
                     this.LoadImage();
@@ -61,7 +61,7 @@ namespace Alika.UI
 
             this.LoadMenu();
 
-            App.main_page.popup.Children.Add(this.popup);
+            App.MainPage.Popup.Children.Add(this.popup);
         }
 
         public void LoadMenu()
@@ -130,7 +130,7 @@ namespace Alika.UI
                 {
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.attachment.photo.GetBestQuality().url))
+                    Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.attachment.Photo.GetBestQuality().Url))
                 }
             });
 
@@ -149,11 +149,11 @@ namespace Alika.UI
             var savePicker = new Windows.Storage.Pickers.FileSavePicker();
             savePicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Downloads;
             string uri = "";
-            switch (this.attachment.type)
+            switch (this.attachment.Type)
             {
                 case "photo":
-                    uri = this.attachment.photo.GetBestQuality().url;
-                    savePicker.SuggestedFileName = "photo" + this.attachment.photo.owner_id + "_" + this.attachment.photo.id;
+                    uri = this.attachment.Photo.GetBestQuality().Url;
+                    savePicker.SuggestedFileName = this.attachment.Photo.ToAttachFormat();
                     savePicker.FileTypeChoices.Add("JPG", new List<string>() { ".jpg" });
                     break;
             }

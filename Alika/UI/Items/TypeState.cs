@@ -29,17 +29,17 @@ namespace Alika.UI.Items
 
             this.UpdateState();
 
-            App.lp.Typing += (a) =>
+            App.LP.Typing += (a) =>
             {
-                if (a.peer_id == peer_id)
+                if (a.Peerid == peer_id)
                 {
-                    this.current = a.user_ids;
+                    this.current = a.UserIds;
                     this.updated = DateTime.Now;
                 }
             };
-            App.lp.OnNewMessage += (a) =>
+            App.LP.OnNewMessage += (a) =>
             {
-                if (a.peer_id == peer_id && this.current.Contains(a.from_id) && this.current.Count == 1)
+                if (a.PeerId == peer_id && this.current.Contains(a.FromId) && this.current.Count == 1)
                 {
                     App.UILoop.AddAction(new UITask
                     {
@@ -69,7 +69,7 @@ namespace Alika.UI.Items
                     if (this.updated <= DateTime.Now.AddSeconds(-5)) this.current.Clear();
                     if (this.current.Count > 0)
                     {
-                        string text = String.Join(", ", this.current.Select(i => App.cache.GetName(i)));
+                        string text = String.Join(", ", this.current.Select(i => App.Cache.GetName(i)));
                         App.UILoop.AddAction(new UITask
                         {
                             Action = () =>

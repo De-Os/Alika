@@ -1,44 +1,42 @@
 ﻿using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
 
 namespace Alika.Libs.VK.Responses
 {
     public class User
     {
-        [JsonProperty("id"), Key]
-        public int user_id { get; set; }
+        [JsonProperty("id")]
+        public int UserId;
         [JsonProperty("first_name")]
-        public string first_name { get; set; }
+        public string FirstName;
         [JsonProperty("last_name")]
-        public string last_name { get; set; }
+        public string LastName;
         [JsonProperty("verified")]
-        public int verified { get; set; }
+        public int Verified;
         [JsonProperty("photo_50")]
-        public string photo_50 { get; set; }
+        public string Photo50;
         [JsonProperty("photo_100")]
-        public string photo_100 { get; set; }
+        public string Photo100;
         [JsonProperty("photo_200")]
-        public string photo_200 { get; set; }
+        public string Photo200;
         [JsonProperty("screen_name")]
-        public string screen_name { get; set; }
+        public string ScreenName;
         [JsonProperty("online")]
-        public int online { get; set; }
+        public int Online;
         [JsonProperty("online_mobile")]
-        public int online_mobile { get; set; }
+        public int OnlineMobile;
         [JsonProperty("online_info")]
-        public OnlineInfo online_info { get; set; }
+        public UserOnlineInfo OnlineInfo;
 
-        public class OnlineInfo
+        public class UserOnlineInfo
         {
             [JsonProperty("visible")]
-            public bool visible { get; set; }
+            public bool Visible;
             [JsonProperty("last_seen")]
-            public int last_seen { get; set; }
+            public int LastSeen;
             [JsonProperty("is_online")]
-            public bool is_online { get; set; }
+            public bool IsOnline;
             [JsonProperty("is_mobile")]
-            public bool is_mobile { get; set; }
-
+            public bool IsMobile;
         }
     }
 }

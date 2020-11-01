@@ -165,6 +165,9 @@
   <data name="Group" xml:space="preserve">
     <value>Группа</value>
   </data>
+  <data name="ImportantMessages" xml:space="preserve">
+    <value>Важные сообщения</value>
+  </data>
   <data name="InvitedTime" xml:space="preserve">
     <value>Присоединился: %time%</value>
   </data>
@@ -222,6 +225,9 @@
   <data name="Promote" xml:space="preserve">
     <value>Назначить администратором</value>
   </data>
+  <data name="RecentStickers" xml:space="preserve">
+    <value>Недавние</value>
+  </data>
   <data name="RemovePhoto" xml:space="preserve">
     <value>Удалить фотографию</value>
   </data>
@@ -230,6 +236,9 @@
   </data>
   <data name="Save" xml:space="preserve">
     <value>Сохранить</value>
+  </data>
+  <data name="SelectChat" xml:space="preserve">
+    <value>Выберите диалог...</value>
   </data>
   <data name="Send" xml:space="preserve">
     <value>Отправить</value>

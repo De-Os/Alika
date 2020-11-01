@@ -23,8 +23,6 @@ namespace Alika
 
         public class VK
         {
-            [JsonProperty("api")]
-            public string api { get; set; } // Api version
             [JsonProperty("domain")]
             public string domain { get; set; } // Domain url
             [JsonProperty("ping_url")]
@@ -87,7 +85,7 @@ namespace Alika
                 await folder.CreateFileAsync("pinned_chats.json");
                 await folder.WriteTextToFileAsync(JsonConvert.SerializeObject(new List<int>()), "pinned_chats.json");
             }
-            App.settings = JsonConvert.DeserializeObject<Config>(await folder.ReadTextFromFileAsync("settings.json"));
+            App.Settings = JsonConvert.DeserializeObject<Config>(await folder.ReadTextFromFileAsync("settings.json"));
         }
 
         public static async Task<List<int>> GetPinnedChats() => JsonConvert.DeserializeObject<List<int>>(await ApplicationData.Current.LocalFolder.ReadTextFromFileAsync("pinned_chats.json"));

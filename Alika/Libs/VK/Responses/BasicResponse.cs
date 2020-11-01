@@ -3,25 +3,37 @@ using System.Collections.Generic;
 
 namespace Alika.Libs.VK.Responses
 {
-    class BasicResponse<Type>
+    public class BasicResponse<Type>
     {
         [JsonProperty("response")]
-        public Type response { get; set; }
+        public Type Response;
         [JsonProperty("error")]
-        public Error error { get; set; }
+        public Error Error;
     }
 
-    class Error
+    public class ItemsResponse<Type>
+    {
+        [JsonProperty("count")]
+        public int Count;
+        [JsonProperty("items")]
+        public List<Type> Items;
+        [JsonProperty("profiles")]
+        public List<User> Profiles;
+        [JsonProperty("groups")]
+        public List<Group> Groups;
+    }
+
+    public class Error
     {
         [JsonProperty("error_code")]
-        public int code { get; set; }
+        public int Code;
         [JsonProperty("error_msg")]
-        public string message { get; set; }
+        public string Message;
         [JsonProperty("captcha_sid")]
-        public string captcha_sid { get; set; }
+        public string CaptchaSid;
         [JsonProperty("captcha_img")]
-        public string captcha_img { get; set; }
+        public string CaptchaImg;
         [JsonProperty("request_params")]
-        public List<Dictionary<string, string>> request_params { get; set; }
+        public List<Dictionary<string, string>> RequestParams;
     }
 }

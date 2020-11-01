@@ -15,12 +15,10 @@
                 <ColumnDefinition Width="0.4*" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <ContentControl Grid.Column="0" x:Name="chats_grid" VerticalAlignment="Stretch" x:FieldModifier="public">
-                
-            </ContentControl>
-            <Grid Grid.Column="1" x:FieldModifier="public" x:Name="dialog"></Grid>
+            <ContentControl Grid.Column="0" x:Name="Chats" VerticalAlignment="Stretch" x:FieldModifier="public" />
+            <Grid Grid.Column="1" x:FieldModifier="public" x:Name="Dialog" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
         </Grid>
         <!--popup elements (костыль)-->
-        <Grid x:Name="popup" x:FieldModifier="public"></Grid>
+        <Grid x:Name="Popup" x:FieldModifier="public"></Grid>
     </Grid>
 </Page>

@@ -36,7 +36,7 @@ namespace Alika.UI.Dialog
 
         public void LoadTitles()
         {
-            string title = App.cache.GetName(peer_id);
+            string title = App.Cache.GetName(peer_id);
             var about = new ContentControl
             {
                 VerticalAlignment = VerticalAlignment.Top
@@ -65,7 +65,7 @@ namespace Alika.UI.Dialog
                 VerticalAlignment = VerticalAlignment.Stretch,
                 HorizontalAlignment = HorizontalAlignment.Stretch
             };
-            text.PointerPressed += (a, b) => new ChatInformation(App.main_page.peer_id);
+            text.PointerPressed += (a, b) => new ChatInformation(App.MainPage.PeerId);
             text.RowDefinitions.Add(new RowDefinition());
             text.RowDefinitions.Add(new RowDefinition());
             Grid.SetColumn(text, 0);
@@ -114,13 +114,13 @@ namespace Alika.UI.Dialog
                 };
 
                 Element info = new Element("Dialog/TopMenuInformation", "info.svg");
-                info.PointerPressed += (a, b) => new ChatInformation(App.main_page.peer_id);
+                info.PointerPressed += (a, b) => new ChatInformation(App.MainPage.PeerId);
                 this.content.Children.Add(info);
 
                 Element attachs = new Element("Dialog/TopMenuAttachments", "album.svg");
                 attachs.PointerPressed += (a, b) =>
                 {
-                    App.main_page.popup.Children.Add(new Popup
+                    App.MainPage.Popup.Children.Add(new Popup
                     {
                         Content = new ChatInformation.AttachmentsList(peer_id, null),
                         Title = Utils.LocString("Attachments/Attachments")

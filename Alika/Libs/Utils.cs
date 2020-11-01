@@ -113,7 +113,7 @@ namespace Alika.Libs
                 return ms.ToArray();
             }
         }
-        public static string AssetTheme(string filename, string path = "UI/") => "ms-appx:///Assets/" + path + (App.systemDarkTheme ? "Light" : "Dark") + "/" + filename;
+        public static string AssetTheme(string filename, string path = "UI/") => "ms-appx:///Assets/" + path + (App.DarkTheme ? "Light" : "Dark") + "/" + filename;
 
         public static string FormatSize(int bytes, int round = 2)
         {
@@ -226,10 +226,10 @@ namespace Alika.Libs
         public static string ToCompactText(this Message msg)
         {
             string text = "";
-            if (msg.text.Length > 0)
+            if (msg.Text.Length > 0)
             {
-                string temptext = msg.text.Replace("\n", " ");
-                MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(msg.text);
+                string temptext = msg.Text.Replace("\n", " ");
+                MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(msg.Text);
                 if (pushes.Count > 0)
                 {
                     foreach (Match push in pushes)
@@ -241,9 +241,9 @@ namespace Alika.Libs
             }
             else
             {
-                if (msg.attachments != null && msg.attachments.Count > 0)
+                if (msg.Attachments != null && msg.Attachments.Count > 0)
                 {
-                    switch (msg.attachments.First().type)
+                    switch (msg.Attachments.First().Type)
                     {
                         case "photo":
                             text += "📷 " + Utils.LocString("Attachments/Photo");
@@ -273,7 +273,7 @@ namespace Alika.Libs
                 }
                 else
                 {
-                    if (msg.fwd_messages?.Count > 0)
+                    if (msg.FwdMessages?.Count > 0)
                     {
                         text += "↩ " + Utils.LocString("Dialog/FwdMessages");
                     }

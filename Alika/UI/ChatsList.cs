@@ -63,9 +63,9 @@ namespace Alika.UI
             this.Content = grid;
             this.LoadMenu();
 
-            App.lp.OnNewMessage += (msg) =>
+            App.LP.OnNewMessage += (msg) =>
             {
-                if (msg.peer_id == App.main_page.peer_id)
+                if (msg.PeerId == App.MainPage.PeerId)
                 {
                     App.UILoop.AddAction(new UITask
                     {
@@ -78,17 +78,16 @@ namespace Alika.UI
             {
                 if (this.FoundChats.SelectedItem is ChatsList.ChatItem chat)
                 {
-                    App.main_page.peer_id = chat.peer_id;
+                    App.MainPage.PeerId = chat.PeerId;
                     foreach (var item in this.Chats.Items)
                     {
-                        if (item is ChatsList.ChatItem c && c.peer_id == chat.peer_id) this.Chats.SelectedItem = c;
+                        if (item is ChatsList.ChatItem c && c.PeerId == chat.PeerId) this.Chats.SelectedItem = c;
                     }
                     this.FoundChats.Items.Clear();
                     this.FoundChats.Visibility = Visibility.Collapsed;
                     this.SearchBar.Text = "";
                 }
             };
-
 
             async void Load()
             {
@@ -107,11 +106,13 @@ namespace Alika.UI
                 {
                     if (b.FinalView.VerticalOffset == (a as ScrollViewer).ScrollableHeight)
                     {
-                        this.Chats.LoadChats(0, start_msg_id: this.Chats.Items.Select(i => i as ChatsList.ChatItem).ToList().Last().message.id);
+                        this.Chats.LoadChats(0, start_msg_id: this.Chats.Items.Select(i => i as ChatsList.ChatItem).ToList().Last().message.Id);
                     }
                 };
                 this.Chats.SelectionChanged += (a, b) => { if (this.Chats.SelectedIndex != -1) this.PinnedChats.SelectedIndex = -1; };
                 this.PinnedChats.SelectionChanged += (a, b) => { if (this.PinnedChats.SelectedIndex != -1) this.Chats.SelectedIndex = -1; };
+
+                App.LP.OnNewMessage += this.CheckNewPeer;
             }
         }
 
@@ -137,7 +138,7 @@ namespace Alika.UI
                 {
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    Source = new SvgImageSource(new System.Uri(Utils.AssetTheme("fly_menu.svg"))),
+                    Source = new SvgImageSource(new Uri(Utils.AssetTheme("fly_menu.svg"))),
                     Width = 20,
                     Height = 20
                 },
@@ -184,6 +185,17 @@ namespace Alika.UI
             loadExport.RightTapped += (a, b) => new DialogExportReader(Window.Current.CoreWindow.GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down));
             menu.Items.Add(loadExport);
 
+            var openImportant = new MenuFlyoutItem
+            {
+                Icon = new FontIcon
+                {
+                    Glyph = "\uE734"
+                },
+                Text = Utils.LocString("Dialog/ImportantMessages")
+            };
+            openImportant.Click += (a, b) => new ImportantMessages();
+            menu.Items.Add(openImportant);
+
             return menu;
         }
 
@@ -212,26 +224,35 @@ namespace Alika.UI
             this.FoundChats.Items.Clear();
             await Task.Factory.StartNew(() =>
             {
-                var convs = App.vk.Messages.SearchConversations(query, fields: "photo_200,online_info");
-                if (convs.conversations.Count > 0)
+                var convs = App.VK.Messages.SearchConversations(query, fields: "photo_200,online_info");
+                if (convs.Items.Count > 0)
                 {
-                    App.UILoop.AddAction(new UITask
-                    {
-                        Action = () => this.FoundChats.Visibility = Visibility.Visible
-                    });
-
                     App.UILoop.AddAction(new UITask
                     {
                         Action = () =>
                         {
-                            foreach (var conv in convs.conversations)
-                            {
-                                this.FoundChats.Items.Add(new ChatsList.ChatItem(conv.peer.id));
-                            }
+                            foreach (var conv in convs.Items) this.FoundChats.Items.Add(new ChatsList.ChatItem(conv.Peer.Id));
+                            this.FoundChats.Visibility = Visibility.Visible;
                         }
                     });
                 }
             });
+        }
+
+        private void CheckNewPeer(Message msg)
+        {
+            App.UILoop.AddAction(new UITask
+            {
+                Action = () =>
+                {
+                    var chats = this.Chats.Items.Select(i => (i as ChatsList.ChatItem).PeerId).ToList();
+                    chats.AddRange(this.PinnedChats.Items.Select(i => (i as ChatsList.ChatItem).PeerId));
+
+                    if (!chats.Contains(msg.PeerId)) this.Chats.Items.Insert(0, new ChatsList.ChatItem(msg.PeerId, msg));
+                },
+                Priority = CoreDispatcherPriority.Low
+            });
+
         }
     }
 
@@ -252,11 +273,11 @@ namespace Alika.UI
             {
                 if (this.SelectedItem is ChatItem i)
                 {
-                    if (i.peer_id != App.main_page.peer_id) App.main_page.peer_id = i.peer_id;
+                    if (i.PeerId != App.MainPage.PeerId) App.MainPage.PeerId = i.PeerId;
                 }
             };
             this.LoadChats(0);
-            App.lp.OnNewMessage += this.ProcessMessage;
+            App.LP.OnNewMessage += this.ProcessMessage;
         }
 
         public void LoadChats(int offset, int count = 50, int start_msg_id = 0)
@@ -264,14 +285,14 @@ namespace Alika.UI
             Task.Factory.StartNew(() =>
               {
                   if (start_msg_id > 0) offset++;
-                  var conversations = App.vk.Messages.GetConversations(count: count, offset: offset, fields: "photo_200,online_info", start_message_id: start_msg_id).conversations;
+                  var conversations = App.VK.Messages.GetConversations(count: count, offset: offset, fields: "photo_200,online_info", start_message_id: start_msg_id).Items;
                   foreach (var conv in conversations)
                   {
-                      if (!this.IgnorePeers.Contains(conv.conversation.peer.id))
+                      if (!this.IgnorePeers.Contains(conv.Conversation.Peer.Id))
                       {
                           App.UILoop.RunAction(new UITask
                           {
-                              Action = () => this.Items.Add(new ChatItem(conv.conversation.peer.id, conv.last_message, unread: conv.conversation.unread_count)),
+                              Action = () => this.Items.Add(new ChatItem(conv.Conversation.Peer.Id, conv.LastMessage, unread: conv.Conversation.UnreadCount)),
                               Priority = CoreDispatcherPriority.High
                           });
                       }
@@ -289,7 +310,7 @@ namespace Alika.UI
                     {
                         if (item is ChatItem chat)
                         {
-                            if (msg.peer_id == chat.peer_id && this.Items.IndexOf(chat) != 0)
+                            if (msg.PeerId == chat.PeerId && this.Items.IndexOf(chat) != 0)
                             {
                                 this.Items.Remove(chat);
                                 this.Items.Insert(0, chat);
@@ -297,7 +318,7 @@ namespace Alika.UI
                             }
                         }
                     }
-                    //this.Items.Insert(0, new ChatItem(msg.peer_id, msg));
+                    //this.Items.Insert(0, new ChatItem(msg.PeerId, msg));
                 },
                 Priority = CoreDispatcherPriority.Low
             });
@@ -310,7 +331,7 @@ namespace Alika.UI
             public Pin OnPin;
             public Pin OnUnPin;
 
-            public int peer_id;
+            public int PeerId;
             public Message message;
             public Grid grid = new Grid
             {
@@ -353,21 +374,21 @@ namespace Alika.UI
                 }
                 set
                 {
-                    var chats = App.main_page.chats_grid.Content as ChatsHolder;
+                    var chats = App.MainPage.Chats.Content as ChatsHolder;
                     this.RemoveParent();
                     if (value)
                     {
                         chats.PinnedChats.Items.Add(this);
                         this.PinImage.Visibility = Visibility.Visible;
                         this.OnPin?.Invoke();
-                        Config.AddPinnedChat(this.peer_id);
+                        Config.AddPinnedChat(this.PeerId);
                     }
                     else
                     {
                         chats.Chats.Items.Insert(0, this);
                         this.PinImage.Visibility = Visibility.Collapsed;
                         this.OnUnPin?.Invoke();
-                        Config.RemovePinnedChat(this.peer_id);
+                        Config.RemovePinnedChat(this.PeerId);
                     }
                     this._pinned = value;
                 }
@@ -419,9 +440,9 @@ namespace Alika.UI
                 Margin = new Thickness(0, 0, 5, 0)
             };
 
-            public ChatItem(int peer_id, Message last_msg, bool pinned = false, int unread = 0)
+            public ChatItem(int PeerId, Message last_msg, bool pinned = false, int unread = 0)
             {
-                this.peer_id = peer_id;
+                this.PeerId = PeerId;
                 this._pinned = pinned;
 
                 this.Render();
@@ -429,10 +450,13 @@ namespace Alika.UI
                 this.UpdateMsg(last_msg);
                 this.UnreadCount = unread;
 
-                App.lp.OnNewMessage += this.OnNewMessage;
-                App.lp.OnMessageEdition += (m) =>
+                var conv = App.Cache.GetConversation(PeerId);
+                if (conv.LastMessageId >= last_msg.Id && last_msg.Id <= (conv.OutRead > conv.InRead ? conv.OutRead : conv.InRead)) this.ReadState.Source = new SvgImageSource(new Uri(Utils.AssetTheme("double_check.svg")));
+
+                App.LP.OnNewMessage += this.OnNewMessage;
+                App.LP.OnMessageEdition += (m) =>
                 {
-                    if (m.id == this.message.id)
+                    if (m.Id == this.message.Id)
                     {
                         App.UILoop.AddAction(new UITask
                         {
@@ -441,26 +465,26 @@ namespace Alika.UI
                         });
                     }
                 };
-                App.lp.OnNewMessage += (a) =>
+                App.LP.OnNewMessage += (a) =>
                 {
-                    if (a.peer_id == this.peer_id && a.from_id != App.vk.user_id) App.UILoop.AddAction(new UITask
+                    if (a.PeerId == this.PeerId && a.FromId != App.VK.UserId) App.UILoop.AddAction(new UITask
                     {
                         Action = () => this.UnreadCount++
                     });
                 };
-                App.lp.OnReadMessage += (a) =>
+                App.LP.OnReadMessage += (a) =>
                 {
-                    if (a.peer_id == this.peer_id)
+                    if (a.PeerId == this.PeerId)
                     {
                         App.UILoop.AddAction(new UITask
                         {
                             Action = () =>
                             {
-                                if (this.message.id <= a.msg_id)
+                                if (this.message.Id <= a.MsgId)
                                 {
                                     this.ReadState.Source = new SvgImageSource(new Uri(Utils.AssetTheme("double_check.svg")));
                                 }
-                                this.UnreadCount = a.unread;
+                                this.UnreadCount = a.Unread;
                             }
                         });
                     }
@@ -493,9 +517,9 @@ namespace Alika.UI
                 pin.Click += (a, b) => this.Pinned = !this.Pinned;
             }
 
-            public ChatItem(int peer_id)
+            public ChatItem(int PeerId)
             {
-                this.peer_id = peer_id;
+                this.PeerId = PeerId;
                 this.Render();
             }
 
@@ -510,7 +534,7 @@ namespace Alika.UI
                 this.textGrid.RowDefinitions.Add(new RowDefinition()); // Chat name
                 this.textGrid.RowDefinitions.Add(new RowDefinition()); // Message text
                 this.LoadAvatar();
-                this.nameBlock.Text = App.cache.GetName(this.peer_id);
+                this.nameBlock.Text = App.Cache.GetName(this.PeerId);
                 Grid.SetRow(this.nameBlock, 0);
                 Grid.SetRow(this.textBlock, 1);
                 this.textGrid.Children.Add(this.nameBlock);
@@ -562,16 +586,16 @@ namespace Alika.UI
                 };
                 export.Click += (a, b) =>
                 {
-                    if ((App.main_page.chats_grid.Content as ChatsHolder).MsgExport.Visibility == Visibility.Collapsed)
+                    if ((App.MainPage.Chats.Content as ChatsHolder).MsgExport.Visibility == Visibility.Collapsed)
                     {
                         var popup = new Popup
                         {
                             Title = Utils.LocString("Dialog/Export")
                         };
-                        var exportPopup = new ExportPopup(this.peer_id);
+                        var exportPopup = new ExportPopup(this.PeerId);
                         exportPopup.Confirm.Click += (c, d) => popup.Hide();
                         popup.Content = exportPopup;
-                        App.main_page.popup.Children.Add(popup);
+                        App.MainPage.Popup.Children.Add(popup);
                     }
                 };
                 this.Flyout.Items.Add(export);
@@ -580,7 +604,7 @@ namespace Alika.UI
 
             private void OnNewMessage(Message msg)
             {
-                if (msg.peer_id == this.peer_id)
+                if (msg.PeerId == this.PeerId)
                 {
                     App.UILoop.AddAction(new UITask
                     {
@@ -592,7 +616,7 @@ namespace Alika.UI
 
             public void LoadAvatar()
             {
-                this.image = new Avatar(this.peer_id)
+                this.image = new Avatar(this.PeerId)
                 {
                     Height = 50,
                     Width = 50,
@@ -608,12 +632,12 @@ namespace Alika.UI
             public void UpdateMsg(Message msg)
             {
                 this.message = msg;
-                string text = this.FormatName(msg.from_id) + ": ";
+                string text = this.FormatName(msg.FromId) + ": ";
                 this.textBlock.Text = text + this.message.ToCompactText();
 
-                var date = msg.date.ToDateTime();
+                var date = msg.Date.ToDateTime();
                 var now = DateTime.Now;
-                string d = "";
+                string d;
                 if (date.Date == now.Date)
                 {
                     d = date.ToString("HH:mm");
@@ -628,19 +652,19 @@ namespace Alika.UI
                 }
                 this.Date.Text = d;
 
-                if (msg.from_id == App.vk.user_id)
+                if (msg.FromId == App.VK.UserId)
                 {
                     this.ReadState.Visibility = Visibility.Visible;
-                    this.ReadState.Source = new SvgImageSource(new Uri(Utils.AssetTheme(msg.read_state == 1 ? "double_check.svg" : "check.svg")));
+                    this.ReadState.Source = new SvgImageSource(new Uri(Utils.AssetTheme(msg.ReadState == 1 ? "double_check.svg" : "check.svg")));
                 }
                 else this.ReadState.Visibility = Visibility.Collapsed;
             }
 
             private string FormatName(int id)
             {
-                if (id == App.vk.user_id) return Utils.LocString("Dialog/You");
-                var name = App.cache.GetName(id);
-                if (name.Count(c => c == ' ') != 1 || this.peer_id > Libs.VK.Limits.Messages.PEERSTART) return name;
+                if (id == App.VK.UserId) return Utils.LocString("Dialog/You");
+                var name = App.Cache.GetName(id);
+                if (name.Count(c => c == ' ') != 1 || this.PeerId > Libs.VK.Limits.Messages.PEERSTART) return name;
                 return name.Split(" ")[0];
             }
         }
@@ -661,7 +685,7 @@ namespace Alika.UI
             {
                 if (this.SelectedItem is ChatsList.ChatItem i)
                 {
-                    if (i.peer_id != App.main_page.peer_id) App.main_page.peer_id = i.peer_id;
+                    if (i.PeerId != App.MainPage.PeerId) App.MainPage.PeerId = i.PeerId;
                 }
             };
 
@@ -669,13 +693,13 @@ namespace Alika.UI
             {
                 Task.Factory.StartNew(() =>
                 {
-                    var convs = App.vk.Messages.GetConversationsById(pinned);
-                    var messages = App.vk.Messages.GetById(convs.conversations.Select(c => c.last_message_id).ToList()).messages;
-                    foreach (var conv in convs.conversations)
+                    var convs = App.VK.Messages.GetConversationsById(pinned);
+                    var messages = App.VK.Messages.GetById(convs.Items.Select(c => c.LastMessageId).ToList()).Items;
+                    foreach (var conv in convs.Items)
                     {
                         App.UILoop.RunAction(new UITask
                         {
-                            Action = () => this.Items.Add(new ChatsList.ChatItem(conv.peer.id, messages.Find(i => i.id == conv.last_message_id), true)),
+                            Action = () => this.Items.Add(new ChatsList.ChatItem(conv.Peer.Id, messages.Find(i => i.Id == conv.LastMessageId), true)),
                             Priority = CoreDispatcherPriority.High
                         });
                     }

@@ -1,4 +1,5 @@
 ﻿using Alika.Libs;
+using Alika.Libs.VK;
 using Alika.UI;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -97,16 +98,16 @@ namespace Alika
         private void OpenSettings(object sender, RoutedEventArgs e) => new Settings();
         private async void Login(string number, string password, string captcha_sid = null, string captcha_key = null, string code = null)
         {
-            var http = new RestClient(App.settings.vk.login.domain);
-            if (App.settings.proxy != null) http.Proxy = App.settings.proxy.ToWebProxy();
+            var http = new RestClient(App.Settings.vk.login.domain);
+            if (App.Settings.proxy != null) http.Proxy = App.Settings.proxy.ToWebProxy();
             var request = new RestRequest();
             request.AddParameter("password", password);
             request.AddParameter("grant_type", "password");
-            request.AddParameter("client_id", App.settings.vk.login.client_id);
-            request.AddParameter("client_secret", App.settings.vk.login.client_secret);
+            request.AddParameter("client_id", App.Settings.vk.login.client_id);
+            request.AddParameter("client_secret", App.Settings.vk.login.client_secret);
             request.AddParameter("username", number);
-            request.AddParameter("scope", String.Join(",", App.settings.vk.login.scope));
-            request.AddParameter("v", App.settings.vk.api);
+            request.AddParameter("scope", String.Join(",", App.Settings.vk.login.scope));
+            request.AddParameter("v", VK.API_VER);
             request.AddParameter("2fa_supported", 1);
             if (captcha_sid != null)
             {

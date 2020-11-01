@@ -169,6 +169,9 @@
     <value>Group</value>
     <comment>Group title in top menu</comment>
   </data>
+  <data name="ImportantMessages" xml:space="preserve">
+    <value>Important messages</value>
+  </data>
   <data name="InvitedTime" xml:space="preserve">
     <value>Joined: %time%</value>
   </data>
@@ -235,6 +238,9 @@
     <value>Promote user</value>
     <comment>Promote user</comment>
   </data>
+  <data name="RecentStickers" xml:space="preserve">
+    <value>Recent</value>
+  </data>
   <data name="RemovePhoto" xml:space="preserve">
     <value>Remove  photo</value>
     <comment>Remove chat photo</comment>
@@ -246,6 +252,9 @@
   <data name="Save" xml:space="preserve">
     <value>Save</value>
     <comment>Save button text</comment>
+  </data>
+  <data name="SelectChat" xml:space="preserve">
+    <value>Select chat...</value>
   </data>
   <data name="Send" xml:space="preserve">
     <value>Send</value>

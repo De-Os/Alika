@@ -3,54 +3,56 @@ using System.Collections.Generic;
 
 namespace Alika.Libs.VK.Responses
 {
-    public class GetStickersResponse
+    public class StickerPackInfo
     {
-        [JsonProperty("count")]
-        public int count { get; set; }
-        [JsonProperty("items")]
-        public List<StickerPackInfo> items { get; set; }
+        [JsonProperty("product")]
+        public ProductInfo Product;
+        [JsonProperty("description")]
+        public string Description;
+        [JsonProperty("author")]
+        public string Author;
+        [JsonProperty("can_purchase")]
+        public int CanPurchase;
+        [JsonProperty("payment_type")]
+        public string PaymentType;
+        [JsonProperty("price")]
+        public int Price;
+        [JsonProperty("price_buy")]
+        public int PriceBuy;
+        [JsonProperty("new")]
+        public int IsNew;
+        [JsonProperty("background")]
+        public string Background;
 
-        public class StickerPackInfo
+        public class ProductInfo
         {
-            [JsonProperty("product")]
-            public Product product { get; set; }
-            [JsonProperty("description")]
-            public string description { get; set; }
-            [JsonProperty("author")]
-            public string author { get; set; }
-            [JsonProperty("can_purchase")]
-            public int can_purchase { get; set; }
-            [JsonProperty("payment_type")]
-            public string payment_type { get; set; }
-            [JsonProperty("price")]
-            public int price { get; set; }
-            [JsonProperty("price_buy")]
-            public int price_buy { get; set; }
-            [JsonProperty("new")]
-            public int is_new { get; set; }
-            [JsonProperty("background")]
-            public string background { get; set; }
+            [JsonProperty("id")]
+            public int Id;
+            [JsonProperty("base_id")]
+            public int BaseId;
+            [JsonProperty("type")]
+            public string Type;
+            [JsonProperty("purchased")]
+            public int Purchased;
+            [JsonProperty("active")]
+            public int Active;
+            [JsonProperty("style_ids")]
+            public List<int> StyleIds;
+            [JsonProperty("title")]
+            public string Title;
+            [JsonProperty("icon")]
+            public IconsInfo Icons;
+            [JsonProperty("previews")]
+            public List<Attachment.PhotoAtt.Size> Previes;
+            [JsonProperty("url")]
+            public string Url { get; set; }
+            [JsonProperty("stickers")]
+            public List<Attachment.StickerAtt> Stickers;
 
-            public class Product
+            public struct IconsInfo
             {
-                [JsonProperty("id")]
-                public int id { get; set; }
-                [JsonProperty("type")]
-                public string type { get; set; }
-                [JsonProperty("purchased")]
-                public int purchased { get; set; }
-                [JsonProperty("active")]
-                public int active { get; set; }
-                [JsonProperty("title")]
-                public string title { get; set; }
-                [JsonProperty("icon")]
-                public List<Attachment.Photo.Size> icons { get; set; }
-                [JsonProperty("previews")]
-                public List<Attachment.Photo.Size> previews { get; set; }
-                [JsonProperty("url")]
-                public string url { get; set; }
-                [JsonProperty("stickers")]
-                public List<Attachment.Sticker> stickers { get; set; }
+                [JsonProperty("base_url")]
+                public string BaseUrl;
             }
         }
     }
@@ -58,18 +60,18 @@ namespace Alika.Libs.VK.Responses
     public class GetStickersKeywordsResponse
     {
         [JsonProperty("count")]
-        public int count { get; set; }
+        public int Count;
         [JsonProperty("dictionary")]
-        public List<Dictionary> dictionary { get; set; }
+        public List<DictionaryInfo> Dictionary;
 
-        public class Dictionary
+        public class DictionaryInfo
         {
             [JsonProperty("words")]
-            public List<string> words { get; set; }
+            public List<string> Words;
             [JsonProperty("user_stickers")]
-            public List<Attachment.Sticker> user_stickers { get; set; }
+            public List<Attachment.StickerAtt> UserStickers;
             [JsonProperty("promoted_stickers")]
-            public List<Attachment.Sticker> promoted_stickers { get; set; }
+            public List<Attachment.StickerAtt> promoted_stickers;
         }
     }
 }

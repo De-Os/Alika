@@ -19,63 +19,63 @@ namespace Alika.UI
     [Windows.UI.Xaml.Data.Bindable]
     public class ChatInformation : StackPanel
     {
-        public int peer_id;
-        public GetConversationsResponse.ConversationResponse.ConversationInfo conversation;
+        public int PeerId;
+        public ConversationInfo Conversation;
 
-        public AvatarAndName avatarAndName;
+        public AvatarAndName AvaAndName;
 
-        public Popup popup = new Popup
+        public Popup Popup = new Popup
         {
             Title = Utils.LocString("Dialog/Conversationinfo")
         };
 
         public ChatInformation(int peer_id)
         {
-            this.peer_id = peer_id;
+            this.PeerId = peer_id;
 
-            if (peer_id == App.vk.user_id) return;
+            if (peer_id == App.VK.UserId) return;
 
             this.Load();
         }
 
         public void Load()
         {
-            this.conversation = App.cache.GetConversation(this.peer_id);
+            this.Conversation = App.Cache.GetConversation(this.PeerId);
 
             this.HorizontalAlignment = HorizontalAlignment.Stretch;
             this.Width = 500;
 
             this.AddSeparator();
-            this.avatarAndName = new AvatarAndName(this.conversation);
-            this.Children.Add(this.avatarAndName);
+            this.AvaAndName = new AvatarAndName(this.Conversation);
+            this.Children.Add(this.AvaAndName);
             this.AddSeparator();
-            this.Children.Add(new AttachmentsList(this.peer_id));
+            this.Children.Add(new AttachmentsList(this.PeerId));
             this.AddSeparator();
 
-            if (this.peer_id > Limits.Messages.PEERSTART)
+            if (this.PeerId > Limits.Messages.PEERSTART)
             {
-                var convMenu = new ConversationItems(this.conversation);
+                var convMenu = new ConversationItems(this.Conversation);
                 convMenu.AvatarUpdated += (av) =>
                 {
                     if (av == null)
                     {
-                        this.avatarAndName.Avatar.ProfilePicture = null;
+                        this.AvaAndName.Avatar.ProfilePicture = null;
                     }
-                    else this.avatarAndName.LoadImage(av);
-                    this.conversation.settings.photos.photo_200 = av;
-                    Task.Factory.StartNew(() => App.cache.Update(this.peer_id));
+                    else this.AvaAndName.LoadImage(av);
+                    this.Conversation.Settings.Photos.Photo200 = av;
+                    Task.Factory.StartNew(() => App.Cache.Update(this.PeerId));
                 };
                 convMenu.TitleUpdated += (name) =>
                 {
-                    this.avatarAndName.Title.Text = name;
-                    this.conversation.settings.title = name;
-                    (App.main_page.dialog.Children[0] as Dialog.Dialog).top_menu.name.Text = name;
-                    Task.Factory.StartNew(() => App.cache.Update(this.peer_id));
+                    this.AvaAndName.Title.Text = name;
+                    this.Conversation.Settings.Title = name;
+                    (App.MainPage.Dialog.Children[0] as Dialog.Dialog).TopMenu.name.Text = name;
+                    Task.Factory.StartNew(() => App.Cache.Update(this.PeerId));
                 };
                 this.Children.Add(convMenu);
             }
 
-            this.popup.Content = new ScrollViewer
+            this.Popup.Content = new ScrollViewer
             {
                 HorizontalScrollMode = ScrollMode.Disabled,
                 VerticalScrollMode = ScrollMode.Auto,
@@ -85,7 +85,7 @@ namespace Alika.UI
 
             App.UILoop.AddAction(new UITask
             {
-                Action = () => { App.main_page.popup.Children.Add(this.popup); }
+                Action = () => { App.MainPage.Popup.Children.Add(this.Popup); }
             });
 
         }
@@ -111,8 +111,8 @@ namespace Alika.UI
                 FontWeight = FontWeights.SemiBold,
                 FontSize = 20
             };
-            public GetConversationsResponse.ConversationResponse.ConversationInfo conv;
-            public AvatarAndName(GetConversationsResponse.ConversationResponse.ConversationInfo conversation)
+            public ConversationInfo conv;
+            public AvatarAndName(ConversationInfo conversation)
             {
                 this.conv = conversation;
                 this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
@@ -131,20 +131,16 @@ namespace Alika.UI
                 {
                     TextTrimming = TextTrimming.CharacterEllipsis,
                 };
-                if (this.conv.peer.id > 0)
+                if (this.conv.Peer.Id > 0)
                 {
-                    if (this.conv.peer.id > Limits.Messages.PEERSTART)
+                    if (this.conv.Peer.Id > Limits.Messages.PEERSTART)
                     {
-                        (subtext as TextBlock).Text = this.conv.settings.members_count.ToString() + " members";
+                        (subtext as TextBlock).Text = Utils.LocString("Dialog/MembersCount").Replace("%count%", this.conv.Settings.MembersCount.ToString());
                     }
                     else
                     {
-                        subtext = new OnlineText(this.conv.peer.id);
+                        subtext = new OnlineText(this.conv.Peer.Id);
                     }
-                }
-                if (this.conv.peer.id > Limits.Messages.PEERSTART)
-                {
-                    (subtext as TextBlock).Text = Utils.LocString("Dialog/MembersCount").Replace("%count%", this.conv.settings.members_count.ToString());
                 }
                 subtext.VerticalAlignment = VerticalAlignment.Top;
                 Grid.SetRow(subtext, 1);
@@ -154,12 +150,12 @@ namespace Alika.UI
                 this.Children.Add(text);
 
                 this.LoadTitle();
-                this.LoadImage(App.cache.GetAvatar(this.conv.peer.id));
+                this.LoadImage(App.Cache.GetAvatar(this.conv.Peer.Id));
             }
 
             public void LoadTitle()
             {
-                this.Title.Text = App.cache.GetName(this.conv.peer.id);
+                this.Title.Text = App.Cache.GetName(this.conv.Peer.Id);
             }
 
             public async void LoadImage(string uri)
@@ -219,7 +215,7 @@ namespace Alika.UI
                     set
                     {
                         this.loadingPopup.Hide();
-                        if (value) App.main_page.popup.Children.Add(this.loadingPopup);
+                        if (value) App.MainPage.Popup.Children.Add(this.loadingPopup);
                         this._loading = value;
                     }
                 }
@@ -242,7 +238,7 @@ namespace Alika.UI
 
                     this.popup.Content = scroll;
 
-                    App.main_page.popup.Children.Add(this.popup);
+                    App.MainPage.Popup.Children.Add(this.popup);
 
                     this.Load();
                 }
@@ -256,21 +252,21 @@ namespace Alika.UI
                     else return;
                     Task.Factory.StartNew(() =>
                     {
-                        var response = App.vk.Messages.GetHistoryAttachments(peer_id: this.peer_id, type: this.type, start_from: this.offset, count: 50);
+                        var response = App.VK.Messages.GetHistoryAttachments(peer_id: this.peer_id, type: this.type, start_from: this.offset, count: 50);
                         App.UILoop.AddAction(new UITask
                         {
                             Action = async () =>
                            {
-                               if (response.items.Count > 0)
+                               if (response.Items.Count > 0)
                                {
-                                   this.offset = response.next_from;
+                                   this.offset = response.NextFrom;
 
                                    StackPanel final = new StackPanel();
 
                                    if (this.type == "photo")
                                    {
                                        StackPanel stack = new StackPanel { Orientation = Orientation.Horizontal };
-                                       foreach (var att in response.items)
+                                       foreach (var att in response.Items)
                                        {
                                            if (stack.Children.Count == 4)
                                            {
@@ -282,9 +278,9 @@ namespace Alika.UI
                                                Stretch = Windows.UI.Xaml.Media.Stretch.UniformToFill,
                                                Width = 100,
                                                Height = 100,
-                                               Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(att.attachment.photo.GetBestQuality().url))
+                                               Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(att.Attachment.Photo.GetBestQuality().Url))
                                            };
-                                           img.PointerPressed += (a, b) => new MediaViewer(att.attachment);
+                                           img.PointerPressed += (a, b) => new MediaViewer(att.Attachment);
                                            stack.Children.Add(new Border
                                            {
                                                Child = img,
@@ -295,12 +291,12 @@ namespace Alika.UI
                                    }
                                    else
                                    {
-                                       foreach (var att in response.items)
+                                       foreach (var att in response.Items)
                                        {
                                            switch (this.type)
                                            {
                                                case "doc":
-                                                   if (att.attachment.document != null) final.Children.Add(new MessageAttachment.Document(att.attachment.document)
+                                                   if (att.Attachment.Document != null) final.Children.Add(new MessageAttachment.Document(att.Attachment.Document)
                                                    {
                                                        HorizontalAlignment = HorizontalAlignment.Stretch,
                                                        HorizontalContentAlignment = HorizontalAlignment.Left,
@@ -308,7 +304,7 @@ namespace Alika.UI
                                                    });
                                                    break;
                                                case "audio_message":
-                                                   final.Children.Add(new MessageAttachment.AudioMessage(att.attachment.audio_message)
+                                                   final.Children.Add(new MessageAttachment.AudioMessage(att.Attachment.AudioMessage)
                                                    {
                                                        HorizontalAlignment = HorizontalAlignment.Stretch,
                                                        Margin = new Thickness(5)
@@ -336,17 +332,17 @@ namespace Alika.UI
             public event Event AvatarUpdated;
             public event Event TitleUpdated;
 
-            private Popup PermsPopup;
-            private Popup MembersPopup;
-            private Popup SettingsPopup;
+            private readonly Popup PermsPopup;
+            private readonly Popup MembersPopup;
+            private readonly Popup SettingsPopup;
 
-            public ConversationItems(GetConversationsResponse.ConversationResponse.ConversationInfo peer)
+            public ConversationItems(ConversationInfo peer)
             {
                 var content = new Popup.Menu("Dialog/Management");
                 this.Content = content;
                 this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
 
-                if (peer.settings.access.can_change_info)
+                if (peer.Settings.Access.CanChangeInfo)
                 {
                     var settings = new Settings(peer);
                     settings.AvatarUpdated += (s) => this.AvatarUpdated?.Invoke(s);
@@ -359,32 +355,32 @@ namespace Alika.UI
                     content.Children.Add(new Popup.Menu.Element(
                             "Settings",
                             "edit.svg",
-                            (a, b) => App.main_page.popup.Children.Add(this.SettingsPopup)
+                            (a, b) => App.MainPage.Popup.Children.Add(this.SettingsPopup)
                         ));
                 }
-                if (peer.settings?.permissions != null && peer.settings?.owner_id == App.vk.user_id)
+                if (peer.Settings?.Permissions != null && peer.Settings?.OwnerId == App.VK.UserId)
                 {
                     this.PermsPopup = new Popup
                     {
-                        Content = new Permissions(peer.settings.permissions, peer.peer.id),
+                        Content = new Permissions(peer.Settings.Permissions, peer.Peer.Id),
                         Title = Utils.LocString("Dialog/Permissions")
                     };
                     content.Children.Add(new Popup.Menu.Element(
                             "Dialog/Permissions",
                             "settings.svg",
-                            (a, b) => App.main_page.popup.Children.Add(this.PermsPopup)
+                            (a, b) => App.MainPage.Popup.Children.Add(this.PermsPopup)
                         ));
                 }
 
                 this.MembersPopup = new Popup
                 {
-                    Content = new Members(peer.peer.id),
+                    Content = new Members(peer.Peer.Id),
                     Title = Utils.LocString("Dialog/Members")
                 };
                 content.Children.Add(new Popup.Menu.Element(
                         "Dialog/Members",
                         "person.svg",
-                        (a, b) => App.main_page.popup.Children.Add(this.MembersPopup)
+                        (a, b) => App.MainPage.Popup.Children.Add(this.MembersPopup)
                     ));
             }
 
@@ -424,27 +420,27 @@ namespace Alika.UI
                         IsAllDisabled = true
                     } }
                 };
-                private static Dictionary<string, string> StateNamings = new Dictionary<string, string> {
+                private static readonly Dictionary<string, string> StateNamings = new Dictionary<string, string> {
                     {"all", Utils.LocString("Dialog/PermissionsTypeAll")},
                     {"owner_and_admins", Utils.LocString("Dialog/PermissionsTypeOwnerAndAdmins")},
                     {"owner", Utils.LocString("Dialog/PermissionsTypeOwner")}
                 };
 
-                public GetConversationsResponse.ConversationResponse.ConversationInfo.PeerSettings.Permissions permissions;
+                public ConversationInfo.PeerSettings.PeerPermissions Perms;
                 public int peer_id;
 
-                public Permissions(GetConversationsResponse.ConversationResponse.ConversationInfo.PeerSettings.Permissions permissions, int peer_id)
+                public Permissions(ConversationInfo.PeerSettings.PeerPermissions permissions, int peer_id)
                 {
                     this.peer_id = peer_id;
-                    this.permissions = permissions;
+                    this.Perms = permissions;
 
-                    this.Children.Add(new Element("invite", permissions.invite));
-                    this.Children.Add(new Element("change_info", permissions.change_info));
-                    this.Children.Add(new Element("change_pin", permissions.change_pin));
-                    this.Children.Add(new Element("use_mass_mentions", permissions.use_mass_mentions));
-                    this.Children.Add(new Element("see_invite_link", permissions.see_invite_link));
-                    this.Children.Add(new Element("call", permissions.call));
-                    this.Children.Add(new Element("change_admins", permissions.change_admins));
+                    this.Children.Add(new Element("invite", permissions.Invite));
+                    this.Children.Add(new Element("change_info", permissions.ChangeInfo));
+                    this.Children.Add(new Element("change_pin", permissions.ChangePin));
+                    this.Children.Add(new Element("use_mass_mentions", permissions.UseMassMentions));
+                    this.Children.Add(new Element("see_invite_link", permissions.SeeInviteLink));
+                    this.Children.Add(new Element("call", permissions.Call));
+                    this.Children.Add(new Element("change_admins", permissions.ChangeAdmins));
                 }
 
                 [Windows.UI.Xaml.Data.Bindable]
@@ -568,8 +564,8 @@ namespace Alika.UI
                                         {
                                             try
                                             {
-                                                App.vk.Call<int>("messages.editChat", new Dictionary<string, dynamic> {
-                                                    {"chat_id", App.main_page.peer_id - Limits.Messages.PEERSTART },
+                                                App.VK.Call<int>("messages.editChat", new Dictionary<string, dynamic> {
+                                                    {"chat_id", App.MainPage.PeerId - Limits.Messages.PEERSTART },
                                                     {"permissions", "{\"" + type + "\": \"" + e.Key + "\"}"  }
                                                 });
                                                 for (int x = 0; x < stack.Children.Count; x++) if (stack.Children[x] is Button bn && bn != btn) bn.Background = Coloring.Transparent.Full;
@@ -603,10 +599,10 @@ namespace Alika.UI
             [Windows.UI.Xaml.Data.Bindable]
             public class Members : Grid
             {
-                private int peer_id;
+                private readonly int PeerId;
                 public Members(int peer_id)
                 {
-                    this.peer_id = peer_id;
+                    this.PeerId = peer_id;
                     this.Children.Add(new ProgressRing
                     {
                         Height = 50,
@@ -624,7 +620,7 @@ namespace Alika.UI
                 {
                     Task.Factory.StartNew(() =>
                     {
-                        var users = App.vk.Messages.GetConversationMembers(this.peer_id, "photo_200,online_info");
+                        var users = App.VK.Messages.GetConversationMembers(this.PeerId, "photo_200,online_info");
                         App.UILoop.AddAction(new UITask
                         {
                             Action = () =>
@@ -637,9 +633,9 @@ namespace Alika.UI
                                     Margin = new Thickness(5)
                                 };
                                 menu.Children.Add(search);
-                                foreach (var m in users.members)
+                                foreach (var m in users.Items)
                                 {
-                                    var member = new Member(m, this.peer_id);
+                                    var member = new Member(m, this.PeerId);
                                     search.TextChanged += (a, b) => member.Visibility = Regex.IsMatch(member.name.Text, (a as TextBox).Text, RegexOptions.IgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
                                     menu.Children.Add(member);
                                 };
@@ -682,12 +678,12 @@ namespace Alika.UI
                         FontSize = 15,
                         FontWeight = FontWeights.SemiBold
                     };
-                    public GetConversationMembersResponse.Member member;
+                    public ConversationMember User;
                     public int peer_id;
 
-                    public Member(GetConversationMembersResponse.Member member, int peer_id)
+                    public Member(ConversationMember member, int peer_id)
                     {
-                        this.member = member;
+                        this.User = member;
                         this.peer_id = peer_id;
 
                         this.HorizontalAlignment = HorizontalAlignment.Stretch;
@@ -698,7 +694,7 @@ namespace Alika.UI
                         this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                         this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
 
-                        var avatar = new Misc.Avatar(member.member_id)
+                        var avatar = new Misc.Avatar(member.MemberId)
                         {
                             Width = 50,
                             Height = 50,
@@ -723,7 +719,7 @@ namespace Alika.UI
                             CornerRadius = new CornerRadius(10),
                             HorizontalAlignment = HorizontalAlignment.Right,
                             VerticalAlignment = VerticalAlignment.Center,
-                            Flyout = new Information(member),
+                            Flyout = new Information(this.User),
                             Margin = new Thickness(0, 0, 10, 0)
                         };
                         Grid.SetColumn(info, 2);
@@ -736,7 +732,7 @@ namespace Alika.UI
 
                     public void GenerateActions()
                     {
-                        Actions flyout = new Actions(this.member, this.peer_id);
+                        Actions flyout = new Actions(this.User, this.peer_id);
                         if (flyout.stack.Children.Count == 0)
                         {
                             this.actions.Flyout = null;
@@ -746,7 +742,7 @@ namespace Alika.UI
                         {
                             flyout.InfoChanged += (a) =>
                             {
-                                this.member = a;
+                                this.User = a;
                                 this.GenerateActions();
                                 this.GenerateName();
                             };
@@ -758,42 +754,40 @@ namespace Alika.UI
 
                     public void GenerateName()
                     {
-                        this.name.Text = App.cache.GetName(this.member.member_id);
-                        if (member.is_admin) this.name.Text += " ⭐";
+                        this.name.Text = App.Cache.GetName(this.User.MemberId);
+                        if (this.User.IsAdmin) this.name.Text += " ⭐";
                     }
 
                     [Windows.UI.Xaml.Data.Bindable]
                     public class Actions : Flyout
                     {
-                        public delegate void Event(GetConversationMembersResponse.Member member);
+                        public delegate void Event(ConversationMember member);
                         public event Event Remove;
                         public event Event InfoChanged;
 
-                        public Grid content = new Grid();
-
-                        public GetConversationMembersResponse.Member member;
-                        public int peer_id;
+                        public ConversationMember Member;
+                        public int PeerId;
 
                         public StackPanel stack = new StackPanel { HorizontalAlignment = HorizontalAlignment.Stretch };
 
-                        public Actions(GetConversationMembersResponse.Member member, int peer_id)
+                        public Actions(ConversationMember member, int peer_id)
                         {
-                            this.member = member;
-                            this.peer_id = peer_id;
+                            this.Member = member;
+                            this.PeerId = peer_id;
 
-                            bool isOwner = App.cache.GetConversation(peer_id).settings.owner_id == App.vk.user_id;
+                            bool isOwner = App.Cache.GetConversation(peer_id).Settings.OwnerId == App.VK.UserId;
 
-                            if (isOwner && member.member_id != App.vk.user_id)
+                            if (isOwner && member.MemberId != App.VK.UserId)
                             {
-                                if (member.is_admin)
+                                if (member.IsAdmin)
                                 {
                                     Button demote = this.GetBtn("Dialog/Demote");
                                     demote.Click += async (a, b) =>
                                     {
                                         try
                                         {
-                                            App.vk.Messages.SetMemberRole(false, member.member_id, peer_id);
-                                            member.is_admin = false;
+                                            App.VK.Messages.SetMemberRole(false, member.MemberId, peer_id);
+                                            member.IsAdmin = false;
                                             this.InfoChanged?.Invoke(member);
                                             this.Hide();
                                         }
@@ -811,8 +805,8 @@ namespace Alika.UI
                                     {
                                         try
                                         {
-                                            App.vk.Messages.SetMemberRole(true, member.member_id, peer_id);
-                                            member.is_admin = true;
+                                            App.VK.Messages.SetMemberRole(true, member.MemberId, peer_id);
+                                            member.IsAdmin = true;
                                             this.InfoChanged?.Invoke(member);
                                             this.Hide();
                                         }
@@ -825,14 +819,14 @@ namespace Alika.UI
                                 }
                             }
 
-                            if (member.can_kick)
+                            if (member.CanKick)
                             {
                                 Button kick = this.GetBtn("Dialog/Kick");
                                 kick.Click += async (a, b) =>
                                 {
                                     try
                                     {
-                                        App.vk.Messages.RemoveChatUser(peer_id, member.member_id);
+                                        App.VK.Messages.RemoveChatUser(peer_id, member.MemberId);
                                         this.Remove?.Invoke(null);
                                         this.Hide();
                                     }
@@ -867,21 +861,21 @@ namespace Alika.UI
                     [Windows.UI.Xaml.Data.Bindable]
                     public class Information : Flyout
                     {
-                        public Information(GetConversationMembersResponse.Member member)
+                        public Information(ConversationMember member)
                         {
                             StackPanel stack = new StackPanel { HorizontalAlignment = HorizontalAlignment.Stretch };
 
                             stack.Children.Add(new TextBlock
                             {
-                                Text = Utils.LocString("Dialog/InvitedTime").Replace("%time%", member.join_date.ToDateTime().ToString(@"d.M.y H:mm:ss")),
+                                Text = Utils.LocString("Dialog/InvitedTime").Replace("%time%", member.JoinDate.ToDateTime().ToString(@"d.M.y H:mm:ss")),
                                 VerticalAlignment = VerticalAlignment.Center
                             });
 
-                            if (member.invited_by != member.member_id)
+                            if (member.InvitedBy != member.MemberId)
                             {
                                 stack.Children.Add(new TextBlock
                                 {
-                                    Text = Utils.LocString("Dialog/JoinedInfo").Replace("%user%", App.cache.GetName(member.invited_by)),
+                                    Text = Utils.LocString("Dialog/JoinedInfo").Replace("%user%", App.Cache.GetName(member.InvitedBy)),
                                     VerticalAlignment = VerticalAlignment.Center
                                 });
                             }
@@ -899,7 +893,7 @@ namespace Alika.UI
                 public event Event AvatarUpdated;
                 public event Event TitleUpdated;
 
-                public GetConversationsResponse.ConversationResponse.ConversationInfo peer;
+                public ConversationInfo Peer;
                 public PersonPicture Avatar = new PersonPicture
                 {
                     Height = 75,
@@ -928,10 +922,10 @@ namespace Alika.UI
                     }
                 };
 
-                public Settings(GetConversationsResponse.ConversationResponse.ConversationInfo peer)
+                public Settings(ConversationInfo peer)
                 {
-                    this.peer = peer;
-                    this.Title.Text = this.peer.settings.title;
+                    this.Peer = peer;
+                    this.Title.Text = this.Peer.Settings.Title;
                     this.Width = 450;
                     this.Children.Add(new ProgressRing
                     {
@@ -973,7 +967,7 @@ namespace Alika.UI
                         if (this.Avatar.ProfilePicture == null) return;
                         try
                         {
-                            App.vk.Messages.DeleteChatPhoto(this.peer.peer.id);
+                            App.VK.Messages.DeleteChatPhoto(this.Peer.Peer.Id);
                             App.UILoop.AddAction(new UITask
                             {
                                 Action = () =>
@@ -1003,13 +997,13 @@ namespace Alika.UI
                         {
                             try
                             {
-                                var response = await App.vk.Messages.SetChatPhoto(file, peer.peer.id);
+                                var response = await App.VK.Messages.SetChatPhoto(file, this.Peer.Peer.Id);
                                 App.UILoop.AddAction(new UITask
                                 {
                                     Action = async () =>
                                     {
-                                        this.Avatar.ProfilePicture = await ImageCache.Instance.GetFromCacheAsync(new Uri(response.chat.photo_200));
-                                        this.AvatarUpdated?.Invoke(response.chat.photo_200);
+                                        this.Avatar.ProfilePicture = await ImageCache.Instance.GetFromCacheAsync(new Uri(response.Chat.Photo200));
+                                        this.AvatarUpdated?.Invoke(response.Chat.Photo200);
                                     }
                                 });
                             }
@@ -1028,7 +1022,7 @@ namespace Alika.UI
                             b.Handled = true;
                             try
                             {
-                                App.vk.Messages.EditTitle(this.peer.peer.id, box.Text);
+                                App.VK.Messages.EditTitle(this.Peer.Peer.Id, box.Text);
                                 App.UILoop.AddAction(new UITask
                                 {
                                     Action = () => this.TitleUpdated(box.Text)
@@ -1054,7 +1048,7 @@ namespace Alika.UI
                     });
                 }
 
-                public async void LoadImage() => this.Avatar.ProfilePicture = await ImageCache.Instance.GetFromCacheAsync(new Uri(App.cache.GetAvatar(this.peer.peer.id)));
+                public async void LoadImage() => this.Avatar.ProfilePicture = await ImageCache.Instance.GetFromCacheAsync(new Uri(App.Cache.GetAvatar(this.Peer.Peer.Id)));
             }
         }
     }
