@@ -128,4 +128,16 @@ namespace Alika.Libs.VK.Responses
             public ConversationInfo.PeerSettings.PeerPhotos Photo;
         }
     }
+
+    public class GetImportantMessagesResponse
+    {
+        [JsonProperty("messages")]
+        public ItemsResponse<Message> Messages;
+        [JsonProperty("profiles")]
+        public List<User> Profiles;
+        [JsonProperty("groups")]
+        public List<Group> Groups;
+        [JsonProperty("conversations")]
+        public List<ConversationInfo> Conversations;
+    }
 }

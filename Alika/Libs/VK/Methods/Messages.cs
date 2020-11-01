@@ -359,6 +359,32 @@ namespace Alika.Libs.VK.Methods
             });
         }
 
+        /// <summary>
+        /// messages.getRecentStickers
+        /// </summary>
         public ItemsResponse<Attachment.StickerAtt> GetRecentStickers() => this._vk.Call<ItemsResponse<Attachment.StickerAtt>>("messages.getRecentStickers");
+
+        /// <summary>
+        /// messages.getImportantMessages
+        /// </summary>
+        public GetImportantMessagesResponse GetImportantMessages(int count = 20, int offset = 0, int start_message_id = 0, string fields = null)
+        {
+            var request = new Dictionary<string, dynamic> {
+                {"count", count}
+            };
+            if (offset != 0) request.Add("offset", 0);
+            if (start_message_id > 0) request.Add("start_message_id", start_message_id);
+            if (fields != null)
+            {
+                if (!fields.Contains("online_info")) fields += ",online_info";
+                request.Add("fields", fields);
+                request.Add("extended", 1);
+            }
+            var response = this._vk.Call<GetImportantMessagesResponse>("messages.getImportantMessages", request);
+            App.Cache.Update(response.Conversations);
+            App.Cache.Update(response.Groups);
+            App.Cache.Update(response.Profiles);
+            return response;
+        }
     }
 }

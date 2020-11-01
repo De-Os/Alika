@@ -138,7 +138,7 @@ namespace Alika.UI
                 {
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    Source = new SvgImageSource(new System.Uri(Utils.AssetTheme("fly_menu.svg"))),
+                    Source = new SvgImageSource(new Uri(Utils.AssetTheme("fly_menu.svg"))),
                     Width = 20,
                     Height = 20
                 },
@@ -184,6 +184,17 @@ namespace Alika.UI
             loadExport.Click += (a, b) => new DialogExportReader();
             loadExport.RightTapped += (a, b) => new DialogExportReader(Window.Current.CoreWindow.GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down));
             menu.Items.Add(loadExport);
+
+            var openImportant = new MenuFlyoutItem
+            {
+                Icon = new FontIcon
+                {
+                    Glyph = "\uE734"
+                },
+                Text = Utils.LocString("Dialog/ImportantMessages")
+            };
+            openImportant.Click += (a, b) => new ImportantMessages();
+            menu.Items.Add(openImportant);
 
             return menu;
         }

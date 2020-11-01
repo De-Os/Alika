@@ -332,9 +332,9 @@ namespace Alika.Misc
         }
 
         [Bindable]
-        private class ViewerWithSearch : Grid
+        public class ViewerWithSearch : Grid
         {
-            public ViewerWithSearch(List<Message> messages)
+            public ViewerWithSearch(List<Message> messages, bool loadAll = false)
             {
                 this.RowDefinitions.Add(new RowDefinition { Height = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Auto) });
                 this.RowDefinitions.Add(new RowDefinition { Height = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Star) });
@@ -398,6 +398,16 @@ namespace Alika.Misc
                     }
                 };
 
+                if (loadAll)
+                {
+                    var all = new List<Message>();
+                    all.AddRange(messages);
+                    holder.Content = new Viewer(all)
+                    {
+                        HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Stretch
+                    };
+                }
+
                 void Search()
                 {
                     var text = searchbar.Text;
@@ -416,11 +426,13 @@ namespace Alika.Misc
                             }
                             else result.AddRange(messages.Where(i => i.Date.ToDateTime().Date == date.Date));
                         }
+                        System.Diagnostics.Debug.WriteLine(result.Count);
 
                         App.UILoop.AddAction(new UITask
                         {
                             Action = () =>
                             {
+                                if (loadAll && result.Count == 0) result.AddRange(messages);
                                 holder.Content = new Viewer(result)
                                 {
                                     HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Stretch

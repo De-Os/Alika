@@ -165,6 +165,9 @@
   <data name="Group" xml:space="preserve">
     <value>Группа</value>
   </data>
+  <data name="ImportantMessages" xml:space="preserve">
+    <value>Важные сообщения</value>
+  </data>
   <data name="InvitedTime" xml:space="preserve">
     <value>Присоединился: %time%</value>
   </data>
