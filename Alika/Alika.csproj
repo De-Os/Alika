@@ -207,6 +207,7 @@
     <Content Include="Assets\UI\Dark\play.svg" />
     <Content Include="Assets\UI\Dark\send.svg" />
     <Content Include="Assets\UI\Dark\settings.svg" />
+    <Content Include="Assets\UI\Dark\share.svg" />
     <Content Include="Assets\UI\Dark\sticker.svg" />
     <Content Include="Assets\UI\Dark\user.svg" />
     <Content Include="Assets\UI\Dark\video.svg" />
@@ -238,6 +239,7 @@
     <Content Include="Assets\UI\Light\play.svg" />
     <Content Include="Assets\UI\Light\send.svg" />
     <Content Include="Assets\UI\Light\settings.svg" />
+    <Content Include="Assets\UI\Light\share.svg" />
     <Content Include="Assets\UI\Light\sticker.svg" />
     <Content Include="Assets\UI\Light\user.svg" />
     <Content Include="Assets\UI\Light\video.svg" />

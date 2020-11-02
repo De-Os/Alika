@@ -175,6 +175,9 @@
   <data name="InvitedTime" xml:space="preserve">
     <value>Joined: %time%</value>
   </data>
+  <data name="InviteLink" xml:space="preserve">
+    <value>Invite link</value>
+  </data>
   <data name="JoinedInfo" xml:space="preserve">
     <value>Invited by %user%</value>
   </data>

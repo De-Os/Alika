@@ -199,4 +199,10 @@ namespace Alika.Libs.VK.Responses
         [JsonProperty("is_default_photo")]
         public bool IsDeaultPhoto;
     }
+
+    public struct GetInviteLinkResponse
+    {
+        [JsonProperty("link")]
+        public string Link;
+    }
 }

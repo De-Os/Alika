@@ -171,6 +171,9 @@
   <data name="InvitedTime" xml:space="preserve">
     <value>Присоединился: %time%</value>
   </data>
+  <data name="InviteLink" xml:space="preserve">
+    <value>Ссылка-приглашение</value>
+  </data>
   <data name="JoinedInfo" xml:space="preserve">
     <value>Приглашён пользователем %user%</value>
   </data>

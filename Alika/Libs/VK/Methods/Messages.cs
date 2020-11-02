@@ -386,5 +386,13 @@ namespace Alika.Libs.VK.Methods
             App.Cache.Update(response.Profiles);
             return response;
         }
+
+        /// <summary>
+        /// messages.getInviteLink
+        /// </summary>
+        public string GetInviteLink(int peer_id, bool reset = false) => this._vk.Call<GetInviteLinkResponse>("messages.getInviteLink", new Dictionary<string, dynamic> {
+            {"peer_id", peer_id},
+            {"reset", reset ? 1 : 0}
+        }).Link;
     }
 }

@@ -1,12 +1,10 @@
 ﻿using Alika.Libs;
 using Alika.Libs.VK;
+using Alika.Misc;
 using Alika.UI.Items;
-using System;
-using Windows.UI.Core;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI.Dialog
 {
@@ -80,11 +78,10 @@ namespace Alika.UI.Dialog
         {
             Button button = new Button
             {
-                Content = new Image
+                Content = new FontIcon
                 {
-                    Source = new SvgImageSource(new Uri(Utils.AssetTheme("fly_menu.svg"))),
-                    Width = 20,
-                    Height = 20,
+                    Glyph = "\uE712",
+                    FontSize = 20
                 },
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Bottom,
@@ -96,29 +93,30 @@ namespace Alika.UI.Dialog
             this.Children.Add(button);
         }
 
-        public class FlyoutMenu : Flyout
+        public class FlyoutMenu : MenuFlyout
         {
-            public int peer_id;
-            public StackPanel content = new StackPanel();
-
             public FlyoutMenu(int peer_id)
             {
-                this.peer_id = peer_id;
-
-                this.Content = this.content;
-
-                this.content.PointerPressed += (a, b) =>
+                var info = new MenuFlyoutItem
                 {
-                    b.Handled = false;
-                    this.Hide();
+                    Icon = new FontIcon
+                    {
+                        Glyph = "\uE946"
+                    },
+                    Text = Utils.LocString("Dialog/TopMenuInformation")
                 };
+                info.Click += (a, b) => new ChatInformation(peer_id);
+                this.Items.Add(info);
 
-                Element info = new Element("Dialog/TopMenuInformation", "info.svg");
-                info.PointerPressed += (a, b) => new ChatInformation(App.MainPage.PeerId);
-                this.content.Children.Add(info);
-
-                Element attachs = new Element("Dialog/TopMenuAttachments", "album.svg");
-                attachs.PointerPressed += (a, b) =>
+                var attachs = new MenuFlyoutItem
+                {
+                    Icon = new FontIcon
+                    {
+                        Glyph = "\uED25"
+                    },
+                    Text = Utils.LocString("Dialog/TopMenuAttachments")
+                };
+                attachs.Click += (a, b) =>
                 {
                     App.MainPage.Popup.Children.Add(new Popup
                     {
@@ -126,7 +124,18 @@ namespace Alika.UI.Dialog
                         Title = Utils.LocString("Attachments/Attachments")
                     });
                 }; ;
-                this.content.Children.Add(attachs);
+                this.Items.Add(attachs);
+
+                var openImportant = new MenuFlyoutItem
+                {
+                    Icon = new FontIcon
+                    {
+                        Glyph = "\uE734"
+                    },
+                    Text = Utils.LocString("Dialog/ImportantMessages")
+                };
+                openImportant.Click += (a, b) => new ImportantMessages(peer_id);
+                this.Items.Add(openImportant);
 
                 /*if (this.peer_id > Limits.Messages.PEERSTART)
                 {
@@ -135,52 +144,6 @@ namespace Alika.UI.Dialog
                     this.content.RowDefinitions.Add(new RowDefinition());
                     this.content.Children.Add(leave);
                 }*/
-            }
-
-            public class Element : Grid
-            {
-                public Image Icon = new Image
-                {
-                    Width = 15,
-                    Height = 15,
-                    Margin = new Thickness(0, 0, 5, 0),
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                public TextBlock Text = new TextBlock
-                {
-                    VerticalAlignment = VerticalAlignment.Center,
-                    FontWeight = FontWeights.SemiBold
-                };
-                public Element(string title, string icon)
-                {
-                    this.HorizontalAlignment = HorizontalAlignment.Stretch;
-                    this.Padding = new Thickness(10);
-                    this.CornerRadius = new CornerRadius(5);
-
-                    this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
-                    this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-
-                    this.Icon.Source = new SvgImageSource(new Uri(Utils.AssetTheme(icon)));
-                    this.Text.Text = Utils.LocString(title);
-
-                    Grid.SetColumn(this.Icon, 0);
-                    Grid.SetColumn(this.Text, 1);
-
-                    this.Children.Add(this.Icon);
-                    this.Children.Add(this.Text);
-
-                    this.PointerEntered += (a, b) =>
-                    {
-                        Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Hand, 0);
-                        this.Background = Coloring.Transparent.Percent(100);
-                    };
-                    this.PointerExited += (a, b) =>
-                    {
-                        Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
-                        this.Background = Coloring.Transparent.Full;
-                    };
-                    this.PointerPressed += (a, b) => Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
-                }
             }
         }
     }

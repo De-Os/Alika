@@ -6,17 +6,20 @@ using Microsoft.Toolkit.Uwp.UI;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 using Windows.UI.Popups;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI
 {
-    [Windows.UI.Xaml.Data.Bindable]
+    [Bindable]
     public class ChatInformation : StackPanel
     {
         public int PeerId;
@@ -95,7 +98,7 @@ namespace Alika.UI
             this.Children.Add(new Grid { Height = height });
         }
 
-        [Windows.UI.Xaml.Data.Bindable]
+        [Bindable]
         public class AvatarAndName : Grid
         {
             public PersonPicture Avatar = new PersonPicture
@@ -164,7 +167,7 @@ namespace Alika.UI
             }
         }
 
-        [Windows.UI.Xaml.Data.Bindable]
+        [Bindable]
         public class AttachmentsList : ContentControl
         {
             public AttachmentsList(int peer_id, string title = "Attachments/Attachments")
@@ -335,6 +338,7 @@ namespace Alika.UI
             private readonly Popup PermsPopup;
             private readonly Popup MembersPopup;
             private readonly Popup SettingsPopup;
+            private readonly Popup LinkPopup;
 
             public ConversationItems(ConversationInfo peer)
             {
@@ -342,6 +346,19 @@ namespace Alika.UI
                 this.Content = content;
                 this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
 
+                if (peer.Settings.Access.CanSeeInviteLink)
+                {
+                    this.LinkPopup = new Popup
+                    {
+                        Content = new Link(peer),
+                        Title = Utils.LocString("Dialog/InviteLink")
+                    };
+                    content.Children.Add(new Popup.Menu.Element(
+                            "Dialog/InviteLink",
+                            "share.svg",
+                            (a, b) => App.MainPage.Popup.Children.Add(this.LinkPopup)
+                        ));
+                }
                 if (peer.Settings.Access.CanChangeInfo)
                 {
                     var settings = new Settings(peer);
@@ -384,7 +401,7 @@ namespace Alika.UI
                     ));
             }
 
-            [Windows.UI.Xaml.Data.Bindable]
+            [Bindable]
             public class Permissions : StackPanel
             {
                 public static Dictionary<string, Type> Types = new Dictionary<string, Type> {
@@ -443,7 +460,7 @@ namespace Alika.UI
                     this.Children.Add(new Element("change_admins", permissions.ChangeAdmins));
                 }
 
-                [Windows.UI.Xaml.Data.Bindable]
+                [Bindable]
                 public class Element : Grid
                 {
                     public Image Icon = new Image
@@ -487,7 +504,7 @@ namespace Alika.UI
                         this.Children.Add(button);
                     }
 
-                    [Windows.UI.Xaml.Data.Bindable]
+                    [Bindable]
                     public class ChangeButton : Button
                     {
                         private readonly Grid _content = new Grid();
@@ -530,32 +547,20 @@ namespace Alika.UI
                             fl.StateChanged += (s) => this.state.Text = StateNamings[s];
                         }
 
-                        [Windows.UI.Xaml.Data.Bindable]
-                        public class FlyOut : Flyout
+                        [Bindable]
+                        public class FlyOut : MenuFlyout
                         {
                             public delegate void Changed(string newtype);
                             public event Changed StateChanged;
 
                             public FlyOut(string type, string current_state)
                             {
-                                StackPanel stack = new StackPanel();
-                                this.Content = stack;
-
                                 foreach (KeyValuePair<string, string> e in StateNamings)
                                 {
                                     if (e.Key == Type.AllName && Types[type].IsAllDisabled) continue;
-                                    Button btn = new Button
+                                    var btn = new MenuFlyoutItem
                                     {
-                                        Content = new TextBlock
-                                        {
-                                            Text = e.Value,
-                                            TextTrimming = TextTrimming.CharacterEllipsis
-                                        },
-                                        Padding = new Thickness(7.5),
-                                        Margin = new Thickness(2.5),
-                                        CornerRadius = new CornerRadius(10),
-                                        HorizontalAlignment = HorizontalAlignment.Stretch,
-                                        HorizontalContentAlignment = HorizontalAlignment.Center,
+                                        Text = e.Value,
                                         Background = e.Key == current_state ? Coloring.Transparent.Percent(50) : Coloring.Transparent.Full
                                     };
                                     btn.Click += (a, b) =>
@@ -568,7 +573,7 @@ namespace Alika.UI
                                                     {"chat_id", App.MainPage.PeerId - Limits.Messages.PEERSTART },
                                                     {"permissions", "{\"" + type + "\": \"" + e.Key + "\"}"  }
                                                 });
-                                                for (int x = 0; x < stack.Children.Count; x++) if (stack.Children[x] is Button bn && bn != btn) bn.Background = Coloring.Transparent.Full;
+                                                foreach (var item in this.Items) if (item is MenuFlyoutItem bn && bn != btn) bn.Background = Coloring.Transparent.Full;
                                                 btn.Background = Coloring.Transparent.Percent(50);
                                                 this.StateChanged?.Invoke(e.Key);
                                             }
@@ -579,7 +584,7 @@ namespace Alika.UI
                                             this.Hide();
                                         }
                                     };
-                                    stack.Children.Add(btn);
+                                    this.Items.Add(btn);
                                 }
                             }
                         }
@@ -596,7 +601,7 @@ namespace Alika.UI
                 }
             }
 
-            [Windows.UI.Xaml.Data.Bindable]
+            [Bindable]
             public class Members : Grid
             {
                 private readonly int PeerId;
@@ -654,7 +659,7 @@ namespace Alika.UI
                     });
                 }
 
-                [Windows.UI.Xaml.Data.Bindable]
+                [Bindable]
                 public class Member : Grid
                 {
                     public Button actions = new Button
@@ -733,7 +738,7 @@ namespace Alika.UI
                     public void GenerateActions()
                     {
                         Actions flyout = new Actions(this.User, this.peer_id);
-                        if (flyout.stack.Children.Count == 0)
+                        if (flyout.Items.Count == 0)
                         {
                             this.actions.Flyout = null;
                             this.actions.Visibility = Visibility.Collapsed;
@@ -758,8 +763,8 @@ namespace Alika.UI
                         if (this.User.IsAdmin) this.name.Text += " ⭐";
                     }
 
-                    [Windows.UI.Xaml.Data.Bindable]
-                    public class Actions : Flyout
+                    [Bindable]
+                    public class Actions : MenuFlyout
                     {
                         public delegate void Event(ConversationMember member);
                         public event Event Remove;
@@ -767,8 +772,6 @@ namespace Alika.UI
 
                         public ConversationMember Member;
                         public int PeerId;
-
-                        public StackPanel stack = new StackPanel { HorizontalAlignment = HorizontalAlignment.Stretch };
 
                         public Actions(ConversationMember member, int peer_id)
                         {
@@ -781,7 +784,14 @@ namespace Alika.UI
                             {
                                 if (member.IsAdmin)
                                 {
-                                    Button demote = this.GetBtn("Dialog/Demote");
+                                    var demote = new MenuFlyoutItem
+                                    {
+                                        Text = Utils.LocString("Dialog/Demote"),
+                                        Icon = new FontIcon
+                                        {
+                                            Glyph = "\uE70D"
+                                        }
+                                    };
                                     demote.Click += async (a, b) =>
                                     {
                                         try
@@ -796,11 +806,18 @@ namespace Alika.UI
                                             await new MessageDialog(exc.Message, Utils.LocString("Error")).ShowAsync();
                                         }
                                     };
-                                    this.stack.Children.Add(demote);
+                                    this.Items.Add(demote);
                                 }
                                 else
                                 {
-                                    Button promote = this.GetBtn("Dialog/Promote");
+                                    var promote = new MenuFlyoutItem
+                                    {
+                                        Text = Utils.LocString("Dialog/Promote"),
+                                        Icon = new FontIcon
+                                        {
+                                            Glyph = "\uE70E"
+                                        }
+                                    };
                                     promote.Click += async (a, b) =>
                                     {
                                         try
@@ -815,13 +832,20 @@ namespace Alika.UI
                                             await new MessageDialog(exc.Message, Utils.LocString("Error")).ShowAsync();
                                         }
                                     };
-                                    this.stack.Children.Add(promote);
+                                    this.Items.Add(promote);
                                 }
                             }
 
                             if (member.CanKick)
                             {
-                                Button kick = this.GetBtn("Dialog/Kick");
+                                var kick = new MenuFlyoutItem
+                                {
+                                    Text = Utils.LocString("Dialog/Kick"),
+                                    Icon = new FontIcon
+                                    {
+                                        Glyph = "\uE711"
+                                    }
+                                };
                                 kick.Click += async (a, b) =>
                                 {
                                     try
@@ -835,30 +859,12 @@ namespace Alika.UI
                                         await new MessageDialog(exc.Message, Utils.LocString("Error")).ShowAsync();
                                     }
                                 };
-                                this.stack.Children.Add(kick);
+                                this.Items.Add(kick);
                             }
-
-                            this.Content = this.stack;
-                        }
-
-                        private Button GetBtn(string text)
-                        {
-                            return new Button
-                            {
-                                Background = Coloring.Transparent.Full,
-                                Content = new TextBlock
-                                {
-                                    Text = Utils.LocString(text)
-                                },
-                                HorizontalContentAlignment = HorizontalAlignment.Left,
-                                HorizontalAlignment = HorizontalAlignment.Stretch,
-                                CornerRadius = new CornerRadius(10),
-                                Margin = new Thickness(0, 5, 0, 5)
-                            };
                         }
                     }
 
-                    [Windows.UI.Xaml.Data.Bindable]
+                    [Bindable]
                     public class Information : Flyout
                     {
                         public Information(ConversationMember member)
@@ -886,7 +892,7 @@ namespace Alika.UI
                 }
             }
 
-            [Windows.UI.Xaml.Data.Bindable]
+            [Bindable]
             public class Settings : Grid
             {
                 public delegate void Event(string str);
@@ -1049,6 +1055,122 @@ namespace Alika.UI
                 }
 
                 public async void LoadImage() => this.Avatar.ProfilePicture = await ImageCache.Instance.GetFromCacheAsync(new Uri(App.Cache.GetAvatar(this.Peer.Peer.Id)));
+            }
+
+            [Bindable]
+            public class Link : Grid
+            {
+                public Link(ConversationInfo chat)
+                {
+                    this.Children.Add(new ProgressRing
+                    {
+                        Width = 50,
+                        Height = 50,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        Margin = new Thickness(10),
+                        IsActive = true
+                    });
+                    Task.Factory.StartNew(() =>
+                    {
+                        var link = App.VK.Messages.GetInviteLink(chat.Peer.Id);
+                        App.UILoop.AddAction(new UITask
+                        {
+                            Action = () =>
+                            {
+                                this.Children.Clear();
+
+                                this.RowDefinitions.Add(new RowDefinition { });
+                                this.RowDefinitions.Add(new RowDefinition { });
+
+                                var textbox = new TextBox
+                                {
+                                    IsReadOnly = true,
+                                    Text = link,
+                                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                                    Margin = new Thickness(5, 5, 5, 2.5)
+                                };
+                                Grid.SetRow(textbox, 0);
+                                this.Children.Add(textbox);
+
+                                var stack = new StackPanel
+                                {
+                                    Orientation = Orientation.Horizontal,
+                                    Margin = new Thickness(5, 2.5, 5, 5)
+                                };
+                                Grid.SetRow(stack, 1);
+                                this.Children.Add(stack);
+
+                                var copy = new Button
+                                {
+                                    Content = new TextBlock
+                                    {
+                                        Text = Utils.LocString("Copy")
+                                    },
+                                    Margin = new Thickness(0, 0, 2.5, 0)
+                                };
+                                stack.Children.Add(copy);
+                                copy.Click += (a, b) =>
+                                {
+                                    var pkg = new DataPackage();
+                                    pkg.SetText(textbox.Text);
+                                    Clipboard.SetContent(pkg);
+                                    var content = copy.Content as TextBlock;
+                                    content.Text = Utils.LocString("Copied") + "!";
+                                    Task.Factory.StartNew(() =>
+                                    {
+                                        Thread.Sleep(TimeSpan.FromSeconds(0.7));
+                                        App.UILoop.AddAction(new UITask
+                                        {
+                                            Action = () => content.Text = Utils.LocString("Copy")
+                                        });
+                                    });
+                                };
+                                if (chat.Settings.Access.CanChangeInviteLink)
+                                {
+                                    var reset = new Button
+                                    {
+                                        Content = new TextBlock
+                                        {
+                                            Text = Utils.LocString("Reset")
+                                        },
+                                        Margin = new Thickness(2.5, 0, 0, 0)
+                                    };
+                                    stack.Children.Add(reset);
+                                    reset.Click += (a, b) =>
+                                    {
+                                        reset.Content = new ProgressRing { IsActive = true };
+                                        Task.Factory.StartNew(() =>
+                                        {
+                                            try
+                                            {
+                                                var nlink = App.VK.Messages.GetInviteLink(chat.Peer.Id, true);
+                                                App.UILoop.AddAction(new UITask
+                                                {
+                                                    Action = () =>
+                                                    {
+                                                        reset.Content = new TextBlock
+                                                        {
+                                                            Text = Utils.LocString("Reset")
+                                                        };
+                                                        textbox.Text = nlink;
+                                                    }
+                                                });
+                                            }
+                                            catch
+                                            {
+                                                App.UILoop.AddAction(new UITask
+                                                {
+                                                    Action = () => reset.Visibility = Visibility.Collapsed
+                                                });
+                                            }
+                                        });
+                                    };
+                                }
+                            }
+                        });
+                    });
+                }
             }
         }
     }

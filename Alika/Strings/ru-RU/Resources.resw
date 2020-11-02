@@ -120,6 +120,12 @@
   <data name="Byte" xml:space="preserve">
     <value>Б</value>
   </data>
+  <data name="Copied" xml:space="preserve">
+    <value>Скопировано</value>
+  </data>
+  <data name="Copy" xml:space="preserve">
+    <value>Скопировать</value>
+  </data>
   <data name="Error" xml:space="preserve">
     <value>Ошибка!</value>
   </data>
@@ -132,6 +138,9 @@
   <data name="Megabyte" xml:space="preserve">
     <value>МБ</value>
   </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Сбросить</value>
+  </data>
   <data name="Save" xml:space="preserve">
     <value>Сохранить</value>
   </data>
@@ -140,5 +149,8 @@
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Настройки</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Обновить</value>
   </data>
 </root>
