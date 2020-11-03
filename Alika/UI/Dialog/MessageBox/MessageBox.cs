@@ -45,17 +45,21 @@ namespace Alika.UI
         {
             public TextBubble Bubble;
             public Avatar Ava;
+
             public TextBlock time = new TextBlock
             {
                 VerticalAlignment = VerticalAlignment.Bottom,
                 Margin = new Thickness(0, 0, 0, 10),
                 Foreground = Coloring.InvertedTransparent.Percent(50)
             };
+
             public StackPanel states = new StackPanel
             {
                 Orientation = Orientation.Horizontal
             };
+
             private bool _edited = false;
+
             private bool Edited
             {
                 set
@@ -75,6 +79,7 @@ namespace Alika.UI
                     this._edited = true;
                 }
             }
+
             private readonly List<Message> _editions = new List<Message>();
 
             public MessageGrid(Message msg, int peer_id, bool isStatic = false)
@@ -188,6 +193,7 @@ namespace Alika.UI
         public class TextBubble : StackPanel
         {
             public Message Message;
+
             public Border Border = new Border
             {
                 BorderThickness = new Thickness(1),
@@ -197,6 +203,7 @@ namespace Alika.UI
                 MinWidth = 50,
                 CornerRadius = new CornerRadius(10)
             };
+
             public TextBlock UserName = new TextBlock
             {
                 FontWeight = FontWeights.Bold,
@@ -398,6 +405,7 @@ namespace Alika.UI
                         this.Children.Add(this.Text);
                     }
                 }
+
                 private void LoadAttachments()
                 {
                     if (this.Message.Attachments?.Count > 0)
@@ -413,19 +421,24 @@ namespace Alika.UI
                                         Width = this.Width
                                     };
                                     break;
+
                                 case "sticker":
                                     attach = new MessageAttachment.Sticker(att.Sticker);
                                     break;
+
                                 case "doc":
                                     attach = new MessageAttachment.Document(att.Document);
                                     break;
+
                                 case "audio_message":
                                     attach = new MessageAttachment.AudioMessage(att.AudioMessage);
                                     break;
+
                                 case "graffiti":
                                     attach = new MessageAttachment.Graffiti(att.Graffiti);
                                     this.MaxWidth = 256;
                                     break;
+
                                 case "gift":
                                     attach = new MessageAttachment.Gift(att.Gift);
                                     break;
@@ -438,6 +451,7 @@ namespace Alika.UI
                         }
                     }
                 }
+
                 private struct ParsedText
                 {
                     public string Text;
@@ -485,6 +499,7 @@ namespace Alika.UI
                         }
                     }
                 }
+
                 /// <summary>
                 /// Forward message holder
                 /// </summary>
@@ -498,6 +513,7 @@ namespace Alika.UI
                         Background = Coloring.InvertedTransparent.Percent(100),
                         Width = 2.5
                     };
+
                     public MessageContent Message;
 
                     public ForwardGrid(Message msg)

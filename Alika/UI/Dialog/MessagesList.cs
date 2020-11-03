@@ -90,7 +90,6 @@ namespace Alika.UI.Dialog
         {
             if (this.Messages.Items.LastOrDefault(l => l != this.Messages.Items.LastOrDefault()) is UIElement msg)
             {
-
                 if (this.Parent is ScrollViewer scroll)
                 {
                     if (scroll.IsElementVisible(msg))
@@ -107,6 +106,7 @@ namespace Alika.UI.Dialog
             public int PeerId;
 
             public delegate void MessageAdded(bool isNew);
+
             public event MessageAdded OnNewMessage;
 
             public MessagesListView(int peer_id)
@@ -258,7 +258,6 @@ namespace Alika.UI.Dialog
             [Windows.UI.Xaml.Data.Bindable]
             public class SwipeMessage : SwipeControl
             {
-
                 public SwipeMessage(MessageBox message)
                 {
                     this.Content = message;

@@ -12,6 +12,7 @@ namespace Alika.UI.Dialog
     public class TopMenu : Grid
     {
         public int peer_id;
+
         public TextBlock name = new TextBlock
         {
             FontWeight = FontWeights.Bold,
@@ -74,6 +75,7 @@ namespace Alika.UI.Dialog
             text.Children.Add(about);
             this.Children.Add(text);
         }
+
         private void LoadMenu()
         {
             Button button = new Button

@@ -15,7 +15,6 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI
 {
-
     /// <summary>
     /// Main stickers selector
     /// </summary>
@@ -25,12 +24,14 @@ namespace Alika.UI
         public int peer_id { get; set; }
 
         public delegate void Event(Attachment.StickerAtt sticker);
+
         public Event StickerSent;
 
         public TextBox Search = new TextBox
         {
             PlaceholderText = Utils.LocString("Search")
         };
+
         public SemanticZoom Semantic = new SemanticZoom
         {
             Height = 500,
@@ -183,12 +184,14 @@ namespace Alika.UI
                 Width = 38,
                 Height = 38
             };
+
             public TextBlock Title = new TextBlock
             {
                 VerticalAlignment = VerticalAlignment.Center,
                 FontWeight = FontWeights.Bold,
                 TextTrimming = TextTrimming.CharacterEllipsis
             };
+
             public StickerName(StickerPackInfo pack)
             {
                 this.Pack = pack;
@@ -210,9 +213,9 @@ namespace Alika.UI
                 this.Content = grid;
 
                 this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.Pack.Product.Previes.Find(i => i.Width == this.Pack.Product.Previes.Max(g => g.Width)).Url));
-
             }
         }
+
         [Bindable]
         public class RecentStickerName : ListViewItem
         {
@@ -243,7 +246,7 @@ namespace Alika.UI
         }
 
         /// <summary>
-        /// Pack stickers 
+        /// Pack stickers
         /// </summary>
         [Bindable]
         public class StickerSet : StackPanel
@@ -252,6 +255,7 @@ namespace Alika.UI
             public List<StickerPackInfo> Styles;
 
             public delegate void Event(Attachment.StickerAtt sticker);
+
             public Event StickerSent;
 
             public StickerSet(StickerPackInfo pack, List<StickerPackInfo> styles = null)
@@ -317,9 +321,11 @@ namespace Alika.UI
             public class StickerHolder : Grid
             {
                 public delegate void Event(Attachment.StickerAtt sticker);
+
                 public Event StickerSent;
 
                 public Attachment.StickerAtt Sticker;
+
                 public Image Image = new Image
                 {
                     HorizontalAlignment = HorizontalAlignment.Center,
@@ -328,6 +334,7 @@ namespace Alika.UI
                     Width = 90,
                     Margin = new Thickness(5)
                 };
+
                 public StickerHolder(Attachment.StickerAtt sticker)
                 {
                     this.Sticker = sticker;
@@ -358,6 +365,7 @@ namespace Alika.UI
     public class StickerSuggestionHolder : Grid // TODO: Non-static images for animated stickers
     {
         public Attachment.StickerAtt Sticker { get; set; }
+
         public Image Image { get; set; } = new Image
         {
             VerticalAlignment = VerticalAlignment.Center,
@@ -365,7 +373,9 @@ namespace Alika.UI
             Height = 80,
             Margin = new Thickness(5)
         };
+
         private bool _selected = false;
+
         public bool Selected
         {
             get
@@ -378,6 +388,7 @@ namespace Alika.UI
                 this.Background = value ? this.Background = Coloring.Transparent.Percent(75) : Coloring.Transparent.Full;
             }
         }
+
         public StickerSuggestionHolder(Attachment.StickerAtt sticker)
         {
             this.Sticker = sticker;
@@ -392,6 +403,7 @@ namespace Alika.UI
 
             this.LoadImage();
         }
+
         public async void LoadImage()
         {
             this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri((App.DarkTheme ? this.Sticker.ImagesWithBackground : this.Sticker.Images).Find(s => s.Width == 128).Url));

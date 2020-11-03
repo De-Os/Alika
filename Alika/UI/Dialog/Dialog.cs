@@ -10,7 +10,6 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI.Dialog
 {
-
     /// <summary>
     /// Dialog grid
     /// </summary>
@@ -21,15 +20,18 @@ namespace Alika.UI.Dialog
         public TopMenu TopMenu;
         public MessagesList MessagesList;
         public Grid BottomMenu = new Grid();
+
         public Grid AttachGrid = new Grid
         {
             MaxHeight = 100,
             HorizontalAlignment = HorizontalAlignment.Left
         };
+
         public ContentControl ReplyGrid = new ContentControl
         {
             HorizontalContentAlignment = HorizontalAlignment.Stretch
         };
+
         public Grid StickerSuggestions = new Grid
         {
             Height = 100,
@@ -43,9 +45,11 @@ namespace Alika.UI.Dialog
             Visibility = Visibility.Collapsed,
             CornerRadius = new CornerRadius(10, 10, 0, 0)
         };
+
         public Grid BottomButtonsGrid = new Grid();
         public Button SendButton = new Buttons.Send();
         public Button Stickers = new Buttons.Stickers();
+
         public TextBox SendText = new TextBox
         {
             PlaceholderText = Utils.LocString("Dialog/TextBoxPlaceholder"),
@@ -55,6 +59,7 @@ namespace Alika.UI.Dialog
             TextWrapping = TextWrapping.Wrap,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
+
         public Button AttachButton = new Buttons.Attachment();
 
         public Dialog(int peer_id)
@@ -133,6 +138,7 @@ namespace Alika.UI.Dialog
             public Message Message;
             public bool CrossEnabled { get; set; } = true;
             public double LineWidth { get; set; } = 5;
+
             public ReplyMessage(Message msg)
             {
                 this.Message = msg;

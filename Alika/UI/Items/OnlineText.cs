@@ -13,6 +13,7 @@ namespace Alika.UI.Items
     {
         private int LastOnline;
         private int UserId;
+
         private TextBlock Text = new TextBlock
         {
             TextTrimming = Windows.UI.Xaml.TextTrimming.CharacterEllipsis

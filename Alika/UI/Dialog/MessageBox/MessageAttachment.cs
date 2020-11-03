@@ -188,6 +188,7 @@ namespace Alika.UI
                 AutoPlay = false,
                 Volume = 100
             };
+
             public Attachment.AudioMessageAtt Audio;
 
             public Image image = new Image
@@ -196,6 +197,7 @@ namespace Alika.UI
                 Width = 25,
                 Height = 25
             };
+
             public StackPanel wave = new StackPanel
             {
                 Margin = new Thickness(5, 0, 5, 0),
@@ -203,6 +205,7 @@ namespace Alika.UI
                 VerticalAlignment = VerticalAlignment.Stretch,
                 Orientation = Orientation.Horizontal
             };
+
             public TextBlock time = new TextBlock
             {
                 VerticalAlignment = VerticalAlignment.Center,
@@ -211,6 +214,7 @@ namespace Alika.UI
 
             private bool _onWaves = false;
             private bool _playing = false;
+
             public bool Playing
             {
                 get
@@ -336,6 +340,7 @@ namespace Alika.UI
             public class WaveHolder
             {
                 public TimeSpan Time;
+
                 public Windows.UI.Xaml.Shapes.Rectangle Rectangle = new Windows.UI.Xaml.Shapes.Rectangle
                 {
                     Width = 2,
@@ -381,7 +386,9 @@ namespace Alika.UI
             {
                 Margin = new Thickness(5)
             };
+
             public Attachment.GraffitiAtt Graf;
+
             public Graffiti(Attachment.GraffitiAtt att)
             {
                 this.Graf = att;
@@ -435,7 +442,6 @@ namespace Alika.UI
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Top,
                 Background = Coloring.Transparent.Full
-
             };
 
             public Grid Preview = new Grid();
@@ -469,7 +475,6 @@ namespace Alika.UI
                     this.LoadDocument();
                     this.Attach = this.Document.ToAttachFormat();
                 }
-
             }
 
             public void LoadImage()
@@ -479,6 +484,7 @@ namespace Alika.UI
                 this.Preview.Children.Add(img);
                 this.LoadImageSource();
             }
+
             public async void LoadImageSource()
             {
                 (this.Preview.Children[0] as Image).Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.Picture.GetBestQuality().Url));
@@ -524,7 +530,6 @@ namespace Alika.UI
 
                 public ImageViewer(Attachment.PhotoAtt pic)
                 {
-
                     this.Picture = pic;
 
                     this.LoadElements();
@@ -536,9 +541,9 @@ namespace Alika.UI
 
                     this.LoadImage();
                 }
+
                 public void LoadElements()
                 {
-
                     Grid content = new Grid();
                     content.RowDefinitions.Add(new RowDefinition());
                     content.RowDefinitions.Add(new RowDefinition());
@@ -568,7 +573,6 @@ namespace Alika.UI
                 public async void LoadImage()
                 {
                     this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.Picture.GetBestQuality().Url));
-
                 }
             }
         }

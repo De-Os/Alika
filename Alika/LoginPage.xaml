@@ -28,9 +28,8 @@
                     <ColumnDefinition></ColumnDefinition>
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Button x:Name="login" Click="LoginClick" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalAlignment="Stretch"/>
+                <Button x:Name="login" Click="LoginClick" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" />
                 <Button x:Name="settings" Click="OpenSettings" Grid.Column="2" HorizontalAlignment="Right" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" />
-
             </Grid>
         </Grid>
 

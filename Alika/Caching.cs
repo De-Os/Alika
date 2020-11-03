@@ -15,12 +15,16 @@ namespace Alika
         public List<Attachment.StickerAtt> RecentStickers { get; set; }
         public StickersSelector StickersSelector;
         public Dictionary<string, List<Attachment.StickerAtt>> StickerDictionary { get; set; }
-        public Caching() { }
+
+        public Caching()
+        {
+        }
 
         public void Update(List<User> users)
         {
             if (users != null && users.Count > 0) users.ForEach((User user) => this.Update(user));
         }
+
         public void Update(User user)
         {
             try
@@ -37,10 +41,12 @@ namespace Alika
             }
             catch { }
         }
+
         public void Update(List<Group> groups)
         {
             if (groups != null && groups.Count > 0) groups.ForEach((Group group) => this.Update(group));
         }
+
         public void Update(Group group)
         {
             try
@@ -57,6 +63,7 @@ namespace Alika
             }
             catch { }
         }
+
         public void Update(List<ConversationResponse> conversations)
         {
             if (conversations != null && conversations.Count > 0) conversations.ForEach((ConversationResponse conversation) =>
@@ -64,6 +71,7 @@ namespace Alika
                 this.Update(conversation.Conversation);
             });
         }
+
         public void Update(List<ConversationInfo> conversations)
         {
             if (conversations != null && conversations.Count > 0) conversations.ForEach((ConversationInfo conversation) =>
@@ -71,6 +79,7 @@ namespace Alika
                 this.Update(conversation);
             });
         }
+
         public void Update(ConversationInfo conversation)
         {
             try
@@ -87,12 +96,14 @@ namespace Alika
             }
             catch { }
         }
+
         public void Update(List<StickerPackInfo> stickers, List<Attachment.StickerAtt> recent)
         {
             this.StickerPacks = stickers;
             this.RecentStickers = recent;
             this.StickersSelector = new StickersSelector(this.StickerPacks, recent);
         }
+
         public void Update(List<GetStickersKeywordsResponse.DictionaryInfo> dictionaries)
         {
             this.StickerDictionary = new Dictionary<string, List<Attachment.StickerAtt>>();
@@ -111,6 +122,7 @@ namespace Alika
                 });
             });
         }
+
         private Type Update<Type>(Type from, Type to)
         {
             var type = from.GetType();

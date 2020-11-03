@@ -11,7 +11,7 @@ namespace Alika.Libs.VK.Longpoll
 {
     public class LongPoll
     {
-        enum Updates
+        private enum Updates
         {
             SET_FLAGS = 2,
             RESET_FLAGS = 3,
@@ -55,16 +55,27 @@ namespace Alika.Libs.VK.Longpoll
         private int ts;
 
         public delegate void LPHandler(JToken lpevent);
+
         public delegate void NewMessage(Message message);
+
         public delegate void ReadMessage(LPEvents.ReadState readState);
+
         public delegate void OnlineEvent(LPEvents.OnlineState onlineState);
+
         public delegate void TypeEvent(LPEvents.TypeState typeState);
+
         public event LPHandler Event;
+
         public event NewMessage OnNewMessage;
+
         public event NewMessage OnMessageEdition;
+
         public event ReadMessage OnReadMessage;
+
         public event OnlineEvent UserOnline;
+
         public event OnlineEvent UserOffline;
+
         public event TypeEvent Typing;
 
         public LongPoll(VK vk)
@@ -203,8 +214,10 @@ namespace Alika.Libs.VK.Longpoll
     {
         [JsonProperty("key")]
         public string Key;
+
         [JsonProperty("server")]
         public string Server;
+
         [JsonProperty("ts")]
         public int Ts;
     }

@@ -7,6 +7,7 @@ namespace Alika.Libs.VK.Responses
     {
         [JsonProperty("response")]
         public Type Response;
+
         [JsonProperty("error")]
         public Error Error;
     }
@@ -15,10 +16,13 @@ namespace Alika.Libs.VK.Responses
     {
         [JsonProperty("count")]
         public int Count;
+
         [JsonProperty("items")]
         public List<Type> Items;
+
         [JsonProperty("profiles")]
         public List<User> Profiles;
+
         [JsonProperty("groups")]
         public List<Group> Groups;
     }
@@ -27,12 +31,16 @@ namespace Alika.Libs.VK.Responses
     {
         [JsonProperty("error_code")]
         public int Code;
+
         [JsonProperty("error_msg")]
         public string Message;
+
         [JsonProperty("captcha_sid")]
         public string CaptchaSid;
+
         [JsonProperty("captcha_img")]
         public string CaptchaImg;
+
         [JsonProperty("request_params")]
         public List<Dictionary<string, string>> RequestParams;
     }

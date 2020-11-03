@@ -48,12 +48,14 @@ namespace Alika.Libs
             }
             return null;
         }
+
         [DllImport("user32.dll", ExactSpelling = true)]
         public static extern int ToUnicode(uint virtualKeyCode, uint scanCode,
             byte[] keyboardState,
             [Out, MarshalAs(UnmanagedType.LPWStr, SizeConst = 64)]
             StringBuilder receivingBuffer,
             int bufferSize, uint flags);
+
         public static string GetCharsFromKeys(this VirtualKey key, bool shift, bool altGr)
         {
             var buf = new StringBuilder(256);
@@ -104,7 +106,6 @@ namespace Alika.Libs
 
             using (var ms = new MemoryStream())
             {
-
                 int read;
 
                 while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
@@ -113,6 +114,7 @@ namespace Alika.Libs
                 return ms.ToArray();
             }
         }
+
         public static string AssetTheme(string filename, string path = "UI/") => "ms-appx:///Assets/" + path + (App.DarkTheme ? "Light" : "Dark") + "/" + filename;
 
         public static string FormatSize(int bytes, int round = 2)
@@ -248,24 +250,31 @@ namespace Alika.Libs
                         case "photo":
                             text += "📷 " + Utils.LocString("Attachments/Photo");
                             break;
+
                         case "video":
                             text += "📽 " + Utils.LocString("Attachments/Video");
                             break;
+
                         case "audio_message":
                             text += "🎤 " + Utils.LocString("Attachments/VoiceMessage");
                             break;
+
                         case "link":
                             text += "🔗 " + Utils.LocString("Attachments/Link");
                             break;
+
                         case "sticker":
                             text += "😀 " + Utils.LocString("Attachments/Sticker");
                             break;
+
                         case "gift":
                             text += "🎁 " + Utils.LocString("Attachments/Gift");
                             break;
+
                         case "doc":
                             text += "📂 " + Utils.LocString("Attachments/Document");
                             break;
+
                         case "graffiti":
                             text += "🖌 " + Utils.LocString("Attachments/Graffiti");
                             break;

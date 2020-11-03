@@ -14,13 +14,14 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Imaging;
 
-
 namespace Alika
 {
     public sealed partial class LoginPage : Page
     {
         public delegate void OnLogin();
+
         public event OnLogin OnSuccesful;
+
         public LoginPage()
         {
             this.InitializeComponent();
@@ -40,6 +41,7 @@ namespace Alika
 
             this.RegisterEvents();
         }
+
         private void RegisterEvents()
         {
             // Arrow navigation
@@ -77,6 +79,7 @@ namespace Alika
                 }
             };
         }
+
         private async void LoginClick(object sender, RoutedEventArgs e)
         {
             if (this.number.Text.Length == 0)
@@ -95,7 +98,9 @@ namespace Alika
                 }
             }
         }
+
         private void OpenSettings(object sender, RoutedEventArgs e) => new Settings();
+
         private async void Login(string number, string password, string captcha_sid = null, string captcha_key = null, string code = null)
         {
             var http = new RestClient(App.Settings.vk.login.domain);
@@ -145,6 +150,7 @@ namespace Alika
             }
             else await new MessageDialog("Check your internet connection", "Error!").ShowAsync();
         }
+
         /// <summary>
         /// Dialog when captcha needed
         /// </summary>
@@ -152,6 +158,7 @@ namespace Alika
         {
             public Grid content;
             public Image img;
+
             public TextBox text = new TextBox
             {
                 PlaceholderText = Utils.LocString("Login/CaptchaPlaceholder"),
@@ -200,12 +207,14 @@ namespace Alika
                 this.Content = this.content;
             }
         }
+
         /// <summary>
         /// Dialog when 2fa needed
         /// </summary>
         public class CodeDialog : ContentDialog
         {
             public Grid content;
+
             public TextBox text = new TextBox
             {
                 PlaceholderText = Utils.LocString("Login/CodePlaceholder"),
@@ -254,7 +263,6 @@ namespace Alika
                 this.content.Children.Add(close);
 
                 this.Content = this.content;
-
             }
         }
     }

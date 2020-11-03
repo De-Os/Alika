@@ -222,7 +222,6 @@ namespace Alika.UI.Dialog
                     }
                 }
             });
-
         }
 
         // Load new messages when user scrolled to top
@@ -278,7 +277,6 @@ namespace Alika.UI.Dialog
         // Upload image from FileOpenpicker
         public async void AttachUpload(StorageFile file)
         {
-
             try
             {
                 Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Wait, 0);
@@ -303,7 +301,6 @@ namespace Alika.UI.Dialog
             {
                 await new MessageDialog(Utils.LocString("FilesChoose/UploadError").Replace("%error%", error.Message), Utils.LocString("Error")).ShowAsync();
             }
-
         }
 
         // Sticker suggestion by word

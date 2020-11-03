@@ -49,6 +49,7 @@ namespace Alika.UI
                 this._content.Background = value;
             }
         }
+
         public string Title
         {
             get
@@ -61,6 +62,7 @@ namespace Alika.UI
                 this._title.Text = value;
             }
         }
+
         public FrameworkElement Content
         {
             get
@@ -79,6 +81,7 @@ namespace Alika.UI
                 this._content.Children.Add(value);
             }
         }
+
         public bool IsPointerOnContent { get; private set; } = false;
 
         public Popup()

@@ -187,12 +187,14 @@ namespace Alika.Libs.VK.Methods
                 case "doc":
                     request.AddFile("file", bytes, "file.da");
                     break;
+
                 case "graffiti":
                     request.AddFile("file", bytes, "file.png");
                     break;
             }
             return this.UploadDocument(request, type, peer_id);
         }
+
         /// <summary>
         /// Uploading StorageFile document
         /// </summary>

@@ -16,6 +16,7 @@ namespace Alika.UI.Dialog
     public class GraffitiWindow : Grid
     {
         public delegate void CloseEvent();
+
         public event CloseEvent OnClose;
 
         private InkCanvas Canvas = new InkCanvas
@@ -23,6 +24,7 @@ namespace Alika.UI.Dialog
             Width = 448,
             Height = 448
         };
+
         private Button Send = new Button
         {
             CornerRadius = new CornerRadius(10),

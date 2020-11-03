@@ -85,12 +85,10 @@ namespace Alika.UI
                 Content = this
             };
 
-
             App.UILoop.AddAction(new UITask
             {
                 Action = () => { App.MainPage.Popup.Children.Add(this.Popup); }
             });
-
         }
 
         private void AddSeparator(double height = 30)
@@ -107,6 +105,7 @@ namespace Alika.UI
                 Height = 75,
                 Margin = new Thickness(0, 0, 10, 0)
             };
+
             public TextBlock Title = new TextBlock
             {
                 TextTrimming = TextTrimming.CharacterEllipsis,
@@ -114,7 +113,9 @@ namespace Alika.UI
                 FontWeight = FontWeights.SemiBold,
                 FontSize = 20
             };
+
             public ConversationInfo conv;
+
             public AvatarAndName(ConversationInfo conversation)
             {
                 this.conv = conversation;
@@ -198,6 +199,7 @@ namespace Alika.UI
                 private bool _loading = false;
 
                 public Grid content = new Grid();
+
                 public Popup loadingPopup = new Popup
                 {
                     Content = new ProgressRing
@@ -209,6 +211,7 @@ namespace Alika.UI
                         Height = 50
                     }
                 };
+
                 public bool Loading
                 {
                     get
@@ -222,6 +225,7 @@ namespace Alika.UI
                         this._loading = value;
                     }
                 }
+
                 public Popup popup = new Popup();
 
                 public AttachmentsPopup(int peer_id, string type, string title = null)
@@ -306,6 +310,7 @@ namespace Alika.UI
                                                        Margin = new Thickness(5)
                                                    });
                                                    break;
+
                                                case "audio_message":
                                                    final.Children.Add(new MessageAttachment.AudioMessage(att.Attachment.AudioMessage)
                                                    {
@@ -332,7 +337,9 @@ namespace Alika.UI
         public class ConversationItems : ContentControl
         {
             public delegate void Event(string str);
+
             public event Event AvatarUpdated;
+
             public event Event TitleUpdated;
 
             private readonly Popup PermsPopup;
@@ -437,6 +444,7 @@ namespace Alika.UI
                         IsAllDisabled = true
                     } }
                 };
+
                 private static readonly Dictionary<string, string> StateNamings = new Dictionary<string, string> {
                     {"all", Utils.LocString("Dialog/PermissionsTypeAll")},
                     {"owner_and_admins", Utils.LocString("Dialog/PermissionsTypeOwnerAndAdmins")},
@@ -470,12 +478,14 @@ namespace Alika.UI
                         Margin = new Thickness(0, 0, 10, 0),
                         VerticalAlignment = VerticalAlignment.Center
                     };
+
                     public TextBlock Text = new TextBlock
                     {
                         VerticalAlignment = VerticalAlignment.Center,
                         FontWeight = FontWeights.SemiBold,
                         TextTrimming = TextTrimming.CharacterEllipsis
                     };
+
                     public Element(string name, string state)
                     {
                         var type = Types[name];
@@ -551,6 +561,7 @@ namespace Alika.UI
                         public class FlyOut : MenuFlyout
                         {
                             public delegate void Changed(string newtype);
+
                             public event Changed StateChanged;
 
                             public FlyOut(string type, string current_state)
@@ -605,6 +616,7 @@ namespace Alika.UI
             public class Members : Grid
             {
                 private readonly int PeerId;
+
                 public Members(int peer_id)
                 {
                     this.PeerId = peer_id;
@@ -676,6 +688,7 @@ namespace Alika.UI
                         VerticalAlignment = VerticalAlignment.Center,
                         Margin = new Thickness(0, 0, 10, 0)
                     };
+
                     public TextBlock name = new TextBlock
                     {
                         VerticalAlignment = VerticalAlignment.Center,
@@ -683,6 +696,7 @@ namespace Alika.UI
                         FontSize = 15,
                         FontWeight = FontWeights.SemiBold
                     };
+
                     public ConversationMember User;
                     public int peer_id;
 
@@ -767,7 +781,9 @@ namespace Alika.UI
                     public class Actions : MenuFlyout
                     {
                         public delegate void Event(ConversationMember member);
+
                         public event Event Remove;
+
                         public event Event InfoChanged;
 
                         public ConversationMember Member;
@@ -896,10 +912,13 @@ namespace Alika.UI
             public class Settings : Grid
             {
                 public delegate void Event(string str);
+
                 public event Event AvatarUpdated;
+
                 public event Event TitleUpdated;
 
                 public ConversationInfo Peer;
+
                 public PersonPicture Avatar = new PersonPicture
                 {
                     Height = 75,
@@ -907,6 +926,7 @@ namespace Alika.UI
                     Margin = new Thickness(10),
                     VerticalAlignment = VerticalAlignment.Center
                 };
+
                 public TextBox Title = new TextBox
                 {
                     AcceptsReturn = false,
@@ -915,6 +935,7 @@ namespace Alika.UI
                     HorizontalAlignment = HorizontalAlignment.Stretch,
                     Margin = new Thickness(5, 0, 0, 0)
                 };
+
                 public Button RemovePhoto = new Button
                 {
                     Background = Coloring.Transparent.Full,
@@ -994,7 +1015,6 @@ namespace Alika.UI
                         {
                             SuggestedStartLocation = PickerLocationId.PicturesLibrary,
                             ViewMode = PickerViewMode.Thumbnail,
-
                         };
                         picker.FileTypeFilter.Add(".png");
                         picker.FileTypeFilter.Add(".jpg");

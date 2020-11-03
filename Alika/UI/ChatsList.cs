@@ -42,10 +42,12 @@ namespace Alika.UI
             Margin = new Thickness(0, 30, 0, 5),
             Padding = new Thickness(5)
         };
+
         private ListView FoundChats = new ListView
         {
             Visibility = Visibility.Collapsed
         };
+
         private TextBox SearchBar = new TextBox
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -252,7 +254,6 @@ namespace Alika.UI
                 },
                 Priority = CoreDispatcherPriority.Low
             });
-
         }
     }
 
@@ -260,6 +261,7 @@ namespace Alika.UI
     public class ChatsList : ListView
     {
         public List<int> IgnorePeers = new List<int>();
+
         public ChatsList(List<int> pinned = null)
         {
             if (pinned != null) this.IgnorePeers = pinned;
@@ -328,33 +330,35 @@ namespace Alika.UI
         public class ChatItem : ListViewItem
         {
             public delegate void Pin();
+
             public Pin OnPin;
             public Pin OnUnPin;
 
             public int PeerId;
             public Message message;
+
             public Grid grid = new Grid
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Center
             };
-            public Grid textGrid = new Grid
-            {
-                HorizontalAlignment = HorizontalAlignment.Stretch
-            };
+
             public TextBlock nameBlock = new TextBlock
             {
                 FontSize = 15,
                 FontWeight = FontWeights.Bold,
                 TextTrimming = TextTrimming.CharacterEllipsis,
-                VerticalAlignment = VerticalAlignment.Bottom
+                VerticalAlignment = VerticalAlignment.Center
             };
+
             public TextBlock textBlock = new TextBlock
             {
                 TextTrimming = TextTrimming.CharacterEllipsis,
-                VerticalAlignment = VerticalAlignment.Top
+                VerticalAlignment = VerticalAlignment.Center
             };
+
             public Avatar image;
+
             public Image PinImage = new Image
             {
                 Source = new SvgImageSource(new System.Uri(Utils.AssetTheme("pin.svg"))),
@@ -365,7 +369,9 @@ namespace Alika.UI
                 Margin = new Thickness(5, 0, 5, 0),
                 Visibility = Visibility.Collapsed
             };
+
             private bool _pinned = false;
+
             private bool Pinned
             {
                 get
@@ -393,7 +399,9 @@ namespace Alika.UI
                     this._pinned = value;
                 }
             }
+
             private MenuFlyout Flyout = new MenuFlyout();
+
             private Border _unreadCount = new Border
             {
                 BorderThickness = new Thickness(0),
@@ -412,6 +420,7 @@ namespace Alika.UI
                 Visibility = Visibility.Collapsed,
                 MinWidth = 20
             };
+
             private int UnreadCount
             {
                 get
@@ -424,11 +433,13 @@ namespace Alika.UI
                     this._unreadCount.Visibility = value == 0 ? Visibility.Collapsed : Visibility.Visible;
                 }
             }
+
             private TextBlock Date = new TextBlock
             {
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
+
             private Image ReadState = new Image
             {
                 Width = 12.5,
@@ -528,26 +539,30 @@ namespace Alika.UI
                 this.Height = 70;
                 this.HorizontalAlignment = HorizontalAlignment.Stretch;
                 this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+                this.VerticalContentAlignment = VerticalAlignment.Stretch;
                 this.grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) }); // Avatar
-                this.grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // Text fields
-                this.grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) }); // Pin icon
-                this.textGrid.RowDefinitions.Add(new RowDefinition()); // Chat name
-                this.textGrid.RowDefinitions.Add(new RowDefinition()); // Message text
+                this.grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // Text fields, pin icon, other info
+
                 this.LoadAvatar();
                 this.nameBlock.Text = App.Cache.GetName(this.PeerId);
-                Grid.SetRow(this.nameBlock, 0);
-                Grid.SetRow(this.textBlock, 1);
-                this.textGrid.Children.Add(this.nameBlock);
-                this.textGrid.Children.Add(this.textBlock);
-                Grid.SetColumn(this.textGrid, 1);
-                this.grid.Children.Add(this.textGrid);
 
-                var indicators = new StackPanel
-                {
-                    VerticalAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    Margin = new Thickness(2.5, 0, 0, 0)
+                var contentGrid = new Grid { 
+                    VerticalAlignment = VerticalAlignment.Center
                 };
+                contentGrid.RowDefinitions.Add(new RowDefinition());
+                contentGrid.RowDefinitions.Add(new RowDefinition());
+                contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+                Grid.SetColumn(contentGrid, 1);
+                this.grid.Children.Add(contentGrid);
+
+                Grid.SetRow(this.nameBlock, 0);
+                Grid.SetColumn(this.nameBlock, 0);
+                contentGrid.Children.Add(this.nameBlock);
+                Grid.SetRow(this.textBlock, 1);
+                Grid.SetColumn(this.textBlock, 0);
+                contentGrid.Children.Add(this.textBlock);
+
                 var topIndicators = new StackPanel
                 {
                     Orientation = Orientation.Horizontal,
@@ -555,6 +570,12 @@ namespace Alika.UI
                     HorizontalAlignment = HorizontalAlignment.Right,
                     Margin = new Thickness(0, 2.5, 0, 2.5)
                 };
+                topIndicators.Children.Add(this.ReadState);
+                topIndicators.Children.Add(this.Date);
+                Grid.SetRow(topIndicators, 0);
+                Grid.SetColumn(topIndicators, 1);
+                contentGrid.Children.Add(topIndicators);
+
                 var bottomIndicators = new StackPanel
                 {
                     Orientation = Orientation.Horizontal,
@@ -562,16 +583,12 @@ namespace Alika.UI
                     HorizontalAlignment = HorizontalAlignment.Right,
                     Margin = new Thickness(0, 2.5, 0, 2.5)
                 };
-
-                topIndicators.Children.Add(this.ReadState);
-                topIndicators.Children.Add(this.Date);
                 bottomIndicators.Children.Add(this._unreadCount);
                 bottomIndicators.Children.Add(this.PinImage);
+                Grid.SetRow(bottomIndicators, 1);
+                Grid.SetColumn(bottomIndicators, 1);
+                contentGrid.Children.Add(bottomIndicators);
 
-                indicators.Children.Add(topIndicators);
-                indicators.Children.Add(bottomIndicators);
-                Grid.SetColumn(indicators, 2);
-                this.grid.Children.Add(indicators);
                 this.Content = this.grid;
 
                 if (this._pinned) this.PinImage.Visibility = Visibility.Visible;

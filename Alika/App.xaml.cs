@@ -87,6 +87,7 @@ namespace Alika
                 return false;
             }
         }
+
         public void LoadMain()
         {
             var vault = new PasswordVault();
@@ -106,6 +107,7 @@ namespace Alika
                     case "vk.domain":
                         App.VK.Domain = App.Settings.vk.domain;
                         break;
+
                     case "proxy":
                         this.LoadProxy();
                         break;
@@ -114,6 +116,7 @@ namespace Alika
 
             (Window.Current.Content as Frame).Content = App.MainPage;
         }
+
         private async void LoadProxy()
         {
             if (App.Settings?.proxy == null) return;
@@ -144,10 +147,12 @@ namespace Alika
                 await new MessageDialog(err.Message, Utils.LocString("Error")).ShowAsync();
             }
         }
+
         private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
+
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();

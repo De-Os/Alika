@@ -10,16 +10,19 @@ using Windows.UI.Xaml.Data;
 namespace Alika.UI.Items
 {
     [Bindable]
-    class TypeState : ContentControl
+    internal class TypeState : ContentControl
     {
         public delegate void BasicEvent();
+
         public event BasicEvent Show;
+
         public event BasicEvent Hide;
 
         private TextBlock Text = new TextBlock
         {
             TextTrimming = Windows.UI.Xaml.TextTrimming.CharacterEllipsis
         };
+
         private List<int> current = new List<int>();
         private DateTime updated = DateTime.Now;
 

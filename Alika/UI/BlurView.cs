@@ -12,6 +12,7 @@ namespace Alika.UI
             VerticalAlignment = VerticalAlignment.Stretch,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
+
         public FrameworkElement Content
         {
             get
@@ -23,11 +24,13 @@ namespace Alika.UI
                 this.Scroll.Content = value;
             }
         }
+
         protected Grid _topmenu = new Grid
         {
             VerticalAlignment = VerticalAlignment.Top,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
+
         public FrameworkElement TopMenu
         {
             get
@@ -41,11 +44,13 @@ namespace Alika.UI
                 this._topmenu.Children.Add(value);
             }
         }
+
         protected Grid _bottomMenu = new Grid
         {
             VerticalAlignment = VerticalAlignment.Bottom,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
+
         public FrameworkElement BottomMenu
         {
             get
@@ -59,7 +64,6 @@ namespace Alika.UI
                 this._bottomMenu.Children.Add(value);
             }
         }
-
 
         public BlurView()
         {
