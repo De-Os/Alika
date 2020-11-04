@@ -133,7 +133,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="Libs\Utils.cs" />
     <Compile Include="Libs\VK\Limits.cs" />
-    <Compile Include="Libs\VK\Methods\Firends.cs" />
+    <Compile Include="Libs\VK\Methods\Friends.cs" />
     <Compile Include="Libs\VK\Responses\Stickers.cs" />
     <Compile Include="Libs\VK\Responses\UploadServers.cs" />
     <Compile Include="Libs\VK\Methods\Groups.cs" />
@@ -300,6 +300,8 @@
     <Content Include="settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <PRIResource Include="Strings\ru-RU\MessageAction.resw" />
+    <PRIResource Include="Strings\en-US\MessageAction.resw" />
     <PRIResource Include="Strings\ru-RU\Time.resw" />
     <PRIResource Include="Strings\en-US\Time.resw" />
     <PRIResource Include="Strings\en-US\Settings.resw" />

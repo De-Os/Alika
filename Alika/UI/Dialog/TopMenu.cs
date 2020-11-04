@@ -139,13 +139,38 @@ namespace Alika.UI.Dialog
                 openImportant.Click += (a, b) => new ImportantMessages(peer_id);
                 this.Items.Add(openImportant);
 
-                /*if (this.peer_id > Limits.Messages.PEERSTART)
+                if (peer_id > Limits.Messages.PEERSTART)
                 {
-                    Element leave = new Element("Dialog/TopMenuLeave", "leave.svg");
+                    var conv = App.Cache.GetConversation(peer_id);
+
+                    if (conv.Settings.Access.CanInvite)
+                    {
+                        var addUser = new MenuFlyoutItem
+                        {
+                            Icon = new FontIcon
+                            {
+                                Glyph = "\uE8FA"
+                            },
+                            Text = Utils.LocString("Dialog/InviteUser")
+                        };
+                        addUser.Click += (a, b) =>
+                        {
+                            var dialog = new ChatInformation.ConversationItems.AddUserDialog(peer_id);
+                            var popup = new Popup
+                            {
+                                Content = dialog,
+                                Title = Utils.LocString("Dialog/InviteUser")
+                            };
+                            dialog.Hide += () => popup.Hide();
+                            App.MainPage.Popup.Children.Add(popup);
+                        };
+                        this.Items.Add(addUser);
+                    }
+                    /*Element leave = new Element("Dialog/TopMenuLeave", "leave.svg");
                     Grid.SetRow(leave, this.content.RowDefinitions.Count);
                     this.content.RowDefinitions.Add(new RowDefinition());
-                    this.content.Children.Add(leave);
-                }*/
+                    this.content.Children.Add(leave);*/
+                }
             }
         }
     }

@@ -58,6 +58,7 @@ namespace Alika.UI.Dialog
                     var msgs = this.Messages.Items.Where(i =>
                         i is SwipeControl s
                         && s.Content is MessageBox msg
+                        && msg.Message != null
                         && msg.Message.Bubble.Message.FromId != App.VK.UserId
                         && !msg.Read).Select(i => (i as SwipeControl).Content as MessageBox).ToList();
                     if (msgs.Count > 0)
@@ -142,7 +143,7 @@ namespace Alika.UI.Dialog
                         msg.Loaded += (a, b) => this.OnNewMessage?.Invoke(true);
                         if (this.Items.Count > 0)
                         {
-                            if ((this.Items.Last(i => i is SwipeControl) as SwipeControl).Content is MessageBox prev)
+                            if ((this.Items.Last(i => i is SwipeControl) as SwipeControl).Content is MessageBox prev && prev.Message != null && msg.Message != null)
                             {
                                 if (prev.Message.Bubble.Message.Date.ToDateTime().Date != message.Date.ToDateTime().Date)
                                 {
@@ -192,7 +193,7 @@ namespace Alika.UI.Dialog
                         var msg = new MessageBox(message);
                         if (this.Items.Count > 0)
                         {
-                            if ((this.Items.First(i => i is SwipeControl) as SwipeControl).Content is MessageBox next && next.Message.Bubble.Message.FromId == message.FromId)
+                            if ((this.Items.First(i => i is SwipeControl) as SwipeControl).Content is MessageBox next && next.Message.Bubble.Message.FromId == message.FromId && next.Message != null && msg.Message != null)
                             {
                                 next.Message.Ava.Visibility = Visibility.Visible;
                                 next.Message.Bubble.UserName.Visibility = Visibility.Collapsed;

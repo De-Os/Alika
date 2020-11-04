@@ -431,7 +431,6 @@ namespace Alika.Misc
                             }
                             else result.AddRange(messages.Where(i => i.Date.ToDateTime().Date == date.Date));
                         }
-                        System.Diagnostics.Debug.WriteLine(result.Count);
 
                         App.UILoop.AddAction(new UITask
                         {
@@ -479,7 +478,7 @@ namespace Alika.Misc
                     var msg = this.Messages[offset];
                     var message = new MessageBox(msg, true);
 
-                    if (this.Items.Count > 0 && this.Items.Last() is MessageBox prev)
+                    if (this.Items.Count > 0 && this.Items.Last() is MessageBox prev && prev.Message != null)
                     {
                         if (prev.Message.Bubble.Message.Date.ToDateTime().Date != msg.Date.ToDateTime().Date)
                         {

@@ -149,7 +149,7 @@ namespace Alika.Libs.VK.Longpoll
             Task.Factory.StartNew(() =>
             {
                 var msgs = updates.Where(i => (int)i[0] == (int)Updates.NEW_MESSAGE || (int)i[0] == (int)Updates.EDIT_MESSAGE);
-                var basic = msgs.Where(i => !i[7].HasValues && (i[2].ToObject<Message.Flags>() & Message.Flags.REPLY_MSG) == Message.Flags.NONE);
+                var basic = msgs.Where(i => i[6]?["source_act"] == null & !i[7].HasValues && (i[2].ToObject<Message.Flags>() & Message.Flags.REPLY_MSG) == Message.Flags.NONE);
                 foreach (var msg in basic)
                 {
                     var message = new Message(msg);

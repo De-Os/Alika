@@ -29,10 +29,19 @@ namespace Alika.UI
         public MessageBox(Message msg, bool isStatic = false)
         {
             this.HorizontalAlignment = HorizontalAlignment.Stretch;
-            this.HorizontalContentAlignment = msg.FromId == App.VK.UserId ? HorizontalAlignment.Right : HorizontalAlignment.Left;
 
-            this.Message = new MessageGrid(msg, isStatic);
-            this.Content = this.Message;
+            System.Diagnostics.Debug.WriteLine(ObjectDumper.Dump(msg));
+            if (msg.Action == null)
+            {
+                this.HorizontalContentAlignment = msg.FromId == App.VK.UserId ? HorizontalAlignment.Right : HorizontalAlignment.Left;
+                this.Message = new MessageGrid(msg, isStatic);
+                this.Content = this.Message;
+            }
+            else
+            {
+                this.HorizontalContentAlignment = HorizontalAlignment.Center;
+                this.Content = new MessageAction(msg);
+            }
 
             this.Read = msg.ReadState == 1;
         }
@@ -84,9 +93,8 @@ namespace Alika.UI
 
             public MessageGrid(Message msg, bool isStatic = false)
             {
-                this.states.HorizontalAlignment = App.VK.UserId == msg.FromId ? HorizontalAlignment.Right : HorizontalAlignment.Left;
                 this.MinWidth = 200;
-
+                this.states.HorizontalAlignment = App.VK.UserId == msg.FromId ? HorizontalAlignment.Right : HorizontalAlignment.Left;
                 this.Bubble = new TextBubble(msg, isStatic);
                 this.LoadAvatar(msg.FromId);
 
@@ -593,6 +601,59 @@ namespace Alika.UI
                     });
                     this.Items.Add(edHistory);
                 }
+            }
+        }
+
+        [Bindable]
+        public class MessageAction : ContentControl
+        {
+            public MessageAction(Message msg)
+            {
+                this.Padding = new Thickness(5);
+                this.VerticalAlignment = VerticalAlignment.Center;
+                var content = new TextBlock
+                {
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    TextAlignment = TextAlignment.Center
+                };
+                this.Content = content;
+                var menu = new MenuFlyout();
+                this.PointerPressed += (a, b) =>
+                {
+                    if (menu.Items.Count > 0) menu.ShowAt(this);
+                };
+                string text = Utils.LocString("MessageAction/" + msg.Action.Type.ToUpper());
+                if (text.Length == 0) text = Utils.LocString("MessageAction/Unknown");
+                if (text.Contains("%user%"))
+                {
+                    text = text.Replace("%user%", App.Cache.GetName(msg.FromId));
+                    if (msg.FromId != App.VK.UserId) menu.Items.Add(this.GetUserItem(msg.FromId));
+                }
+                if (text.Contains("%member%"))
+                {
+                    text = text.Replace("%member%", App.Cache.GetName(msg.Action.MemberId));
+                    if (msg.Action.MemberId != App.VK.UserId) menu.Items.Add(this.GetUserItem(msg.Action.MemberId));
+                }
+                if (text.Contains("%text%"))
+                {
+                    text = text.Replace("%text%", msg.Action.Text);
+                }
+                content.Text = text;
+            }
+
+            private MenuFlyoutItem GetUserItem(int user_id)
+            {
+                var item = new MenuFlyoutItem
+                {
+                    Icon = new FontIcon
+                    {
+                        Glyph = "\uEE57"
+                    },
+                    Text = App.Cache.GetName(user_id)
+                };
+                item.Click += (a, b) => new ChatInformation(user_id);
+                return item;
             }
         }
     }
