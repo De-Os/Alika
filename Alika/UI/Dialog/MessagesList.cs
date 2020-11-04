@@ -138,7 +138,7 @@ namespace Alika.UI.Dialog
                 {
                     Action = () =>
                     {
-                        var msg = new MessageBox(message, this.PeerId);
+                        var msg = new MessageBox(message);
                         msg.Loaded += (a, b) => this.OnNewMessage?.Invoke(true);
                         if (this.Items.Count > 0)
                         {
@@ -189,7 +189,7 @@ namespace Alika.UI.Dialog
                 {
                     Action = () =>
                     {
-                        var msg = new MessageBox(message, this.PeerId);
+                        var msg = new MessageBox(message);
                         if (this.Items.Count > 0)
                         {
                             if ((this.Items.First(i => i is SwipeControl) as SwipeControl).Content is MessageBox next && next.Message.Bubble.Message.FromId == message.FromId)

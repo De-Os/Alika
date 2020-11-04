@@ -26,12 +26,12 @@ namespace Alika.UI
         public MessageGrid Message;
         public bool Read = false;
 
-        public MessageBox(Message msg, int peer_id, bool isStatic = false)
+        public MessageBox(Message msg, bool isStatic = false)
         {
             this.HorizontalAlignment = HorizontalAlignment.Stretch;
             this.HorizontalContentAlignment = msg.FromId == App.VK.UserId ? HorizontalAlignment.Right : HorizontalAlignment.Left;
 
-            this.Message = new MessageGrid(msg, peer_id, isStatic);
+            this.Message = new MessageGrid(msg, isStatic);
             this.Content = this.Message;
 
             this.Read = msg.ReadState == 1;
@@ -82,12 +82,12 @@ namespace Alika.UI
 
             private readonly List<Message> _editions = new List<Message>();
 
-            public MessageGrid(Message msg, int peer_id, bool isStatic = false)
+            public MessageGrid(Message msg, bool isStatic = false)
             {
                 this.states.HorizontalAlignment = App.VK.UserId == msg.FromId ? HorizontalAlignment.Right : HorizontalAlignment.Left;
                 this.MinWidth = 200;
 
-                this.Bubble = new TextBubble(msg, peer_id, isStatic);
+                this.Bubble = new TextBubble(msg, isStatic);
                 this.LoadAvatar(msg.FromId);
 
                 var date = msg.Date.ToDateTime();
@@ -210,7 +210,7 @@ namespace Alika.UI
                 Margin = new Thickness(12, 5, 12, 1)
             };
 
-            public TextBubble(Message msg, int peer_id, bool isStatic = false)
+            public TextBubble(Message msg, bool isStatic = false)
             {
                 this.Message = msg;
 

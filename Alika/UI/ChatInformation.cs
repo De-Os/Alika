@@ -2,9 +2,11 @@
 using Alika.Libs.VK;
 using Alika.Libs.VK.Responses;
 using Alika.UI.Items;
+using Alika.UI.Misc;
 using Microsoft.Toolkit.Uwp.UI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,15 +50,14 @@ namespace Alika.UI
             this.HorizontalAlignment = HorizontalAlignment.Stretch;
             this.Width = 500;
 
-            this.AddSeparator();
             this.AvaAndName = new AvatarAndName(this.Conversation);
             this.Children.Add(this.AvaAndName);
             this.AddSeparator();
             this.Children.Add(new AttachmentsList(this.PeerId));
-            this.AddSeparator();
 
             if (this.PeerId > Limits.Messages.PEERSTART)
             {
+                this.AddSeparator();
                 var convMenu = new ConversationItems(this.Conversation);
                 convMenu.AvatarUpdated += (av) =>
                 {
@@ -352,6 +353,25 @@ namespace Alika.UI
                 var content = new Popup.Menu("Dialog/Management");
                 this.Content = content;
                 this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+
+                if (peer.Settings.Access.CanInvite)
+                {
+                    content.Children.Add(new Popup.Menu.Element(
+                            "Dialog/InviteUser",
+                            "add_user.svg",
+                            (a, b) =>
+                            {
+                                var dialog = new AddUserDialog(peer.Peer.Id);
+                                var popup = new Popup
+                                {
+                                    Content = dialog,
+                                    Title = Utils.LocString("Dialog/InviteUser")
+                                };
+                                dialog.Hide += () => popup.Hide();
+                                App.MainPage.Popup.Children.Add(popup);
+                            }
+                        ));
+                }
 
                 if (peer.Settings.Access.CanSeeInviteLink)
                 {
@@ -1190,6 +1210,197 @@ namespace Alika.UI
                             }
                         });
                     });
+                }
+            }
+
+            public class AddUserDialog : Grid
+            {
+                public delegate void Event();
+
+                public Event Hide;
+
+                public AddUserDialog(int peer_id)
+                {
+                    this.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
+                    this.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+                    this.Width = 500;
+                    this.MinHeight = 300;
+
+                    var searchbar = new TextBox
+                    {
+                        PlaceholderText = Utils.LocString("Search"),
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        Margin = new Thickness(10)
+                    };
+                    Grid.SetRow(searchbar, 0);
+                    this.Children.Add(searchbar);
+
+                    var userlist = new ListView
+                    {
+                        HorizontalAlignment = HorizontalAlignment.Stretch
+                    };
+                    var scroll = new ScrollViewer
+                    {
+                        HorizontalScrollMode = ScrollMode.Disabled,
+                        VerticalScrollMode = ScrollMode.Auto,
+                        Content = userlist
+                    };
+                    Grid.SetRow(scroll, 1);
+                    this.Children.Add(scroll);
+                    var progress = new ProgressRing
+                    {
+                        Width = 50,
+                        Height = 50,
+                        IsActive = true,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        Margin = new Thickness(20)
+                    };
+                    Grid.SetRow(progress, 1);
+                    this.Children.Add(progress);
+
+                    userlist.SelectionChanged += (a, b) =>
+                    {
+                        if (userlist.SelectedItem is UserItem item)
+                        {
+                            var dialog = new AddDialog(item.UserId, peer_id);
+                            var popup = new Popup
+                            {
+                                Title = Utils.LocString("Dialog/InviteUser") + ": " + item.UserName,
+                                Content = dialog
+                            };
+                            dialog.Hide += () =>
+                            {
+                                popup.Hide();
+                                userlist.SelectedItem = null;
+                            };
+                            dialog.OnSuccess += () => this.Hide?.Invoke();
+                            App.MainPage.Popup.Children.Add(popup);
+                        }
+                    };
+                    Task.Factory.StartNew(() =>
+                    {
+                        int total = -1;
+                        var users = new List<User>();
+                        var members = App.VK.Messages.GetConversationMembers(peer_id).Items.Select(i => i.MemberId);
+                        while (total == -1 || users.Count < total)
+                        {
+                            var response = App.VK.Friends.Get(count: 5000, offset: users.Count);
+                            total = response.Count;
+                            users.AddRange(response.Items);
+                            if (users.Count < total) Thread.Sleep(TimeSpan.FromSeconds(0.7));
+                        }
+
+                        App.UILoop.AddAction(new UITask
+                        {
+                            Action = () =>
+                            {
+                                foreach (var user in users)
+                                {
+                                    if (!members.Contains(user.UserId))
+                                    {
+                                        var item = new UserItem(user.UserId);
+                                        searchbar.TextChanged += (a, b) => item.Visibility = Regex.IsMatch(item.UserName, (a as TextBox).Text, RegexOptions.IgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+                                        userlist.Items.Add(item);
+                                    }
+                                }
+                                this.Children.Remove(progress);
+                            }
+                        });
+                    });
+                }
+
+                private class UserItem : ListViewItem
+                {
+                    public int UserId;
+                    public string UserName;
+
+                    public UserItem(int user_id)
+                    {
+                        this.UserId = user_id;
+                        this.UserName = App.Cache.GetName(this.UserId);
+                        this.HorizontalAlignment = HorizontalAlignment.Stretch;
+
+                        var content = new StackPanel { Orientation = Orientation.Horizontal };
+                        content.Children.Add(new Avatar(this.UserId)
+                        {
+                            Width = 50,
+                            Height = 50,
+                            Margin = new Thickness(0, 5, 10, 5)
+                        });
+                        content.Children.Add(new TextBlock
+                        {
+                            Text = this.UserName,
+                            VerticalAlignment = VerticalAlignment.Center,
+                            FontWeight = FontWeights.SemiBold
+                        });
+                        this.Content = content;
+                    }
+                }
+
+                private class AddDialog : StackPanel
+                {
+                    public delegate void Event();
+
+                    public Event Hide;
+                    public Event OnSuccess;
+
+                    public AddDialog(int user_id, int peer_id)
+                    {
+                        var gr = new Grid
+                        {
+                            Margin = new Thickness(5)
+                        };
+                        gr.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                        gr.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+
+                        var text = new TextBlock
+                        {
+                            Text = Utils.LocString("Dialog/InviteUserShowMessages"),
+                            VerticalAlignment = VerticalAlignment.Center,
+                            Margin = new Thickness(0, 0, 20, 0)
+                        };
+                        Grid.SetColumn(text, 0);
+                        gr.Children.Add(text);
+                        var num = new Microsoft.UI.Xaml.Controls.NumberBox
+                        {
+                            Maximum = 1000,
+                            Minimum = 0,
+                            VerticalAlignment = VerticalAlignment.Center,
+                            HorizontalAlignment = HorizontalAlignment.Right,
+                            SpinButtonPlacementMode = Microsoft.UI.Xaml.Controls.NumberBoxSpinButtonPlacementMode.Inline,
+                            Value = 100
+                        };
+                        Grid.SetColumn(num, 1);
+                        gr.Children.Add(num);
+                        this.Children.Add(gr);
+
+                        var okbtn = new Button
+                        {
+                            Content = new TextBlock
+                            {
+                                Text = Utils.LocString("Add")
+                            },
+                            CornerRadius = new CornerRadius(10),
+                            Margin = new Thickness(5),
+                            HorizontalAlignment = HorizontalAlignment.Right
+                        };
+                        this.Children.Add(okbtn);
+
+                        okbtn.Click += async (a, b) =>
+                        {
+                            try
+                            {
+                                App.VK.Messages.AddChatUser(peer_id, user_id, (int)num.Value);
+                                this.OnSuccess?.Invoke();
+                            }
+                            catch (Exception exc)
+                            {
+                                await new MessageDialog(exc.Message, Utils.LocString("Error")).ShowAsync();
+                            }
+                            this.Hide?.Invoke();
+                        };
+                    }
                 }
             }
         }

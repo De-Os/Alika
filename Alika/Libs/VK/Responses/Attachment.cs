@@ -62,7 +62,7 @@ namespace Alika.Libs.VK.Responses
 
             public Size GetBestQuality() => this.Sizes.OrderByDescending(i => i.Width).ThenByDescending(i => i.Height).First();
 
-            public override string ToAttachFormat() => "photo" + base.ToAttachFormat();
+            public override string ToAttachFormat(bool key = true) => "photo" + base.ToAttachFormat(key);
 
             public class Size
             {
@@ -160,7 +160,7 @@ namespace Alika.Libs.VK.Responses
             [JsonProperty("is_favorite")]
             public bool IsFavorite;
 
-            public override string ToAttachFormat() => "video" + base.ToAttachFormat();
+            public override string ToAttachFormat(bool key = true) => "video" + base.ToAttachFormat(key);
         }
 
         public class AudioAtt : AttachBase
@@ -195,7 +195,7 @@ namespace Alika.Libs.VK.Responses
             [JsonProperty("is_hq")]
             public int IsHQ;
 
-            public override string ToAttachFormat() => "audio" + base.ToAttachFormat();
+            public override string ToAttachFormat(bool key = true) => "audio" + base.ToAttachFormat(key);
         }
 
         public class DocumentAtt : AttachBase
@@ -221,7 +221,7 @@ namespace Alika.Libs.VK.Responses
             [JsonProperty("preview")]
             public DocPreview Preview;
 
-            public override string ToAttachFormat() => "doc" + base.ToAttachFormat();
+            public override string ToAttachFormat(bool key = true) => "doc" + base.ToAttachFormat(key);
 
             public class DocPreview
             {
@@ -247,7 +247,7 @@ namespace Alika.Libs.VK.Responses
             [JsonProperty("height")]
             public int Height;
 
-            public override string ToAttachFormat() => "doc" + base.ToAttachFormat();
+            public override string ToAttachFormat(bool key = true) => "doc" + base.ToAttachFormat(key);
         }
 
         public class AudioMessageAtt : AttachBase
@@ -270,7 +270,7 @@ namespace Alika.Libs.VK.Responses
             [JsonProperty("transcript_state")]
             public string TranscriptState;
 
-            public override string ToAttachFormat() => "doc" + base.ToAttachFormat();
+            public override string ToAttachFormat(bool key = true) => "doc" + base.ToAttachFormat(key);
         }
 
         public class LinkAtt
@@ -409,7 +409,7 @@ namespace Alika.Libs.VK.Responses
             [JsonProperty("access_key")]
             public string AccessKey;
 
-            public virtual string ToAttachFormat() => this.OwnerId.ToString() + "_" + this.Id.ToString() + (this.AccessKey?.Length > 0 ? "_" + this.AccessKey : "");
+            public virtual string ToAttachFormat(bool key = true) => this.OwnerId.ToString() + "_" + this.Id.ToString() + (this.AccessKey?.Length > 0 && key ? "_" + this.AccessKey : "");
         }
     }
 

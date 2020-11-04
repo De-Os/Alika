@@ -396,5 +396,18 @@ namespace Alika.Libs.VK.Methods
             {"peer_id", peer_id},
             {"reset", reset ? 1 : 0}
         }).Link;
+
+        /// <summary>
+        /// messages.AddChatUser
+        /// </summary>
+        public int AddChatUser(int peer_id, int user_id, int visible_messages_count = 0)
+        {
+            if (peer_id > Limits.Messages.PEERSTART) peer_id -= Limits.Messages.PEERSTART;
+            return this._vk.Call<int>("messages.addChatUser", new Dictionary<string, dynamic> {
+            {"chat_id", peer_id},
+            {"user_id", user_id},
+            {"visible_messages_count", visible_messages_count > 0 && visible_messages_count <= 1000 ? visible_messages_count : 0}
+        });
+        }
     }
 }

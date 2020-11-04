@@ -105,6 +105,7 @@ namespace Alika.Libs.VK
         public Groups Groups => new Groups(this);
         public Users Users => new Users(this);
         public Messages Messages => new Messages(this);
+        public Friends Friends => new Friends(this);
 
         public class Settings
         {

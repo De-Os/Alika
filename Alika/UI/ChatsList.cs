@@ -81,9 +81,15 @@ namespace Alika.UI
                 if (this.FoundChats.SelectedItem is ChatsList.ChatItem chat)
                 {
                     App.MainPage.PeerId = chat.PeerId;
-                    foreach (var item in this.Chats.Items)
+                    if (this.Chats.Items.Any(i => (i as ChatsList.ChatItem).PeerId == chat.PeerId))
                     {
-                        if (item is ChatsList.ChatItem c && c.PeerId == chat.PeerId) this.Chats.SelectedItem = c;
+                        this.Chats.SelectedItem = this.Chats.Items.First(i => (i as ChatsList.ChatItem).PeerId == chat.PeerId);
+                        this.PinnedChats.SelectedItem = null;
+                    }
+                    else if (this.PinnedChats.Items.Any(i => (i as ChatsList.ChatItem).PeerId == chat.PeerId))
+                    {
+                        this.PinnedChats.SelectedItem = this.PinnedChats.Items.First(i => (i as ChatsList.ChatItem).PeerId == chat.PeerId);
+                        this.Chats.SelectedItem = null;
                     }
                     this.FoundChats.Items.Clear();
                     this.FoundChats.Visibility = Visibility.Collapsed;
@@ -250,7 +256,18 @@ namespace Alika.UI
                     var chats = this.Chats.Items.Select(i => (i as ChatsList.ChatItem).PeerId).ToList();
                     chats.AddRange(this.PinnedChats.Items.Select(i => (i as ChatsList.ChatItem).PeerId));
 
-                    if (!chats.Contains(msg.PeerId)) this.Chats.Items.Insert(0, new ChatsList.ChatItem(msg.PeerId, msg));
+                    if (!chats.Contains(msg.PeerId))
+                    {
+                        Task.Factory.StartNew(() =>
+                        {
+                            App.Cache.Update(msg.PeerId);
+                            App.UILoop.AddAction(new UITask
+                            {
+                                Action = () => this.Chats.Items.Insert(0, new ChatsList.ChatItem(msg.PeerId, msg)),
+                                Priority = CoreDispatcherPriority.Normal
+                            });
+                        });
+                    }
                 },
                 Priority = CoreDispatcherPriority.Low
             });
@@ -546,7 +563,8 @@ namespace Alika.UI
                 this.LoadAvatar();
                 this.nameBlock.Text = App.Cache.GetName(this.PeerId);
 
-                var contentGrid = new Grid { 
+                var contentGrid = new Grid
+                {
                     VerticalAlignment = VerticalAlignment.Center
                 };
                 contentGrid.RowDefinitions.Add(new RowDefinition());

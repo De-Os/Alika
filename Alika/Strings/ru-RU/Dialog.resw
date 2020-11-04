@@ -160,7 +160,7 @@
     <value>Только сообщения (без кеша вложений)</value>
   </data>
   <data name="FwdMessages" xml:space="preserve">
-    <value>Forwarded messages</value>
+    <value>Пересланные сообщения</value>
   </data>
   <data name="Group" xml:space="preserve">
     <value>Группа</value>
@@ -173,6 +173,12 @@
   </data>
   <data name="InviteLink" xml:space="preserve">
     <value>Ссылка-приглашение</value>
+  </data>
+  <data name="InviteUser" xml:space="preserve">
+    <value>Пригласить пользователя</value>
+  </data>
+  <data name="InviteUserShowMessages" xml:space="preserve">
+    <value>Показать последних сообщений:</value>
   </data>
   <data name="JoinedInfo" xml:space="preserve">
     <value>Приглашён пользователем %user%</value>

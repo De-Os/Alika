@@ -477,7 +477,7 @@ namespace Alika.Misc
                 while (offset < count)
                 {
                     var msg = this.Messages[offset];
-                    var message = new MessageBox(msg, msg.PeerId, true);
+                    var message = new MessageBox(msg, true);
 
                     if (this.Items.Count > 0 && this.Items.Last() is MessageBox prev)
                     {
