@@ -213,7 +213,7 @@ namespace Alika.UI.Dialog
                 {
                     string temptext;
                     // Send multiple messages if text length > 4096
-                    while (text.Length > 0)
+                    while (text.Length > 0 || attachments.Count > 0)
                     {
                         temptext = text.Substring(0, text.Length > Limits.Messages.MAX_LENGTH ? Limits.Messages.MAX_LENGTH : text.Length);
                         try { App.VK.Messages.Send(this.PeerId, text: temptext, attachments: attachments.Count > 0 ? attachments : null, reply_to: reply); } catch { break; }
@@ -222,7 +222,6 @@ namespace Alika.UI.Dialog
                     }
                 }
             });
-
         }
 
         // Load new messages when user scrolled to top
@@ -278,7 +277,6 @@ namespace Alika.UI.Dialog
         // Upload image from FileOpenpicker
         public async void AttachUpload(StorageFile file)
         {
-
             try
             {
                 Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Wait, 0);
@@ -303,7 +301,6 @@ namespace Alika.UI.Dialog
             {
                 await new MessageDialog(Utils.LocString("FilesChoose/UploadError").Replace("%error%", error.Message), Utils.LocString("Error")).ShowAsync();
             }
-
         }
 
         // Sticker suggestion by word

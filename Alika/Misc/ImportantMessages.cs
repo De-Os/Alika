@@ -12,7 +12,7 @@ namespace Alika.Misc
 {
     public class ImportantMessages
     {
-        public ImportantMessages()
+        public ImportantMessages(int peer_id = 0)
         {
             var popup = new Popup
             {
@@ -37,6 +37,7 @@ namespace Alika.Misc
                     messages.AddRange(response.Items);
                     Thread.Sleep(TimeSpan.FromSeconds(1));
                 }
+                if (peer_id != 0) messages.RemoveAll(i => i.PeerId != peer_id);
                 App.UILoop.AddAction(new UITask
                 {
                     Action = () => popup.Content = new DialogExportReader.ViewerWithSearch(messages, true),

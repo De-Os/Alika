@@ -49,6 +49,7 @@ namespace Alika.UI
                 this._content.Background = value;
             }
         }
+
         public string Title
         {
             get
@@ -61,6 +62,7 @@ namespace Alika.UI
                 this._title.Text = value;
             }
         }
+
         public FrameworkElement Content
         {
             get
@@ -79,6 +81,7 @@ namespace Alika.UI
                 this._content.Children.Add(value);
             }
         }
+
         public bool IsPointerOnContent { get; private set; } = false;
 
         public Popup()
@@ -170,14 +173,25 @@ namespace Alika.UI
                     content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                     content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-                    var image = new Image
+                    FrameworkElement image;
+                    if (icon.EndsWith(".svg"))
                     {
-                        Width = 20,
-                        Height = 20,
-                        Margin = new Thickness(0, 0, 10, 0),
-                        VerticalAlignment = VerticalAlignment.Center,
-                        Source = new SvgImageSource(new Uri(Utils.AssetTheme(icon)))
-                    };
+                        image = new Image
+                        {
+                            Source = new SvgImageSource(new Uri(Utils.AssetTheme(icon)))
+                        };
+                    }
+                    else
+                    {
+                        image = new FontIcon
+                        {
+                            Glyph = icon
+                        };
+                    }
+                    image.Width = 20;
+                    image.Height = 20;
+                    image.Margin = new Thickness(0, 0, 10, 0);
+                    image.VerticalAlignment = VerticalAlignment.Center;
                     var text = new TextBlock
                     {
                         VerticalAlignment = VerticalAlignment.Center,

@@ -37,7 +37,7 @@ namespace Alika.UI.Dialog
                     {
                         HorizontalScrollMode = ScrollMode.Disabled,
                         VerticalScrollMode = ScrollMode.Auto,
-                        Content = new MessageBox.MessageGrid(msg, msg.PeerId, true)
+                        Content = new MessageBox(msg, true)
                         {
                             MaxWidth = 500
                         }

@@ -15,12 +15,14 @@ namespace Alika.UI
     public class Settings
     {
         public delegate void Save();
+
         public event Save OnSave;
 
         private Popup popup = new Popup
         {
             Title = Utils.LocString("Settings")
         };
+
         private StackPanel menu = new StackPanel
         {
             Width = 500

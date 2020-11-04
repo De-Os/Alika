@@ -68,6 +68,7 @@ namespace Alika.Misc
             public DialogExport.ExportMode Mode { get; set; }
         }
     }
+
     public class DialogExport
     {
         public enum ExportMode
@@ -140,6 +141,7 @@ namespace Alika.Misc
                                             var photo = await attachs.photos.CreateFileAsync(att.Photo.ToAttachFormat() + ".jpg");
                                             await FileIO.WriteBytesAsync(photo, new RestClient(new Uri(att.Photo.GetBestQuality().Url)).DownloadData(new RestRequest()));
                                             break;
+
                                         case "audio_message":
                                             var voice = await attachs.voice_messages.CreateFileAsync(att.AudioMessage.ToAttachFormat() + ".mp3");
                                             await FileIO.WriteBytesAsync(voice, new RestClient(new Uri(att.AudioMessage.LinkMP3)).DownloadData(new RestRequest()));
@@ -235,12 +237,15 @@ namespace Alika.Misc
         {
             [JsonProperty("peer_id")]
             public int peer_id;
+
             [JsonProperty("export_time")]
             public int export_time;
+
             [JsonProperty("messages")]
             public List<Message> messages;
         }
     }
+
     public class DialogExportReader
     {
         public DialogExportReader(bool oldFormat = false) => this.ChooseFile(oldFormat);
@@ -426,7 +431,6 @@ namespace Alika.Misc
                             }
                             else result.AddRange(messages.Where(i => i.Date.ToDateTime().Date == date.Date));
                         }
-                        System.Diagnostics.Debug.WriteLine(result.Count);
 
                         App.UILoop.AddAction(new UITask
                         {
@@ -472,9 +476,9 @@ namespace Alika.Misc
                 while (offset < count)
                 {
                     var msg = this.Messages[offset];
-                    var message = new MessageBox(msg, msg.PeerId, true);
+                    var message = new MessageBox(msg, true);
 
-                    if (this.Items.Count > 0 && this.Items.Last() is MessageBox prev)
+                    if (this.Items.Count > 0 && this.Items.Last() is MessageBox prev && prev.Message != null)
                     {
                         if (prev.Message.Bubble.Message.Date.ToDateTime().Date != msg.Date.ToDateTime().Date)
                         {

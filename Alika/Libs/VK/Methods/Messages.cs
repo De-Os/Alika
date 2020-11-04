@@ -187,12 +187,14 @@ namespace Alika.Libs.VK.Methods
                 case "doc":
                     request.AddFile("file", bytes, "file.da");
                     break;
+
                 case "graffiti":
                     request.AddFile("file", bytes, "file.png");
                     break;
             }
             return this.UploadDocument(request, type, peer_id);
         }
+
         /// <summary>
         /// Uploading StorageFile document
         /// </summary>
@@ -385,6 +387,27 @@ namespace Alika.Libs.VK.Methods
             App.Cache.Update(response.Groups);
             App.Cache.Update(response.Profiles);
             return response;
+        }
+
+        /// <summary>
+        /// messages.getInviteLink
+        /// </summary>
+        public string GetInviteLink(int peer_id, bool reset = false) => this._vk.Call<GetInviteLinkResponse>("messages.getInviteLink", new Dictionary<string, dynamic> {
+            {"peer_id", peer_id},
+            {"reset", reset ? 1 : 0}
+        }).Link;
+
+        /// <summary>
+        /// messages.AddChatUser
+        /// </summary>
+        public int AddChatUser(int peer_id, int user_id, int visible_messages_count = 0)
+        {
+            if (peer_id > Limits.Messages.PEERSTART) peer_id -= Limits.Messages.PEERSTART;
+            return this._vk.Call<int>("messages.addChatUser", new Dictionary<string, dynamic> {
+            {"chat_id", peer_id},
+            {"user_id", user_id},
+            {"visible_messages_count", visible_messages_count > 0 && visible_messages_count <= 1000 ? visible_messages_count : 0}
+        });
         }
     }
 }

@@ -12,6 +12,7 @@ namespace Alika
     public sealed partial class MainPage : Page
     {
         private int _peer_id;
+
         public int PeerId
         {
             get
@@ -110,7 +111,6 @@ namespace Alika
                 });
             });
             Task.Factory.StartNew(() => App.Cache.Update(App.VK.GetStickersKeywords().Dictionary));
-
         }
     }
 }

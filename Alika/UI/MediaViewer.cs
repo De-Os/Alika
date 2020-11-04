@@ -25,6 +25,7 @@ namespace Alika.UI
                 BackgroundSource = AcrylicBackgroundSource.Backdrop
             }
         };
+
         public Grid menu = new Grid
         {
             CornerRadius = new CornerRadius(10),
@@ -40,7 +41,9 @@ namespace Alika.UI
             Margin = new Thickness(0, 0, 0, 10),
             Padding = new Thickness(5)
         };
+
         public Attachment attachment;
+
         public Popup popup = new Popup
         {
             ContentBackground = Coloring.Transparent.Full

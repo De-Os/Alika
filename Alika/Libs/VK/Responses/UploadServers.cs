@@ -8,8 +8,10 @@ namespace Alika.Libs.VK.Responses
         {
             [JsonProperty("album_id")]
             public int AlbumId;
+
             [JsonProperty("user_id")]
             public int UserId;
+
             [JsonProperty("group_id")]
             public int GroupId;
 
@@ -17,12 +19,15 @@ namespace Alika.Libs.VK.Responses
             {
                 [JsonProperty("server")]
                 public int Server;
+
                 [JsonProperty("photo")]
                 public string Photo;
+
                 [JsonProperty("hash")]
                 public string Hash;
             }
         }
+
         public class DocumentMessages : UploadServerBase
         {
             public class UploadResult
@@ -35,13 +40,15 @@ namespace Alika.Libs.VK.Responses
             {
                 [JsonProperty("type")]
                 public string Type;
+
                 [JsonProperty("doc")]
                 public Attachment.DocumentAtt Document;
+
                 [JsonProperty("graffiti")]
                 public Attachment.GraffitiAtt Graffiti;
+
                 [JsonProperty("audio_message")]
                 public Attachment.AudioMessageAtt AudioMessage;
-
             }
         }
 

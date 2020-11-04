@@ -19,7 +19,7 @@
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
-    <PackageCertificateThumbprint>99ECE3637E695A93916F2E6FE943DEEC12CF0B8A</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>27EABEE39CD7B70732AD8E1DE9B370416FC8E2D9</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
@@ -27,6 +27,7 @@
     <AppxBundlePlatforms>x86|x64|arm|arm64</AppxBundlePlatforms>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+    <PackageCertificateKeyFile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -132,6 +133,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="Libs\Utils.cs" />
     <Compile Include="Libs\VK\Limits.cs" />
+    <Compile Include="Libs\VK\Methods\Friends.cs" />
     <Compile Include="Libs\VK\Responses\Stickers.cs" />
     <Compile Include="Libs\VK\Responses\UploadServers.cs" />
     <Compile Include="Libs\VK\Methods\Groups.cs" />
@@ -207,6 +209,7 @@
     <Content Include="Assets\UI\Dark\play.svg" />
     <Content Include="Assets\UI\Dark\send.svg" />
     <Content Include="Assets\UI\Dark\settings.svg" />
+    <Content Include="Assets\UI\Dark\share.svg" />
     <Content Include="Assets\UI\Dark\sticker.svg" />
     <Content Include="Assets\UI\Dark\user.svg" />
     <Content Include="Assets\UI\Dark\video.svg" />
@@ -238,6 +241,7 @@
     <Content Include="Assets\UI\Light\play.svg" />
     <Content Include="Assets\UI\Light\send.svg" />
     <Content Include="Assets\UI\Light\settings.svg" />
+    <Content Include="Assets\UI\Light\share.svg" />
     <Content Include="Assets\UI\Light\sticker.svg" />
     <Content Include="Assets\UI\Light\user.svg" />
     <Content Include="Assets\UI\Light\video.svg" />
@@ -288,7 +292,7 @@
       <Version>3.0.20251.1</Version>
     </PackageReference>
     <PackageReference Include="RestSharp">
-      <Version>106.11.5</Version>
+      <Version>106.11.7</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -296,6 +300,8 @@
     <Content Include="settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <PRIResource Include="Strings\ru-RU\MessageAction.resw" />
+    <PRIResource Include="Strings\en-US\MessageAction.resw" />
     <PRIResource Include="Strings\ru-RU\Time.resw" />
     <PRIResource Include="Strings\en-US\Time.resw" />
     <PRIResource Include="Strings\en-US\Settings.resw" />

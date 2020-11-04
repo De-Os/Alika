@@ -117,9 +117,18 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
   <data name="Byte" xml:space="preserve">
     <value>B</value>
     <comment>Short byte name</comment>
+  </data>
+  <data name="Copied" xml:space="preserve">
+    <value>Copied</value>
+  </data>
+  <data name="Copy" xml:space="preserve">
+    <value>Copy</value>
   </data>
   <data name="Error" xml:space="preserve">
     <value>Error!</value>
@@ -137,6 +146,9 @@
     <value>Mb</value>
     <comment>Short megabyte name</comment>
   </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
     <comment>Save something</comment>
@@ -148,5 +160,8 @@
   <data name="Settings" xml:space="preserve">
     <value>Settings</value>
     <comment>Settings</comment>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
   </data>
 </root>

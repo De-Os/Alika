@@ -36,6 +36,7 @@ namespace Alika.UI
             /// <param name="percent">Opacity percents</param>
             public static SolidColorBrush Percent(int percent) => Coloring.Transparent.Percent((double)percent / 100);
         }
+
         public static class InvertedTransparent
         {
             /// <summary>
@@ -66,6 +67,7 @@ namespace Alika.UI
             /// <param name="percent">Opacity percents</param>
             public static SolidColorBrush Percent(int percent) => Coloring.InvertedTransparent.Percent((double)percent / 100);
         }
+
         public static class MessageBox
         {
             public static class TextBubble
@@ -114,16 +116,20 @@ namespace Alika.UI
                     {
                         case "primary":
                             return "5181B8";
+
                         case "negative":
                             return "E64646";
+
                         case "positive":
                             return "4BB34B";
+
                         default:
                             return "FFFFFF";
                     }
                 }
             }
         }
+
         public static Color FromHash(string hash)
         {
             if (hash.StartsWith("#")) hash = hash.Substring(1);

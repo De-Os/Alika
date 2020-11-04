@@ -6,7 +6,7 @@
     Директивы среды выполнения задокументированы по адресу https://go.microsoft.com/fwlink/?LinkID=391919.
 
     Полное разрешение отражения для App1.MyClass и всех его открытых и закрытых членов
-    <Type Name="App1.MyClass" Dynamic="Required All"/>
+    <Type Name="App1.MyClass" Dynamic="Required All" />
 
     Разрешение динамического создания конкретного экземпляра AppClass<T> в System.Int32
     <TypeInstantiation Name="App1.AppClass" Arguments="System.Int32" Activate="Required Public" />
@@ -22,10 +22,7 @@
       пакете приложения. Звездочки не являются подстановочными знаками.
     -->
     <Assembly Name="*Application*" Dynamic="Required All" />
-    
-    
+
     <!-- Добавьте сюда директивы среды выполнения, относящиеся к приложению. -->
-
-
   </Application>
 </Directives>

@@ -29,36 +29,53 @@ namespace Alika.Libs.VK.Responses
 
         [JsonProperty("id")]
         public int Id;
+
         [JsonProperty("peer_id")]
         public int PeerId;
+
         [JsonProperty("from_id")]
         public int FromId;
+
         [JsonProperty("date")]
         public int Date;
+
         [JsonProperty("read_state")]
         public int ReadState = 0;
+
         [JsonProperty("text")]
         public string Text;
+
         [JsonProperty("fwd_messages")]
         public List<Message> FwdMessages;
+
         [JsonProperty("reply_message")]
         public Message ReplyMessage;
+
         [JsonProperty("out")]
         public int IsOut = 0;
+
         [JsonProperty("attachments")]
         public List<Attachment> Attachments;
+
         [JsonProperty("important")]
         public bool Important;
+
         [JsonProperty("payload")]
         public string Payload;
+
         [JsonProperty("keyboard")]
         public MsgKeyboard Keyboard;
+
         [JsonProperty("action")]
         public MsgAction Action;
+
         [JsonProperty("update_time")]
         public int UpdateTime;
 
-        public Message() { }
+        public Message()
+        {
+        }
+
         public Message(JToken message)
         {
             if (message != null)
@@ -84,14 +101,18 @@ namespace Alika.Libs.VK.Responses
         {
             [JsonProperty("one_time")]
             public bool OneTime;
+
             [JsonProperty("inline")]
             public bool Inline;
+
             [JsonProperty("buttons")]
             public List<List<Button>> Buttons;
+
             public class Button
             {
                 [JsonProperty("color")]
                 public string Color;
+
                 [JsonProperty("action")]
                 public BtnAction Action;
 
@@ -99,32 +120,42 @@ namespace Alika.Libs.VK.Responses
                 {
                     [JsonProperty("type")]
                     public string Type;
+
                     [JsonProperty("label")]
                     public string Label;
+
                     [JsonProperty("payload")]
                     public string Payload;
 
                     [JsonProperty("url")]
                     public string Url;
+
                     [JsonProperty("hash")]
                     public string Hash;
+
                     [JsonProperty("app_id")]
                     public int AppId;
+
                     [JsonProperty("owner_id")]
                     public int OwnerId;
                 }
             }
         }
+
         public class MsgAction
         {
             [JsonProperty("type")]
             public string Type;
+
             [JsonProperty("member_id")]
             public int MemberId;
+
             [JsonProperty("text")]
             public string Text;
+
             [JsonProperty("email")]
             public string EMail;
+
             [JsonProperty("photo")]
             public ConversationInfo.PeerSettings.PeerPhotos Photo;
         }
@@ -134,10 +165,13 @@ namespace Alika.Libs.VK.Responses
     {
         [JsonProperty("messages")]
         public ItemsResponse<Message> Messages;
+
         [JsonProperty("profiles")]
         public List<User> Profiles;
+
         [JsonProperty("groups")]
         public List<Group> Groups;
+
         [JsonProperty("conversations")]
         public List<ConversationInfo> Conversations;
     }

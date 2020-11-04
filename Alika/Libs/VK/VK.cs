@@ -14,6 +14,7 @@ namespace Alika.Libs.VK
         public const string API_VER = "5.140";
 
         public int UserId;
+
         public string Domain
         {
             get
@@ -25,6 +26,7 @@ namespace Alika.Libs.VK
                 this._http = new RestClient(value);
             }
         }
+
         public WebProxy Proxy
         {
             get
@@ -103,6 +105,7 @@ namespace Alika.Libs.VK
         public Groups Groups => new Groups(this);
         public Users Users => new Users(this);
         public Messages Messages => new Messages(this);
+        public Friends Friends => new Friends(this);
 
         public class Settings
         {

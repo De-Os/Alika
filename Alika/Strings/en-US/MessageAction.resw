@@ -117,43 +117,34 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Add" xml:space="preserve">
-    <value>Добавить</value>
+  <data name="CHAT_CREATE" xml:space="preserve">
+    <value>%user% created chat &lt;&lt;%text%&gt;&gt;</value>
   </data>
-  <data name="Byte" xml:space="preserve">
-    <value>Б</value>
+  <data name="CHAT_INVITE_USER" xml:space="preserve">
+    <value>%user% invited %member%</value>
   </data>
-  <data name="Copied" xml:space="preserve">
-    <value>Скопировано</value>
+  <data name="CHAT_INVITE_USER_BY_LINK" xml:space="preserve">
+    <value>%user% joined chat via link</value>
   </data>
-  <data name="Copy" xml:space="preserve">
-    <value>Скопировать</value>
+  <data name="CHAT_KICK_USER" xml:space="preserve">
+    <value>%user% kicked %member%</value>
   </data>
-  <data name="Error" xml:space="preserve">
-    <value>Ошибка!</value>
+  <data name="CHAT_PHOTO_REMOVE" xml:space="preserve">
+    <value>%user% removed chat photo</value>
   </data>
-  <data name="Gigabyte" xml:space="preserve">
-    <value>ГБ</value>
+  <data name="CHAT_PHOTO_UPDATE" xml:space="preserve">
+    <value>%user% updated chat photo</value>
   </data>
-  <data name="Kibibyte" xml:space="preserve">
-    <value>КиБ</value>
+  <data name="CHAT_PIN_MESSAGE" xml:space="preserve">
+    <value>%user% pinned message</value>
   </data>
-  <data name="Megabyte" xml:space="preserve">
-    <value>МБ</value>
+  <data name="CHAT_TITLE_UPDATE" xml:space="preserve">
+    <value>%user% renamed chat to &lt;&lt;%text%&gt;&gt;</value>
   </data>
-  <data name="Reset" xml:space="preserve">
-    <value>Сбросить</value>
+  <data name="CHAT_UNPIN_MESSAGE" xml:space="preserve">
+    <value>%user% unpinned message</value>
   </data>
-  <data name="Save" xml:space="preserve">
-    <value>Сохранить</value>
-  </data>
-  <data name="Search" xml:space="preserve">
-    <value>Поиск</value>
-  </data>
-  <data name="Settings" xml:space="preserve">
-    <value>Настройки</value>
-  </data>
-  <data name="Update" xml:space="preserve">
-    <value>Обновить</value>
+  <data name="Unknown" xml:space="preserve">
+    <value />
   </data>
 </root>
