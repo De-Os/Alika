@@ -6,6 +6,7 @@ using RestSharp;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using Windows.Security.Credentials;
 using Windows.UI.Popups;
 using Windows.UI.Text;
@@ -30,14 +31,6 @@ namespace Alika
             this.number.PlaceholderText = Utils.LocString("Login/NumberPlaceholder");
             this.password.PlaceholderText = Utils.LocString("Login/PasswordPlaceholder");
             this.login.Content = new TextBlock { Text = Utils.LocString("Login/ButtonText") };
-            this.settings.Content = new Image
-            {
-                Source = new SvgImageSource(new Uri(Utils.AssetTheme("settings.svg"))),
-                Width = 20,
-                Height = 20,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
 
             this.RegisterEvents();
         }
@@ -101,6 +94,69 @@ namespace Alika
 
         private void OpenSettings(object sender, RoutedEventArgs e) => new Settings();
 
+        private void TokenClick(object sender, RoutedEventArgs e)
+        {
+            var content = new Grid();
+            content.RowDefinitions.Add(new RowDefinition());
+            content.RowDefinitions.Add(new RowDefinition());
+
+            var tokenInput = new TextBox
+            {
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Width = 200,
+                Margin = new Thickness(5, 10, 5, 5),
+                PlaceholderText = Utils.LocString("Login/TokenPlaceholder")
+            };
+            var okBtn = new Button
+            {
+                Content = new TextBlock
+                {
+                    Text = Utils.LocString("Login/ButtonText")
+                },
+                Margin = new Thickness(5, 5, 5, 10),
+                CornerRadius = new CornerRadius(10),
+                HorizontalAlignment = HorizontalAlignment.Right
+            };
+            Grid.SetRow(tokenInput, 0);
+            Grid.SetRow(okBtn, 1);
+            content.Children.Add(tokenInput);
+            content.Children.Add(okBtn);
+
+            var popup = new Popup
+            {
+                Title = Utils.LocString("Login/LoginByToken"),
+                Content = content
+            };
+            okBtn.Click += async (a, b) =>
+            {
+                if (tokenInput.Text.Length > 0)
+                {
+                    try
+                    {
+                        var token = tokenInput.Text;
+                        var vk = new VK(new VK.Settings
+                        {
+                            ApiDomain = App.Settings.vk.domain,
+                            Token = token
+                        });
+                        vk.Messages.GetConversations(count: 1);
+                        vk.Friends.Get(count: 1);
+                        Thread.Sleep(TimeSpan.FromSeconds(0.7));
+                        var vault = new PasswordVault();
+                        vault.Add(new PasswordCredential(App.appName, "default", token));
+                        this.OnSuccesful?.Invoke();
+                    }
+                    catch
+                    {
+                        await new MessageDialog(Utils.LocString("Login/WrongToken"), Utils.LocString("Error")).ShowAsync();
+                    }
+                }
+                else popup.Hide();
+            };
+
+            this.Popup.Children.Add(popup);
+        }
+
         private async void Login(string number, string password, string captcha_sid = null, string captcha_key = null, string code = null)
         {
             var http = new RestClient(App.Settings.vk.login.domain);
@@ -120,7 +176,7 @@ namespace Alika
                 request.AddParameter("captcha_key", captcha_key);
             }
             if (code != null) request.AddParameter("code", code);
-            string response = http.Post(request).Content;
+            var response = http.Post(request).Content;
             if (response != null && response.Length > 0)
             {
                 JObject parsed = JObject.Parse(response);
@@ -139,7 +195,7 @@ namespace Alika
                         await captcha.ShowAsync();
                         this.Login(number, password, (string)parsed["captcha_sid"], captcha.text.Text);
                     }
-                    else await new MessageDialog("Unknown auth error occured: " + (string)parsed["error_description"], "Error!").ShowAsync();
+                    else await new MessageDialog((string)parsed["error_description"], Utils.LocString("Error")).ShowAsync();
                 }
                 else
                 {
@@ -148,7 +204,7 @@ namespace Alika
                     this.OnSuccesful?.Invoke();
                 }
             }
-            else await new MessageDialog("Check your internet connection", "Error!").ShowAsync();
+            else await new MessageDialog(Utils.LocString("Login/CheckInternet"), Utils.LocString("Error")).ShowAsync();
         }
 
         /// <summary>

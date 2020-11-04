@@ -17,7 +17,6 @@ using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI
 {
@@ -178,11 +177,11 @@ namespace Alika.UI
                 this.Content = content;
                 this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
 
-                AddElement("photo", "Attachments/Photos", "camera.svg");
-                AddElement("doc", "Attachments/Documents", "document.svg");
-                AddElement("video", "Attachments/Videos", "video.svg");
-                AddElement("link", "Attachments/Links", "link.svg");
-                AddElement("audio_message", "Attachments/VoiceMessages", "microphone.svg");
+                AddElement("photo", "Attachments/Photos", "\uEB9F");
+                AddElement("doc", "Attachments/Documents", "\uED25");
+                AddElement("video", "Attachments/Videos", "\uE8AA");
+                AddElement("link", "Attachments/Links", "\uE71B");
+                AddElement("audio_message", "Attachments/VoiceMessages", "\uE720");
 
                 void AddElement(string type, string name, string image) => content.Children.Add(new Popup.Menu.Element(
                         name,
@@ -358,7 +357,7 @@ namespace Alika.UI
                 {
                     content.Children.Add(new Popup.Menu.Element(
                             "Dialog/InviteUser",
-                            "add_user.svg",
+                            "\uE8FA",
                             (a, b) =>
                             {
                                 var dialog = new AddUserDialog(peer.Peer.Id);
@@ -382,7 +381,7 @@ namespace Alika.UI
                     };
                     content.Children.Add(new Popup.Menu.Element(
                             "Dialog/InviteLink",
-                            "share.svg",
+                            "\uF3E2",
                             (a, b) => App.MainPage.Popup.Children.Add(this.LinkPopup)
                         ));
                 }
@@ -398,7 +397,7 @@ namespace Alika.UI
                     };
                     content.Children.Add(new Popup.Menu.Element(
                             "Settings",
-                            "edit.svg",
+                            "\uE70F",
                             (a, b) => App.MainPage.Popup.Children.Add(this.SettingsPopup)
                         ));
                 }
@@ -423,7 +422,7 @@ namespace Alika.UI
                 };
                 content.Children.Add(new Popup.Menu.Element(
                         "Dialog/Members",
-                        "person.svg",
+                        "\uEBDA",
                         (a, b) => App.MainPage.Popup.Children.Add(this.MembersPopup)
                     ));
             }
@@ -435,32 +434,32 @@ namespace Alika.UI
                     {"invite", new Type
                     {
                         Name = Utils.LocString("Dialog/PermissionsInvite"),
-                        Picture = Utils.AssetTheme("add_user.svg")
+                        Picture = "\uE8FA"
                     } },
                     {"change_info", new Type
                     {
                         Name = Utils.LocString("Dialog/PermissionsChangeInfo"),
-                        Picture = Utils.AssetTheme("edit.svg")
+                        Picture = "\uE70F"
                     } },
                     {"change_pin", new Type{
                         Name = Utils.LocString("Dialog/PermissionsPin"),
-                        Picture = Utils.AssetTheme("pin.svg")
+                        Picture = "\uE718"
                     } },
                     {"use_mass_mentions", new Type{
                         Name = Utils.LocString("Dialog/PermissionsMentions"),
-                        Picture = Utils.AssetTheme("mention.svg")
+                        Picture = "\uE789"
                     } },
                     {"see_invite_link", new Type{
                         Name = Utils.LocString("Dialog/PermissionsLink"),
-                        Picture = Utils.AssetTheme("eye.svg")
+                        Picture = "\uE910"
                     } },
                     {"call", new Type{
                         Name = Utils.LocString("Dialog/PermissionsCall"),
-                        Picture = Utils.AssetTheme("call.svg")
+                        Picture = "\uE717"
                     } },
                     {"change_admins", new Type{
                         Name = Utils.LocString("Dialog/PermissionsChangeAdmins"),
-                        Picture = Utils.AssetTheme("user.svg"),
+                        Picture = "\uE748",
                         IsAllDisabled = true
                     } }
                 };
@@ -491,7 +490,7 @@ namespace Alika.UI
                 [Bindable]
                 public class Element : Grid
                 {
-                    public Image Icon = new Image
+                    public FontIcon Icon = new FontIcon
                     {
                         Width = 20,
                         Height = 20,
@@ -520,7 +519,7 @@ namespace Alika.UI
                         this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                         this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
 
-                        this.Icon.Source = new SvgImageSource(new Uri(type.Picture));
+                        this.Icon.Glyph = type.Picture;
                         this.Text.Text = type.Name;
 
                         var button = new ChangeButton(name, state);
@@ -561,13 +560,12 @@ namespace Alika.UI
 
                             Grid.SetColumn(this.state, 0);
                             this._content.Children.Add(this.state);
-                            var img = new Image
+                            var img = new FontIcon
                             {
                                 VerticalAlignment = VerticalAlignment.Center,
-                                Height = 15,
-                                Width = 15,
+                                FontSize = 10,
                                 Margin = new Thickness(5),
-                                Source = new SvgImageSource(new Uri(Utils.AssetTheme("fly_menu.svg")))
+                                Glyph = "\uE70D"
                             };
                             Grid.SetColumn(img, 1);
                             this._content.Children.Add(img);
@@ -696,11 +694,9 @@ namespace Alika.UI
                 {
                     public Button actions = new Button
                     {
-                        Content = new Image
+                        Content = new FontIcon
                         {
-                            Source = new SvgImageSource(new Uri(Utils.AssetTheme("fly_menu.svg"))),
-                            Width = 15,
-                            Height = 15
+                            Glyph = "\uE70D"
                         },
                         Background = Coloring.Transparent.Full,
                         CornerRadius = new CornerRadius(10),
@@ -733,7 +729,7 @@ namespace Alika.UI
                         this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                         this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
 
-                        var avatar = new Misc.Avatar(member.MemberId)
+                        var avatar = new Avatar(member.MemberId)
                         {
                             Width = 50,
                             Height = 50,
@@ -748,11 +744,9 @@ namespace Alika.UI
 
                         Button info = new Button
                         {
-                            Content = new Image
+                            Content = new FontIcon
                             {
-                                Source = new SvgImageSource(new Uri(Utils.AssetTheme("info.svg"))),
-                                Width = 15,
-                                Height = 15
+                                Glyph = "\uE946"
                             },
                             Background = Coloring.Transparent.Full,
                             CornerRadius = new CornerRadius(10),

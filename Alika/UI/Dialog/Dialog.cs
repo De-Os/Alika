@@ -1,12 +1,10 @@
 ﻿using Alika.Libs;
 using Alika.Libs.VK.Responses;
-using System;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI.Dialog
 {
@@ -199,9 +197,9 @@ namespace Alika.UI.Dialog
                     var cross = new Button
                     {
                         Background = Coloring.Transparent.Full,
-                        Content = new Image
+                        Content = new FontIcon
                         {
-                            Source = new SvgImageSource(new Uri(Utils.AssetTheme("close.svg"))),
+                            Glyph = "\uE711",
                             Height = 20,
                             Width = 20,
                             HorizontalAlignment = HorizontalAlignment.Center,

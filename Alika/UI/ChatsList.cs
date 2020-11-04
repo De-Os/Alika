@@ -142,11 +142,11 @@ namespace Alika.UI
             var menu = new Button
             {
                 Background = Coloring.Transparent.Full,
-                Content = new Image
+                Content = new FontIcon
                 {
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    Source = new SvgImageSource(new Uri(Utils.AssetTheme("fly_menu.svg"))),
+                    Glyph = "\uE70D",
                     Width = 20,
                     Height = 20
                 },

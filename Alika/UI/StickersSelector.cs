@@ -11,7 +11,6 @@ using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI
 {
@@ -117,11 +116,9 @@ namespace Alika.UI
                 top.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                 Button back = new Button
                 {
-                    Content = new Image
+                    Content = new FontIcon
                     {
-                        Source = new SvgImageSource(new Uri(Utils.AssetTheme("back.svg"))),
-                        Width = 20,
-                        Height = 20
+                        Glyph = "\uE72B"
                     },
                     Width = 40,
                     Background = Coloring.Transparent.Full
