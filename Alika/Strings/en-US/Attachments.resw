@@ -173,4 +173,10 @@
     <value>Voice messages</value>
     <comment>Voice messageS</comment>
   </data>
+  <data name="Wall" xml:space="preserve">
+    <value>Wall post</value>
+  </data>
+  <data name="WallReply" xml:space="preserve">
+    <value>Comment</value>
+  </data>
 </root>

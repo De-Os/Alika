@@ -458,6 +458,18 @@ namespace Alika.UI
                                 case "gift":
                                     attach = new MessageAttachment.Gift(att.Gift);
                                     break;
+
+                                case "link":
+                                    attach = new MessageAttachment.Link(att.Link);
+                                    break;
+
+                                case "wall":
+                                    attach = new MessageAttachment.Wall(att.Wall);
+                                    break;
+
+                                case "wall_reply":
+                                    attach = new MessageAttachment.WallReply(att.WallReply);
+                                    break;
                             }
                             if (attach != null)
                             {
