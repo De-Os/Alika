@@ -6,13 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
+using Windows.UI.Popups;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace Alika.UI
@@ -327,7 +328,7 @@ namespace Alika.UI
                         }
                     };
 
-                    if (this.Message.Keyboard != null) this.Children.Add(new ButtonsGrid(this.Message.Keyboard, this.Message.PeerId));
+                    if (this.Message.Keyboard != null) this.Children.Add(new Keyboard(this.Message.Keyboard, this.Message.PeerId, this.Message.Id));
                 }
 
                 private void LoadText()
@@ -396,15 +397,22 @@ namespace Alika.UI
                                 Action = () =>
                                 {
                                     Paragraph p = new Paragraph();
-                                    foreach (var t in parsed)
+                                    try
                                     {
-                                        if (t.Link)
+                                        foreach (var t in parsed)
                                         {
-                                            Hyperlink link = new Hyperlink { NavigateUri = new Uri(t.Url) };
-                                            link.Inlines.Add(new Run { Text = t.Text });
-                                            p.Inlines.Add(link);
+                                            if (t.Link)
+                                            {
+                                                Hyperlink link = new Hyperlink { NavigateUri = new Uri(t.Url) };
+                                                link.Inlines.Add(new Run { Text = t.Text });
+                                                p.Inlines.Add(link);
+                                            }
+                                            else p.Inlines.Add(new Run { Text = t.Text });
                                         }
-                                        else p.Inlines.Add(new Run { Text = t.Text });
+                                    }
+                                    catch
+                                    {
+                                        p.Inlines.Add(new Run { Text = this.Message.Text });
                                     }
                                     this.Text.Blocks.Add(p);
                                 }
@@ -471,9 +479,9 @@ namespace Alika.UI
                 /// <summary>
                 /// Keyboard
                 /// </summary>
-                public class ButtonsGrid : StackPanel
+                public class Keyboard : StackPanel
                 {
-                    public ButtonsGrid(Message.MsgKeyboard keyboard, int peer_id)
+                    public Keyboard(Message.MsgKeyboard keyboard, int peer_id, int msg_id = 0)
                     {
                         this.HorizontalAlignment = HorizontalAlignment.Stretch;
                         foreach (var btns in keyboard.Buttons)
@@ -484,26 +492,98 @@ namespace Alika.UI
                             };
                             foreach (var button in btns)
                             {
-                                Button btn = new Button
-                                {
-                                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                                    Margin = new Thickness(5),
-                                    CornerRadius = new CornerRadius(5)
-                                };
-                                if (button.Color != "default") btn.Background = new SolidColorBrush(Coloring.FromHash(Coloring.MessageBox.Keyboard.GetColor(button.Color)));
-                                btn.Content = new TextBlock
-                                {
-                                    Text = button.Action.Label,
-                                    HorizontalAlignment = HorizontalAlignment.Center,
-                                    VerticalAlignment = VerticalAlignment.Center
-                                };
-                                btn.Click += (object sender, RoutedEventArgs e) => Task.Factory.StartNew(() => App.VK.Messages.Send(peer_id, text: button.Action.Label, payload: button.Action.Payload));
-
+                                var btn = new Button(button, peer_id, msg_id);
                                 Grid.SetColumn(btn, grid.ColumnDefinitions.Count);
                                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                                 grid.Children.Add(btn);
                             }
                             this.Children.Add(grid);
+                        }
+                    }
+
+                    [Bindable]
+                    private class Button : Windows.UI.Xaml.Controls.Button
+                    {
+                        private string EventId;
+
+                        public Button(Message.MsgKeyboard.Button button, int peer_id, int msg_id = 0)
+                        {
+                            this.HorizontalAlignment = HorizontalAlignment.Stretch;
+                            this.CornerRadius = new CornerRadius(5);
+                            this.Margin = new Thickness(5);
+                            SetText();
+                            if (button.Action.Type == "callback")
+                            {
+                                App.LP.Callback += (cb) =>
+                                {
+                                    if (this.EventId != null && cb.EventId == this.EventId)
+                                    {
+                                        App.UILoop.AddAction(new UITask
+                                        {
+                                            Action = async () =>
+                                            {
+                                                if (this.Content is ProgressRing) SetText();
+                                                if (cb.Action.Type == "show_snackbar")
+                                                {
+                                                    // TODO: make TeachingTip without
+                                                    // The program '[304] Alika.exe' has exited with code -1073741819 (0xc0000005) 'Access violation'.
+                                                    await new MessageDialog(cb.Action.Text, Utils.LocString("Dialog/СallbackMessageFrom").Replace("%user%", App.Cache.GetName(cb.OwnerId))).ShowAsync();
+                                                }
+                                                else
+                                                {
+                                                    string link = "";
+                                                    if (cb.Action.Type == "open_link")
+                                                    {
+                                                        link = cb.Action.Link;
+                                                    }
+                                                    else
+                                                    {
+                                                        link += "https://vk.com/app" + cb.Action.AppId;
+                                                        if (cb.Action.OwnerId.HasValue) link += "_" + cb.Action.OwnerId.Value;
+                                                        if (cb.Action.Hash != null) link += "#" + cb.Action.Hash;
+                                                    }
+                                                    await Windows.System.Launcher.LaunchUriAsync(new Uri(link));
+                                                }
+                                            }
+                                        });
+                                    }
+                                };
+                                this.Click += (a, b) =>
+                                {
+                                    if (this.Content is TextBlock)
+                                    {
+                                        this.Content = new ProgressRing
+                                        {
+                                            Width = 20,
+                                            Height = 20,
+                                            IsActive = true
+                                        };
+                                        Task.Factory.StartNew(() =>
+                                        {
+                                            this.EventId = App.VK.Messages.SendMessageEvent(peer_id, button.Action.Payload, msg_id);
+                                            Thread.Sleep(TimeSpan.FromSeconds(1));
+                                            App.UILoop.AddAction(new UITask
+                                            {
+                                                Action = () =>
+                                                {
+                                                    if (this.Content is ProgressRing) SetText();
+                                                }
+                                            });
+                                        });
+                                    }
+                                };
+                            }
+                            else
+                            {
+                                this.Click += (object sender, RoutedEventArgs e) => Task.Factory.StartNew(() => App.VK.Messages.Send(peer_id, text: button.Action.Label, payload: button.Action.Payload));
+                            }
+
+                            void SetText() => this.Content = new TextBlock
+                            {
+                                Text = button.Action.Label,
+                                HorizontalAlignment = HorizontalAlignment.Center,
+                                VerticalAlignment = VerticalAlignment.Center
+                            };
                         }
                     }
                 }

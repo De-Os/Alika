@@ -276,4 +276,7 @@
   <data name="You" xml:space="preserve">
     <value>Вы</value>
   </data>
+  <data name="СallbackMessageFrom" xml:space="preserve">
+    <value>Сообщение от %user%</value>
+  </data>
 </root>
