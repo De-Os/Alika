@@ -68,6 +68,20 @@ namespace Alika.UI
                 Orientation = Orientation.Horizontal
             };
 
+            public Button Reply = new Button
+            {
+                Content = new FontIcon
+                {
+                    Glyph = "\uE97A",
+                    FontSize = 15
+                },
+                Background = Coloring.Transparent.Full,
+                CornerRadius = new CornerRadius(15),
+                Visibility = Visibility.Collapsed,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Margin = new Thickness(5)
+            };
+
             private bool _edited = false;
 
             private bool Edited
@@ -119,6 +133,7 @@ namespace Alika.UI
                 if (msg.FromId == App.VK.UserId)
                 {
                     this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+                    this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                     this.ColumnDefinitions.Add(new ColumnDefinition());
                     this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(50) });
 
@@ -144,19 +159,28 @@ namespace Alika.UI
                         this.states.Children.Add(readState);
                     }
 
-                    Grid.SetColumn(stateHolder, 0);
-                    Grid.SetColumn(this.Bubble, 1);
-                    Grid.SetColumn(this.Ava, 2);
+                    Grid.SetColumn(this.Reply, 0);
+                    Grid.SetColumn(stateHolder, 1);
+                    Grid.SetColumn(this.Bubble, 2);
+                    Grid.SetColumn(this.Ava, 3);
                 }
                 else
                 {
                     this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(50) });
                     this.ColumnDefinitions.Add(new ColumnDefinition());
                     this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+                    this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                     Grid.SetColumn(this.Ava, 0);
                     Grid.SetColumn(this.Bubble, 1);
                     Grid.SetColumn(stateHolder, 2);
+                    Grid.SetColumn(this.Reply, 3);
                 }
+
+                stateHolder.Children.Add(this.states);
+                stateHolder.Children.Add(this.time);
+                this.Children.Add(stateHolder);
+                this.Children.Add(this.Bubble);
+                this.Children.Add(this.Ava);
 
                 if (!isStatic)
                 {
@@ -169,15 +193,16 @@ namespace Alika.UI
                             this._editions.Add(m);
                         }
                     };
+                    this.RightTapped += (a, b) => new MessageFlyout(msg, this._editions).ShowAt(this, b.GetPosition(b.OriginalSource as UIElement));
+
+                    this.Children.Add(this.Reply);
+                    this.Reply.Click += (a, b) =>
+                    {
+                        var reply = (App.MainPage.Dialog.Children[0] as Dialog.Dialog).ReplyGrid;
+                        if (reply.Content is Dialog.Dialog.ReplyMessage prev && prev.Message.Id == msg.Id) return;
+                        reply.Content = new Dialog.Dialog.ReplyMessage(msg);
+                    };
                 }
-
-                stateHolder.Children.Add(this.states);
-                stateHolder.Children.Add(this.time);
-                this.Children.Add(stateHolder);
-                this.Children.Add(this.Bubble);
-                this.Children.Add(this.Ava);
-
-                if (!isStatic) this.RightTapped += (a, b) => new MessageFlyout(msg, this._editions).ShowAt(this, b.GetPosition(b.OriginalSource as UIElement));
             }
 
             public void LoadAvatar(int user_id)
@@ -664,7 +689,7 @@ namespace Alika.UI
                 {
                     Icon = new FontIcon
                     {
-                        Glyph = "\uE8CA"
+                        Glyph = "\uE97A"
                     },
                     Text = Utils.LocString("Dialog/Reply")
                 };

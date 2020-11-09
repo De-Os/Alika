@@ -13,8 +13,6 @@ namespace Alika.UI.Dialog
     {
         public int PeerId;
 
-        private bool loading = false;
-
         public MessagesListView Messages;
 
         public MessagesList(int peer_id)
@@ -265,7 +263,7 @@ namespace Alika.UI.Dialog
                 {
                     IconSource = new FontIconSource
                     {
-                        Glyph = "\uE8CA"
+                        Glyph = "\uE97A"
                     },
                     Text = Utils.LocString("Dialog/Reply"),
                     Background = Coloring.Transparent.Percent(100),
@@ -279,11 +277,14 @@ namespace Alika.UI.Dialog
                         reply.Content = new Dialog.ReplyMessage(message);
                     };
                 leftItems.Add(item);
-                return new SwipeControl
+                var control = new SwipeControl
                 {
                     Content = msg,
                     LeftItems = leftItems
                 };
+                control.PointerEntered += (a, b) => msg.Message.Reply.Visibility = Visibility.Visible;
+                control.PointerExited += (a, b) => msg.Message.Reply.Visibility = Visibility.Collapsed;
+                return control;
             }
 
             // Crashes on release, idk why. Use GetSwipeMessage.
