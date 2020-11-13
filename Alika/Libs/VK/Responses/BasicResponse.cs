@@ -12,7 +12,7 @@ namespace Alika.Libs.VK.Responses
         public Error Error;
     }
 
-    public class ItemsResponse<Type>
+    public class ItemsResponse<Type> : IItemsResponse
     {
         [JsonProperty("count")]
         public int Count;
@@ -21,10 +21,16 @@ namespace Alika.Libs.VK.Responses
         public List<Type> Items;
 
         [JsonProperty("profiles")]
-        public List<User> Profiles;
+        public List<User> Profiles { get; set; }
 
         [JsonProperty("groups")]
-        public List<Group> Groups;
+        public List<Group> Groups { get; set; }
+    }
+
+    public interface IItemsResponse
+    {
+        public List<User> Profiles { get; set; }
+        public List<Group> Groups { get; set; }
     }
 
     public class Error

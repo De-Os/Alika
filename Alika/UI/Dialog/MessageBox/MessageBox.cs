@@ -495,6 +495,14 @@ namespace Alika.UI
                                 case "wall_reply":
                                     attach = new MessageAttachment.WallReply(att.WallReply);
                                     break;
+
+                                case "money_transfer":
+                                    attach = new MessageAttachment.MoneyTransfer(att.MoneyTransfer);
+                                    break;
+
+                                case "story":
+                                    attach = new MessageAttachment.Story(att.Story);
+                                    break;
                             }
                             if (attach != null)
                             {

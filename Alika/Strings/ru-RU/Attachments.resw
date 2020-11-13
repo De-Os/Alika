@@ -132,11 +132,17 @@
   <data name="Graffiti" xml:space="preserve">
     <value>Граффити</value>
   </data>
+  <data name="History" xml:space="preserve">
+    <value>История</value>
+  </data>
   <data name="Link" xml:space="preserve">
     <value>Ссылка</value>
   </data>
   <data name="Links" xml:space="preserve">
     <value>Ссылки</value>
+  </data>
+  <data name="MoneyTranfer" xml:space="preserve">
+    <value>Денежный перевод</value>
   </data>
   <data name="Photo" xml:space="preserve">
     <value>Фотография</value>

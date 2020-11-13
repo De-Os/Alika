@@ -137,6 +137,9 @@
     <value>Graffiti</value>
     <comment>Graffiti</comment>
   </data>
+  <data name="History" xml:space="preserve">
+    <value>History</value>
+  </data>
   <data name="Link" xml:space="preserve">
     <value>Link</value>
     <comment>Link</comment>
@@ -144,6 +147,9 @@
   <data name="Links" xml:space="preserve">
     <value>Links</value>
     <comment>Links</comment>
+  </data>
+  <data name="MoneyTransfer" xml:space="preserve">
+    <value>Money transfer</value>
   </data>
   <data name="Photo" xml:space="preserve">
     <value>Photo</value>

@@ -442,7 +442,7 @@ namespace Alika.UI
                     };
                 }
                 this.Title = lnk.Title;
-                this.Subtitle = lnk.Url;
+                this.Subtitle = lnk.Caption;
                 this.Link = lnk.Url;
             }
 
@@ -479,6 +479,35 @@ namespace Alika.UI
                 this.Title = Utils.LocString("Attachments/WallReply");
                 this.Subtitle = reply.Text.RemovePushes();
                 this.Link = "https://vk.com/wall" + reply.OwnerId + "_" + reply.PostId + "?reply=" + reply.Id;
+            }
+        }
+
+        [Bindable]
+        public class MoneyTransfer : LinkHolder
+        {
+            public MoneyTransfer(Attachment.MoneyTransferAtt money)
+            {
+                this.Content = new FontIcon
+                {
+                    Glyph = "\uE8C7"
+                };
+                this.Title = money.Amount.Text;
+                this.Subtitle = Utils.LocString("Attachments/MoneyTransfer");
+                this.Link = "https://vk.com/settings?act=payments&section=transfer";
+            }
+        }
+
+        [Bindable]
+        public class Story : LinkHolder
+        {
+            public Story(Attachment.StoryAtt story)
+            {
+                this.Content = new FontIcon
+                {
+                    Glyph = "\uF738"
+                };
+                this.Title = Utils.LocString("Attachments/History");
+                this.Link = "https://vk.com/" + story.ToAttachFormat(false);
             }
         }
 
@@ -526,12 +555,32 @@ namespace Alika.UI
                 }
             }
 
+            protected FrameworkElement Button
+            {
+                get
+                {
+                    return this._button.Content as FrameworkElement;
+                }
+                set
+                {
+                    this._button.Visibility = value == null ? Visibility.Collapsed : Visibility.Visible;
+                    this._button.Content = value;
+                }
+            }
+
             private Border _border = new Border
             {
                 CornerRadius = new CornerRadius(10),
                 Width = 50,
                 Height = 50,
                 Margin = new Thickness(0, 0, 5, 0)
+            };
+
+            private Button _button = new Button
+            {
+                CornerRadius = new CornerRadius(10),
+                Margin = new Thickness(3),
+                Visibility = Visibility.Collapsed
             };
 
             private TextBlock _title = new TextBlock
@@ -563,6 +612,7 @@ namespace Alika.UI
                 };
                 stack.Children.Add(this._title);
                 stack.Children.Add(this._subtitle);
+                stack.Children.Add(this._button);
                 Grid.SetColumn(stack, 1);
                 this.Children.Add(stack);
 

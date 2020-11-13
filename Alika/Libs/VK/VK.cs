@@ -61,12 +61,41 @@ namespace Alika.Libs.VK
         public Type Call<Type>(string method, Dictionary<string, dynamic> fields = null)
         {
             var result = this.CallMethod(method, fields);
+            if (result.Contains("money_transfer")) System.Diagnostics.Debug.WriteLine(result);
             BasicResponse<Type> job = JsonConvert.DeserializeObject<BasicResponse<Type>>(result);
             if (job == null || job?.Error != null)
             {
                 throw new Exception(method + ": " + (job == null ? result : job.Error.Message));
             }
-            else return job.Response;
+            else
+            {
+                if (job.Response is IItemsResponse items)
+                {
+                    App.Cache.Update(items.Groups);
+                    App.Cache.Update(items.Profiles);
+
+                    if (job.Response is ItemsResponse<Group> groups) App.Cache.Update(groups.Items);
+                    if (job.Response is ItemsResponse<User> users) App.Cache.Update(users.Items);
+                    if (job.Response is ItemsResponse<ConversationResponse> convs) App.Cache.Update(convs.Items);
+                    if (job.Response is ItemsResponse<ConversationInfo> convinfos) App.Cache.Update(convinfos.Items);
+                }
+                else if (job.Response is GetImportantMessagesResponse response)
+                {
+                    App.Cache.Update(response.Groups);
+                    App.Cache.Update(response.Conversations);
+                    App.Cache.Update(response.Profiles);
+                }
+                else if (job.Response is List<User> users)
+                {
+                    App.Cache.Update(users);
+                }
+                else if (job.Response is List<Group> groups)
+                {
+                    App.Cache.Update(groups);
+                }
+
+                return job.Response;
+            }
         }
 
         /// <summary>

@@ -52,9 +52,6 @@ namespace Alika.Libs.VK.Methods
                 request.Add("extended", 1);
             }
             var response = this._vk.Call<ItemsResponse<ConversationResponse>>("messages.getConversations", request);
-            App.Cache.Update(response.Items);
-            App.Cache.Update(response.Profiles);
-            App.Cache.Update(response.Groups);
             return response;
         }
 
@@ -72,9 +69,6 @@ namespace Alika.Libs.VK.Methods
             }
             request.Add("peer_ids", String.Join(",", peer_ids));
             var response = this._vk.Call<ItemsResponse<ConversationInfo>>("messages.getConversationsById", request);
-            App.Cache.Update(response.Items);
-            App.Cache.Update(response.Profiles);
-            App.Cache.Update(response.Groups);
             return response;
         }
 
@@ -98,8 +92,6 @@ namespace Alika.Libs.VK.Methods
                 request.Add("fields", fields);
             }
             var response = this._vk.Call<ItemsResponse<Message>>("messages.getHistory", request);
-            App.Cache.Update(response.Profiles);
-            App.Cache.Update(response.Groups);
             return response;
         }
 
@@ -117,8 +109,6 @@ namespace Alika.Libs.VK.Methods
             }
             request.Add("message_ids", String.Join(",", msg_ids));
             var response = this._vk.Call<ItemsResponse<Message>>("messages.getById", request);
-            App.Cache.Update(response.Profiles);
-            App.Cache.Update(response.Groups);
             return response;
         }
 
@@ -137,8 +127,6 @@ namespace Alika.Libs.VK.Methods
                 request.Add("fields", fields);
             }
             var response = this._vk.Call<ItemsResponse<ConversationMember>>("messages.getConversationMembers", request);
-            App.Cache.Update(response.Profiles);
-            App.Cache.Update(response.Groups);
             return response;
         }
 
@@ -344,9 +332,6 @@ namespace Alika.Libs.VK.Methods
                 request.Add("extended", 1);
             }
             var response = this._vk.Call<ItemsResponse<ConversationInfo>>("messages.searchConversations", request);
-            App.Cache.Update(response.Items);
-            App.Cache.Update(response.Profiles);
-            App.Cache.Update(response.Groups);
             return response;
         }
 
@@ -383,9 +368,6 @@ namespace Alika.Libs.VK.Methods
                 request.Add("extended", 1);
             }
             var response = this._vk.Call<GetImportantMessagesResponse>("messages.getImportantMessages", request);
-            App.Cache.Update(response.Conversations);
-            App.Cache.Update(response.Groups);
-            App.Cache.Update(response.Profiles);
             return response;
         }
 
