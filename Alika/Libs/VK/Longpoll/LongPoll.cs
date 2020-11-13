@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -64,6 +65,8 @@ namespace Alika.Libs.VK.Longpoll
 
         public delegate void TypeEvent(LPEvents.TypeState typeState);
 
+        public delegate void CallbackEvent(LPEvents.CallbackAction callbackAction);
+
         public event LPHandler Event;
 
         public event NewMessage OnNewMessage;
@@ -77,6 +80,8 @@ namespace Alika.Libs.VK.Longpoll
         public event OnlineEvent UserOffline;
 
         public event TypeEvent Typing;
+
+        public event CallbackEvent Callback;
 
         public LongPoll(VK vk)
         {
@@ -99,7 +104,7 @@ namespace Alika.Libs.VK.Longpoll
             request.AddParameter("key", lp.Key);
             request.AddParameter("ts", lp.Ts);
             request.AddParameter("wait", 50);
-            request.AddParameter("mode", 2);
+            request.AddParameter("mode", 2 | 8 | 32 | 64 | 128);
             request.AddParameter("version", 10);
             this.ts = lp.Ts;
             this.stop = false;
@@ -207,6 +212,12 @@ namespace Alika.Libs.VK.Longpoll
                 }).ToList();
                 if (typings.Count > 0) foreach (var type in typings) this.Typing?.Invoke(type);
             });
+
+            Task.Factory.StartNew(() =>
+            {
+                var callbacks = updates.Where(i => (int)i[0] == (int)Updates.CALLBACK_BUTTON_RESPONSE).Select(i => i[1].ToObject<LPEvents.CallbackAction>()).ToList();
+                if (callbacks.Count > 0) foreach (var cb in callbacks) this.Callback?.Invoke(cb);
+            });
         }
     }
 
@@ -241,6 +252,42 @@ namespace Alika.Libs.VK.Longpoll
         {
             public List<int> UserIds;
             public int Peerid;
+        }
+
+        public struct CallbackAction
+        {
+            [JsonProperty("owner_id")]
+            public int OwnerId;
+
+            [JsonProperty("peer_id")]
+            public int PeerId;
+
+            [JsonProperty("event_id")]
+            public string EventId;
+
+            [JsonProperty("action")]
+            public CBAction Action;
+
+            public struct CBAction
+            {
+                [JsonProperty("type")]
+                public string Type;
+
+                [JsonProperty("text")]
+                public string Text;
+
+                [JsonProperty("link")]
+                public string Link;
+
+                [JsonProperty("app_id")]
+                public int? AppId;
+
+                [JsonProperty("owner_id")]
+                public int? OwnerId;
+
+                [JsonProperty("hash")]
+                public string Hash;
+            }
         }
     }
 }

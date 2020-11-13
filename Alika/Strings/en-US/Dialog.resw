@@ -301,4 +301,7 @@
     <value>You</value>
     <comment>You</comment>
   </data>
+  <data name="СallbackMessageFrom" xml:space="preserve">
+    <value>Message from %user%</value>
+  </data>
 </root>

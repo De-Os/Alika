@@ -84,6 +84,41 @@ namespace Alika.UI.Dialog
                         }
                     }
                 };
+                // TODO: Load older messages
+                /*scroll.ViewChanging += (a, b) =>
+                {
+                    if (this.loading) return;
+                    if (this.Messages.Items.First() is FrameworkElement el && scroll.IsElementVisible(el))
+                    {
+                        this.loading = true;
+                        var msg = this.Messages.Items.First(i => i is SwipeControl) as SwipeControl;
+                        if (msg.Content is MessageBox box && box.Message != null)
+                        {
+                            var msg_id = box.Message.Bubble.Message.Id;
+                            Task.Factory.StartNew(() =>
+                            {
+                                try
+                                {
+                                    var msgs = App.VK.Messages.GetHistory(this.PeerId, count: 50, start_message_id: msg_id);
+                                    if (msgs?.Items?.Count > 0)
+                                    {
+                                        App.UILoop.AddAction(new UITask
+                                        {
+                                            Action = () =>
+                                            {
+                                                scroll.VerticalScrollMode = ScrollMode.Disabled;
+                                                foreach (var message in msgs.Items) this.Messages.AddOldMessage(message);
+                                                this.loading = false;
+                                                scroll.VerticalScrollMode = ScrollMode.Enabled;
+                                            }
+                                        });
+                                    }
+                                }
+                                catch { }
+                            });
+                        }
+                    }
+                };*/
             }
         }
 
@@ -129,99 +164,93 @@ namespace Alika.UI.Dialog
 
                 App.LP.OnNewMessage += (msg) =>
                 {
-                    if (msg.PeerId == this.PeerId) this.AddNewMessage(msg);
+                    if (msg.PeerId == this.PeerId)
+                    {
+                        App.UILoop.AddAction(new UITask
+                        {
+                            Action = () => this.AddNewMessage(msg)
+                        });
+                    }
                 };
             }
 
             public void AddNewMessage(Message message)
             {
-                App.UILoop.AddAction(new UITask
+                var msg = new MessageBox(message);
+                msg.Loaded += (a, b) => this.OnNewMessage?.Invoke(true);
+                if (this.Items.Count > 0)
                 {
-                    Action = () =>
+                    if ((this.Items.Last(i => i is SwipeControl) as SwipeControl).Content is MessageBox prev && prev.Message != null && msg.Message != null)
                     {
-                        var msg = new MessageBox(message);
-                        msg.Loaded += (a, b) => this.OnNewMessage?.Invoke(true);
-                        if (this.Items.Count > 0)
+                        if (prev.Message.Bubble.Message.Date.ToDateTime().Date != message.Date.ToDateTime().Date)
                         {
-                            if ((this.Items.Last(i => i is SwipeControl) as SwipeControl).Content is MessageBox prev && prev.Message != null && msg.Message != null)
+                            this.Items.Add(new ListViewItem
                             {
-                                if (prev.Message.Bubble.Message.Date.ToDateTime().Date != message.Date.ToDateTime().Date)
-                                {
-                                    this.Items.Add(new ListViewItem
-                                    {
-                                        Content = new DateSeparator(message.Date.ToDateTime()),
-                                        HorizontalAlignment = HorizontalAlignment.Center,
-                                        HorizontalContentAlignment = HorizontalAlignment.Center
-                                    });
-                                }
-                                if (prev.Message.Bubble.Message.FromId == message.FromId && this.Items.Last() is SwipeControl)
-                                {
-                                    prev.Message.Ava.Visibility = Visibility.Collapsed;
-                                    Thickness prevMargin = prev.Message.Bubble.Border.Margin;
-                                    prevMargin.Bottom = 2.5;
-                                    prev.Message.Bubble.Border.Margin = prevMargin;
-                                    CornerRadius corners = prev.Message.Bubble.Border.CornerRadius;
-                                    CornerRadius msg_corners = msg.Message.Bubble.Border.CornerRadius;
-                                    if (prev.HorizontalContentAlignment == HorizontalAlignment.Left)
-                                    {
-                                        corners.BottomLeft = 0;
-                                        msg_corners.TopLeft = 0;
-                                    }
-                                    else
-                                    {
-                                        corners.BottomRight = 0;
-                                        msg_corners.TopRight = 0;
-                                    }
-                                    prev.Message.Bubble.Border.CornerRadius = corners;
-                                    msg.Message.Bubble.Border.CornerRadius = msg_corners;
-                                    msg.Message.Bubble.UserName.Visibility = Visibility.Collapsed;
-                                    msg.Message.Bubble.Border.Margin = new Thickness(10, 2.5, 10, 5);
-                                }
-                            }
+                                Content = new DateSeparator(message.Date.ToDateTime()),
+                                HorizontalAlignment = HorizontalAlignment.Center,
+                                HorizontalContentAlignment = HorizontalAlignment.Center
+                            });
                         }
-                        this.Items.Add(this.GetSwipeMessage(msg));
+                        if (prev.Message.Bubble.Message.FromId == message.FromId && this.Items.Last() is SwipeControl)
+                        {
+                            prev.Message.Ava.Visibility = Visibility.Collapsed;
+                            Thickness prevMargin = prev.Message.Bubble.Border.Margin;
+                            prevMargin.Bottom = 2.5;
+                            prev.Message.Bubble.Border.Margin = prevMargin;
+                            CornerRadius corners = prev.Message.Bubble.Border.CornerRadius;
+                            CornerRadius msg_corners = msg.Message.Bubble.Border.CornerRadius;
+                            if (prev.HorizontalContentAlignment == HorizontalAlignment.Left)
+                            {
+                                corners.BottomLeft = 0;
+                                msg_corners.TopLeft = 0;
+                            }
+                            else
+                            {
+                                corners.BottomRight = 0;
+                                msg_corners.TopRight = 0;
+                            }
+                            prev.Message.Bubble.Border.CornerRadius = corners;
+                            msg.Message.Bubble.Border.CornerRadius = msg_corners;
+                            msg.Message.Bubble.UserName.Visibility = Visibility.Collapsed;
+                            msg.Message.Bubble.Border.Margin = new Thickness(10, 2.5, 10, 5);
+                        }
                     }
-                });
+                }
+                this.Items.Add(this.GetSwipeMessage(msg));
             }
 
             public void AddOldMessage(Message message)
             {
-                App.UILoop.AddAction(new UITask
+                var msg = new MessageBox(message);
+                if (this.Items.Count > 0)
                 {
-                    Action = () =>
+                    if ((this.Items.First(i => i is SwipeControl) as SwipeControl).Content is MessageBox next && next.Message.Bubble.Message.FromId == message.FromId && next.Message != null && msg.Message != null)
                     {
-                        var msg = new MessageBox(message);
-                        if (this.Items.Count > 0)
+                        next.Message.Ava.Visibility = Visibility.Visible;
+                        next.Message.Bubble.UserName.Visibility = Visibility.Collapsed;
+                        msg.Message.Ava.Visibility = Visibility.Collapsed;
+                        Thickness prevMargin = next.Message.Bubble.Border.Margin;
+                        prevMargin.Top = 2.5;
+                        next.Message.Bubble.Border.Margin = prevMargin;
+                        CornerRadius corners = next.Message.Bubble.Border.CornerRadius;
+                        CornerRadius msg_corner = msg.Message.Bubble.Border.CornerRadius;
+                        if (next.HorizontalContentAlignment == HorizontalAlignment.Left)
                         {
-                            if ((this.Items.First(i => i is SwipeControl) as SwipeControl).Content is MessageBox next && next.Message.Bubble.Message.FromId == message.FromId && next.Message != null && msg.Message != null)
-                            {
-                                next.Message.Ava.Visibility = Visibility.Visible;
-                                next.Message.Bubble.UserName.Visibility = Visibility.Collapsed;
-                                msg.Message.Ava.Visibility = Visibility.Collapsed;
-                                Thickness prevMargin = next.Message.Bubble.Border.Margin;
-                                prevMargin.Top = 2.5;
-                                next.Message.Bubble.Border.Margin = prevMargin;
-                                CornerRadius corners = next.Message.Bubble.Border.CornerRadius;
-                                CornerRadius msg_corner = msg.Message.Bubble.Border.CornerRadius;
-                                if (next.HorizontalContentAlignment == HorizontalAlignment.Left)
-                                {
-                                    corners.TopLeft = 0;
-                                    msg_corner.BottomLeft = 0;
-                                }
-                                else
-                                {
-                                    corners.TopRight = 0;
-                                    msg_corner.BottomRight = 0;
-                                }
-                                msg.Message.Bubble.Border.CornerRadius = msg_corner;
-                                next.Message.Bubble.Border.CornerRadius = corners;
-                                msg.Message.Bubble.Border.Margin = new Thickness(10, 5, 10, 2.5);
-                            }
+                            corners.TopLeft = 0;
+                            msg_corner.BottomLeft = 0;
                         }
-                        msg.Loaded += (a, b) => this.OnNewMessage?.Invoke(false);
-                        this.Items.Insert(0, this.GetSwipeMessage(msg));
+                        else
+                        {
+                            corners.TopRight = 0;
+                            msg_corner.BottomRight = 0;
+                        }
+                        msg.Message.Bubble.Border.CornerRadius = msg_corner;
+                        next.Message.Bubble.Border.CornerRadius = corners;
+                        msg.Message.Bubble.Border.Margin = new Thickness(10, 5, 10, 2.5);
                     }
-                });
+                }
+                msg.Loaded += (a, b) => this.OnNewMessage?.Invoke(false);
+                this.Items.Insert(0, this.GetSwipeMessage(msg));
             }
 
             private SwipeControl GetSwipeMessage(MessageBox msg)
@@ -234,7 +263,7 @@ namespace Alika.UI.Dialog
                 {
                     IconSource = new FontIconSource
                     {
-                        Glyph = "\uE8CA"
+                        Glyph = "\uE97A"
                     },
                     Text = Utils.LocString("Dialog/Reply"),
                     Background = Coloring.Transparent.Percent(100),
@@ -248,11 +277,14 @@ namespace Alika.UI.Dialog
                         reply.Content = new Dialog.ReplyMessage(message);
                     };
                 leftItems.Add(item);
-                return new SwipeControl
+                var control = new SwipeControl
                 {
                     Content = msg,
                     LeftItems = leftItems
                 };
+                control.PointerEntered += (a, b) => msg.Message.Reply.Visibility = Visibility.Visible;
+                control.PointerExited += (a, b) => msg.Message.Reply.Visibility = Visibility.Collapsed;
+                return control;
             }
 
             // Crashes on release, idk why. Use GetSwipeMessage.

@@ -52,9 +52,6 @@ namespace Alika.Libs.VK.Methods
                 request.Add("extended", 1);
             }
             var response = this._vk.Call<ItemsResponse<ConversationResponse>>("messages.getConversations", request);
-            App.Cache.Update(response.Items);
-            App.Cache.Update(response.Profiles);
-            App.Cache.Update(response.Groups);
             return response;
         }
 
@@ -72,9 +69,6 @@ namespace Alika.Libs.VK.Methods
             }
             request.Add("peer_ids", String.Join(",", peer_ids));
             var response = this._vk.Call<ItemsResponse<ConversationInfo>>("messages.getConversationsById", request);
-            App.Cache.Update(response.Items);
-            App.Cache.Update(response.Profiles);
-            App.Cache.Update(response.Groups);
             return response;
         }
 
@@ -98,8 +92,6 @@ namespace Alika.Libs.VK.Methods
                 request.Add("fields", fields);
             }
             var response = this._vk.Call<ItemsResponse<Message>>("messages.getHistory", request);
-            App.Cache.Update(response.Profiles);
-            App.Cache.Update(response.Groups);
             return response;
         }
 
@@ -117,8 +109,6 @@ namespace Alika.Libs.VK.Methods
             }
             request.Add("message_ids", String.Join(",", msg_ids));
             var response = this._vk.Call<ItemsResponse<Message>>("messages.getById", request);
-            App.Cache.Update(response.Profiles);
-            App.Cache.Update(response.Groups);
             return response;
         }
 
@@ -137,8 +127,6 @@ namespace Alika.Libs.VK.Methods
                 request.Add("fields", fields);
             }
             var response = this._vk.Call<ItemsResponse<ConversationMember>>("messages.getConversationMembers", request);
-            App.Cache.Update(response.Profiles);
-            App.Cache.Update(response.Groups);
             return response;
         }
 
@@ -344,9 +332,6 @@ namespace Alika.Libs.VK.Methods
                 request.Add("extended", 1);
             }
             var response = this._vk.Call<ItemsResponse<ConversationInfo>>("messages.searchConversations", request);
-            App.Cache.Update(response.Items);
-            App.Cache.Update(response.Profiles);
-            App.Cache.Update(response.Groups);
             return response;
         }
 
@@ -383,9 +368,6 @@ namespace Alika.Libs.VK.Methods
                 request.Add("extended", 1);
             }
             var response = this._vk.Call<GetImportantMessagesResponse>("messages.getImportantMessages", request);
-            App.Cache.Update(response.Conversations);
-            App.Cache.Update(response.Groups);
-            App.Cache.Update(response.Profiles);
             return response;
         }
 
@@ -404,10 +386,25 @@ namespace Alika.Libs.VK.Methods
         {
             if (peer_id > Limits.Messages.PEERSTART) peer_id -= Limits.Messages.PEERSTART;
             return this._vk.Call<int>("messages.addChatUser", new Dictionary<string, dynamic> {
-            {"chat_id", peer_id},
-            {"user_id", user_id},
-            {"visible_messages_count", visible_messages_count > 0 && visible_messages_count <= 1000 ? visible_messages_count : 0}
-        });
+                {"chat_id", peer_id},
+                {"user_id", user_id},
+                {"visible_messages_count", visible_messages_count > 0 && visible_messages_count <= 1000 ? visible_messages_count : 0}
+            });
+        }
+
+        /// <summary>
+        /// messages.sendMessageEvent
+        /// </summary>
+        public string SendMessageEvent(int peer_id, string payload, int message_id = 0, int conversation_message_id = 0, int author_id = 0)
+        {
+            var request = new Dictionary<string, dynamic> {
+                {"peer_id", peer_id},
+                {"payload", payload}
+            };
+            if (message_id != 0) request.Add("message_id", message_id);
+            if (conversation_message_id != 0) request.Add("conversation_message_id", conversation_message_id);
+            if (author_id != 0) request.Add("author_id", author_id);
+            return this._vk.Call<string>("messages.sendMessageEvent", request);
         }
     }
 }

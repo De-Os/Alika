@@ -230,16 +230,7 @@ namespace Alika.Libs
             string text = "";
             if (msg.Text.Length > 0)
             {
-                string temptext = msg.Text.Replace("\n", " ");
-                MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(msg.Text);
-                if (pushes.Count > 0)
-                {
-                    foreach (Match push in pushes)
-                    {
-                        temptext = temptext.Replace(push.Value, push.Value.Split("|").Last().Replace("]", ""));
-                    }
-                }
-                text += temptext;
+                text += msg.Text.RemovePushes();
             }
             else
             {
@@ -278,6 +269,14 @@ namespace Alika.Libs
                         case "graffiti":
                             text += "🖌 " + Utils.LocString("Attachments/Graffiti");
                             break;
+
+                        case "wall":
+                            text += "📣 " + Utils.LocString("Attachments/Wall");
+                            break;
+
+                        case "wall_reply":
+                            text += "💬 " + Utils.LocString("Attachments/WallReply");
+                            break;
                     }
                 }
                 else
@@ -289,6 +288,20 @@ namespace Alika.Libs
                 }
             }
             return text;
+        }
+
+        public static string RemovePushes(this string str)
+        {
+            string temptext = str.Replace("\n", " ");
+            MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(str);
+            if (pushes.Count > 0)
+            {
+                foreach (Match push in pushes)
+                {
+                    temptext = temptext.Replace(push.Value, push.Value.Split("|").Last().Replace("]", ""));
+                }
+            }
+            return temptext;
         }
     }
 }

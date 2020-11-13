@@ -300,6 +300,7 @@ namespace Alika.UI
                                    {
                                        foreach (var att in response.Items)
                                        {
+                                           if (att.Attachment.Type != this.type) continue;
                                            switch (this.type)
                                            {
                                                case "doc":
@@ -316,6 +317,14 @@ namespace Alika.UI
                                                    {
                                                        HorizontalAlignment = HorizontalAlignment.Stretch,
                                                        Margin = new Thickness(5)
+                                                   });
+                                                   break;
+
+                                               case "link":
+                                                   final.Children.Add(new MessageAttachment.Link(att.Attachment.Link)
+                                                   {
+                                                       HorizontalAlignment = HorizontalAlignment.Stretch,
+                                                       MaxWidth = 400
                                                    });
                                                    break;
                                            }

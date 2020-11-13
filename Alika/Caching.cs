@@ -66,18 +66,12 @@ namespace Alika
 
         public void Update(List<ConversationResponse> conversations)
         {
-            if (conversations != null && conversations.Count > 0) conversations.ForEach((ConversationResponse conversation) =>
-            {
-                this.Update(conversation.Conversation);
-            });
+            if (conversations?.Count > 0) foreach (var conv in conversations) this.Update(conv.Conversation);
         }
 
         public void Update(List<ConversationInfo> conversations)
         {
-            if (conversations != null && conversations.Count > 0) conversations.ForEach((ConversationInfo conversation) =>
-            {
-                this.Update(conversation);
-            });
+            if (conversations?.Count > 0) foreach (var conv in conversations) this.Update(conv);
         }
 
         public void Update(ConversationInfo conversation)

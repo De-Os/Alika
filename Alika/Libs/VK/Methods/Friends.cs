@@ -19,7 +19,6 @@ namespace Alika.Libs.VK.Methods
             if (!fields.Contains("online_info")) fields += ",online_info";
             request.Add("fields", fields);
             var response = this._vk.Call<ItemsResponse<User>>("friends.get", request);
-            App.Cache.Update(response.Items);
             return response;
         }
     }

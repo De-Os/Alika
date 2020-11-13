@@ -425,6 +425,201 @@ namespace Alika.UI
             }
         }
 
+        [Bindable]
+        public class Link : LinkHolder
+        {
+            public Link(Attachment.LinkAtt lnk)
+            {
+                if (lnk.Photo != null)
+                {
+                    this.LoadPhoto(lnk.Photo.GetBestQuality().Url);
+                }
+                else
+                {
+                    this.Content = new FontIcon
+                    {
+                        Glyph = "\uE71B"
+                    };
+                }
+                this.Title = lnk.Title;
+                this.Subtitle = lnk.Caption;
+                this.Link = lnk.Url;
+            }
+
+            private async void LoadPhoto(string photo) => this.Content = new Image
+            {
+                Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(photo))
+            };
+        }
+
+        [Bindable]
+        public class Wall : LinkHolder
+        {
+            public Wall(Attachment.WallAtt wall)
+            {
+                this.Content = new FontIcon
+                {
+                    Glyph = "\uE8F3"
+                };
+                this.Title = Utils.LocString("Attachments/Wall");
+                this.Subtitle = wall.Text.RemovePushes();
+                this.Link = "https://vk.com/wall" + (wall.ToId != 0 ? wall.ToId : wall.OwnerId) + "_" + wall.Id;
+            }
+        }
+
+        [Bindable]
+        public class WallReply : LinkHolder
+        {
+            public WallReply(Attachment.WallReplyAtt reply)
+            {
+                this.Content = new FontIcon
+                {
+                    Glyph = "\uE8F2"
+                };
+                this.Title = Utils.LocString("Attachments/WallReply");
+                this.Subtitle = reply.Text.RemovePushes();
+                this.Link = "https://vk.com/wall" + reply.OwnerId + "_" + reply.PostId + "?reply=" + reply.Id;
+            }
+        }
+
+        [Bindable]
+        public class MoneyTransfer : LinkHolder
+        {
+            public MoneyTransfer(Attachment.MoneyTransferAtt money)
+            {
+                this.Content = new FontIcon
+                {
+                    Glyph = "\uE8C7"
+                };
+                this.Title = money.Amount.Text;
+                this.Subtitle = Utils.LocString("Attachments/MoneyTransfer");
+                this.Link = "https://vk.com/settings?act=payments&section=transfer";
+            }
+        }
+
+        [Bindable]
+        public class Story : LinkHolder
+        {
+            public Story(Attachment.StoryAtt story)
+            {
+                this.Content = new FontIcon
+                {
+                    Glyph = "\uF738"
+                };
+                this.Title = Utils.LocString("Attachments/History");
+                this.Link = "https://vk.com/" + story.ToAttachFormat(false);
+            }
+        }
+
+        [Bindable]
+        public abstract class LinkHolder : Grid
+        {
+            protected string Link;
+
+            protected FrameworkElement Content
+            {
+                get
+                {
+                    return this._border.Child as FrameworkElement;
+                }
+                set
+                {
+                    value.VerticalAlignment = VerticalAlignment.Center;
+                    value.VerticalAlignment = VerticalAlignment.Center;
+                    if (value is FontIcon f) f.FontSize = 30;
+                    this._border.Child = value;
+                }
+            }
+
+            protected string Title
+            {
+                get
+                {
+                    return this._title.Text;
+                }
+                set
+                {
+                    this._title.Text = value;
+                }
+            }
+
+            protected string Subtitle
+            {
+                get
+                {
+                    return this._subtitle.Text;
+                }
+                set
+                {
+                    this._subtitle.Text = value;
+                }
+            }
+
+            protected FrameworkElement Button
+            {
+                get
+                {
+                    return this._button.Content as FrameworkElement;
+                }
+                set
+                {
+                    this._button.Visibility = value == null ? Visibility.Collapsed : Visibility.Visible;
+                    this._button.Content = value;
+                }
+            }
+
+            private Border _border = new Border
+            {
+                CornerRadius = new CornerRadius(10),
+                Width = 50,
+                Height = 50,
+                Margin = new Thickness(0, 0, 5, 0)
+            };
+
+            private Button _button = new Button
+            {
+                CornerRadius = new CornerRadius(10),
+                Margin = new Thickness(3),
+                Visibility = Visibility.Collapsed
+            };
+
+            private TextBlock _title = new TextBlock
+            {
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                FontWeight = FontWeights.Bold
+            };
+
+            private TextBlock _subtitle = new TextBlock
+            {
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                FontWeight = FontWeights.SemiBold
+            };
+
+            public LinkHolder()
+            {
+                this.HorizontalAlignment = HorizontalAlignment.Stretch;
+                this.Padding = new Thickness(10);
+                this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+                this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+                Grid.SetColumn(this._border, 0);
+                this.Children.Add(this._border);
+
+                var stack = new StackPanel
+                {
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Stretch
+                };
+                stack.Children.Add(this._title);
+                stack.Children.Add(this._subtitle);
+                stack.Children.Add(this._button);
+                Grid.SetColumn(stack, 1);
+                this.Children.Add(stack);
+
+                this.PointerPressed += async (a, b) => await Windows.System.Launcher.LaunchUriAsync(new Uri(this.Link));
+            }
+        }
+
         /// <summary>
         /// Uploaded file holder
         /// </summary>

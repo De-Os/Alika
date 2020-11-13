@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Windows.System;
+using Windows.UI.Core;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -339,7 +341,7 @@ namespace Alika.UI
                     this.PointerPressed += (a, b) =>
                     {
                         Task.Factory.StartNew(() => App.VK.Messages.Send(App.MainPage.PeerId, sticker_id: this.Sticker.StickerId));
-                        this.StickerSent?.Invoke(sticker);
+                        if (!Window.Current.CoreWindow.GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down)) this.StickerSent?.Invoke(sticker);
                     };
                     this.PointerEntered += (a, b) => this.Background = Coloring.Transparent.Percent(50); // Sticker "selection" by background color
                     this.PointerExited += (a, b) => this.Background = Coloring.Transparent.Full; // Remove selection

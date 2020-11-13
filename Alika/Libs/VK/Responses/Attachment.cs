@@ -31,6 +31,9 @@ namespace Alika.Libs.VK.Responses
         [JsonProperty("link")]
         public LinkAtt Link;
 
+        [JsonProperty("money_transfer")]
+        public MoneyTransferAtt MoneyTransfer;
+
         [JsonProperty("wall")]
         public WallAtt Wall;
 
@@ -42,6 +45,9 @@ namespace Alika.Libs.VK.Responses
 
         [JsonProperty("gift")]
         public GiftAtt Gift;
+
+        [JsonProperty("story")]
+        public StoryAtt Story;
 
         public class PhotoAtt : AttachBase
         {
@@ -250,6 +256,11 @@ namespace Alika.Libs.VK.Responses
             public override string ToAttachFormat(bool key = true) => "doc" + base.ToAttachFormat(key);
         }
 
+        public class StoryAtt : AttachBase
+        {
+            public override string ToAttachFormat(bool key = true) => "story" + base.ToAttachFormat(key);
+        }
+
         public class AudioMessageAtt : AttachBase
         {
             [JsonProperty("duration")]
@@ -281,7 +292,7 @@ namespace Alika.Libs.VK.Responses
             [JsonProperty("title")]
             public string Title;
 
-            [JsonProperty("caption ")]
+            [JsonProperty("caption")]
             public string Caption;
 
             [JsonProperty("description")]
@@ -289,6 +300,9 @@ namespace Alika.Libs.VK.Responses
 
             [JsonProperty("photo")]
             public PhotoAtt Photo;
+
+            [JsonProperty("button")]
+            public Message.MsgKeyboard.Button Button;
         }
 
         public class WallAtt
@@ -396,6 +410,60 @@ namespace Alika.Libs.VK.Responses
 
             [JsonProperty("thumb_48")]
             public string Thumb48;
+        }
+
+        public class MoneyTransferAtt
+        {
+            [JsonProperty("id")]
+            public int Id;
+
+            [JsonProperty("from_id")]
+            public int FromId;
+
+            [JsonProperty("to_id")]
+            public int ToId;
+
+            [JsonProperty("status")]
+            public int Status;
+
+            [JsonProperty("date")]
+            public int Date;
+
+            [JsonProperty("amount")]
+            public AmountInfo Amount;
+
+            [JsonProperty("comment")]
+            public string Comment;
+
+            [JsonProperty("is_anonymous")]
+            public bool IsAnonymous;
+
+            [JsonProperty("is_vkpay")]
+            public bool IsVKPay;
+
+            [JsonProperty("by_phone")]
+            public bool ByPhone;
+
+            public struct AmountInfo
+            {
+                [JsonProperty("amount")]
+                public string Amount;
+
+                [JsonProperty("currency")]
+                public CurrencyInfo Currency;
+
+                [JsonProperty("text")]
+                public string Text;
+
+                public struct CurrencyInfo
+                {
+                    [JsonProperty("id")]
+                    public int Id;
+
+                    [JsonProperty("name")]
+                    public string Name;
+                }
+            }
         }
 
         public abstract class AttachBase
