@@ -543,88 +543,40 @@ namespace Alika.UI
                     }
 
                     [Bindable]
-                    public class ChangeButton : Button
+                    public class ChangeButton : ComboBox
                     {
-                        private readonly Grid _content = new Grid();
-
-                        public TextBlock state = new TextBlock
-                        {
-                            VerticalAlignment = VerticalAlignment.Center,
-                            TextTrimming = TextTrimming.CharacterEllipsis
-                        };
-
                         public ChangeButton(string type, string state)
                         {
-                            this.state.Text = StateNamings[state];
-
-                            this.Background = Coloring.Transparent.Full;
+                            this.Width = 200;
                             this.HorizontalAlignment = HorizontalAlignment.Right;
                             this.VerticalAlignment = VerticalAlignment.Center;
-                            this.CornerRadius = new CornerRadius(10);
                             this.Margin = new Thickness(10, 0, 0, 0);
-                            this.Content = this._content;
 
-                            this._content.ColumnDefinitions.Add(new ColumnDefinition());
-                            this._content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
-
-                            Grid.SetColumn(this.state, 0);
-                            this._content.Children.Add(this.state);
-                            var img = new FontIcon
+                            foreach (var perm in StateNamings)
                             {
-                                VerticalAlignment = VerticalAlignment.Center,
-                                FontSize = 10,
-                                Margin = new Thickness(5),
-                                Glyph = "\uE70D"
-                            };
-                            Grid.SetColumn(img, 1);
-                            this._content.Children.Add(img);
-
-                            var fl = new FlyOut(type, state);
-                            this.Flyout = fl;
-                            fl.StateChanged += (s) => this.state.Text = StateNamings[s];
-                        }
-
-                        [Bindable]
-                        public class FlyOut : MenuFlyout
-                        {
-                            public delegate void Changed(string newtype);
-
-                            public event Changed StateChanged;
-
-                            public FlyOut(string type, string current_state)
-                            {
-                                foreach (KeyValuePair<string, string> e in StateNamings)
+                                if (perm.Key == Type.AllName && Types[type].IsAllDisabled) continue;
+                                var p = new TextBlock
                                 {
-                                    if (e.Key == Type.AllName && Types[type].IsAllDisabled) continue;
-                                    var btn = new MenuFlyoutItem
-                                    {
-                                        Text = e.Value,
-                                        Background = e.Key == current_state ? Coloring.Transparent.Percent(50) : Coloring.Transparent.Full
-                                    };
-                                    btn.Click += (a, b) =>
-                                    {
-                                        if (btn.Background == Coloring.Transparent.Full)
-                                        {
-                                            try
-                                            {
-                                                App.VK.Call<int>("messages.editChat", new Dictionary<string, dynamic> {
-                                                    {"chat_id", App.MainPage.PeerId - Limits.Messages.PEERSTART },
-                                                    {"permissions", "{\"" + type + "\": \"" + e.Key + "\"}"  }
-                                                });
-                                                foreach (var item in this.Items) if (item is MenuFlyoutItem bn && bn != btn) bn.Background = Coloring.Transparent.Full;
-                                                btn.Background = Coloring.Transparent.Percent(50);
-                                                this.StateChanged?.Invoke(e.Key);
-                                            }
-                                            catch (Exception exc)
-                                            {
-                                                Task.Run(async () => await new MessageDialog(exc.Message, Utils.LocString("Error")).ShowAsync());
-                                            }
-                                            this.Hide();
-                                        }
-                                    };
-                                    this.Items.Add(btn);
-                                }
+                                    Text = perm.Value
+                                };
+                                this.Items.Add(p);
+                                if (perm.Key == state) this.SelectedItem = p;
                             }
+                            this.SelectionChanged += (a, b) =>
+                            {
+                                try
+                                {
+                                    App.VK.Call<int>("messages.editChat", new Dictionary<string, dynamic> {
+                                                    {"chat_id", App.MainPage.PeerId - Limits.Messages.PEERSTART },
+                                                    {"permissions", "{\"" + type + "\": \"" + StateNamings.First(i => i.Value == (this.SelectedItem as TextBlock).Text).Key + "\"}"  }
+                                                });
+                                }
+                                catch (Exception exc)
+                                {
+                                    this.SelectedItem = this.Items.First(i => i is TextBlock text && text.Text == StateNamings[state]);
+                                    Task.Run(async () => await new MessageDialog(exc.Message, Utils.LocString("Error")).ShowAsync());
+                                }
+                            };
                         }
                     }
                 }
