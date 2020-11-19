@@ -17,6 +17,8 @@ using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media;
+using static Alika.Theme;
 
 namespace Alika.UI
 {
@@ -106,18 +108,18 @@ namespace Alika.UI
                 Margin = new Thickness(0, 0, 10, 0)
             };
 
-            public TextBlock Title = new TextBlock
-            {
-                TextTrimming = TextTrimming.CharacterEllipsis,
-                VerticalAlignment = VerticalAlignment.Bottom,
-                FontWeight = FontWeights.SemiBold,
-                FontSize = 20
-            };
+            public TextBlock Title;
 
             public ConversationInfo conv;
 
             public AvatarAndName(ConversationInfo conversation)
             {
+                this.Title = ThemeHelpers.GetThemedText();
+                this.Title.TextTrimming = TextTrimming.CharacterEllipsis;
+                this.Title.VerticalAlignment = VerticalAlignment.Bottom;
+                this.Title.FontWeight = FontWeights.SemiBold;
+                this.Title.FontSize = 20;
+
                 this.conv = conversation;
                 this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                 this.ColumnDefinitions.Add(new ColumnDefinition());
@@ -131,10 +133,8 @@ namespace Alika.UI
 
                 text.Children.Add(this.Title);
 
-                FrameworkElement subtext = new TextBlock
-                {
-                    TextTrimming = TextTrimming.CharacterEllipsis,
-                };
+                FrameworkElement subtext = ThemeHelpers.GetThemedText();
+                (subtext as TextBlock).TextTrimming = TextTrimming.CharacterEllipsis;
                 if (this.conv.Peer.Id > 0)
                 {
                     if (this.conv.Peer.Id > Limits.Messages.PEERSTART)
@@ -419,7 +419,7 @@ namespace Alika.UI
                     };
                     content.Children.Add(new Popup.Menu.Element(
                             "Dialog/Permissions",
-                            "settings.svg",
+                            "\uE713",
                             (a, b) => App.MainPage.Popup.Children.Add(this.PermsPopup)
                         ));
                 }
@@ -443,32 +443,32 @@ namespace Alika.UI
                     {"invite", new Type
                     {
                         Name = Utils.LocString("Dialog/PermissionsInvite"),
-                        Picture = "\uE8FA"
+                        Picture = Glyphs.AddUser
                     } },
                     {"change_info", new Type
                     {
                         Name = Utils.LocString("Dialog/PermissionsChangeInfo"),
-                        Picture = "\uE70F"
+                        Picture = Glyphs.Pen
                     } },
                     {"change_pin", new Type{
                         Name = Utils.LocString("Dialog/PermissionsPin"),
-                        Picture = "\uE718"
+                        Picture = Glyphs.Pin
                     } },
                     {"use_mass_mentions", new Type{
                         Name = Utils.LocString("Dialog/PermissionsMentions"),
-                        Picture = "\uE789"
+                        Picture = Glyphs.Mention
                     } },
                     {"see_invite_link", new Type{
                         Name = Utils.LocString("Dialog/PermissionsLink"),
-                        Picture = "\uE910"
+                        Picture = Glyphs.Link
                     } },
                     {"call", new Type{
                         Name = Utils.LocString("Dialog/PermissionsCall"),
-                        Picture = "\uE717"
+                        Picture = Glyphs.Call
                     } },
                     {"change_admins", new Type{
                         Name = Utils.LocString("Dialog/PermissionsChangeAdmins"),
-                        Picture = "\uE748",
+                        Picture = Glyphs.SwitchUser,
                         IsAllDisabled = true
                     } }
                 };
@@ -499,7 +499,7 @@ namespace Alika.UI
                 [Bindable]
                 public class Element : Grid
                 {
-                    public FontIcon Icon = new FontIcon
+                    public FontIcon Icon = new ThemedFontIcon
                     {
                         Width = 20,
                         Height = 20,
@@ -507,19 +507,19 @@ namespace Alika.UI
                         VerticalAlignment = VerticalAlignment.Center
                     };
 
-                    public TextBlock Text = new TextBlock
-                    {
-                        VerticalAlignment = VerticalAlignment.Center,
-                        FontWeight = FontWeights.SemiBold,
-                        TextTrimming = TextTrimming.CharacterEllipsis
-                    };
+                    public TextBlock Text;
 
                     public Element(string name, string state)
                     {
                         var type = Types[name];
 
+                        this.Text = ThemeHelpers.GetThemedText();
+                        this.Text.VerticalAlignment = VerticalAlignment.Center;
+                        this.Text.FontWeight = FontWeights.SemiBold;
+                        this.Text.TextTrimming = TextTrimming.CharacterEllipsis;
+
                         this.HorizontalAlignment = HorizontalAlignment.Stretch;
-                        this.Background = Coloring.Transparent.Full;
+                        this.Background = App.Theme.Colors.Transparent;
 
                         this.Padding = new Thickness(10);
                         this.CornerRadius = new CornerRadius(5);
@@ -555,10 +555,8 @@ namespace Alika.UI
                             foreach (var perm in StateNamings)
                             {
                                 if (perm.Key == Type.AllName && Types[type].IsAllDisabled) continue;
-                                var p = new TextBlock
-                                {
-                                    Text = perm.Value
-                                };
+                                var p = ThemeHelpers.GetThemedText();
+                                p.Text = perm.Value;
                                 this.Items.Add(p);
                                 if (perm.Key == state) this.SelectedItem = p;
                             }
@@ -622,7 +620,7 @@ namespace Alika.UI
                             Action = () =>
                             {
                                 StackPanel menu = new StackPanel();
-                                var search = new TextBox
+                                var search = new ThemedTextBox
                                 {
                                     PlaceholderText = Utils.LocString("Search"),
                                     HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -655,24 +653,19 @@ namespace Alika.UI
                 {
                     public Button actions = new Button
                     {
-                        Content = new FontIcon
+                        Content = new ThemedFontIcon
                         {
-                            Glyph = "\uE70D"
+                            Glyph = Glyphs.DropMenu
                         },
-                        Background = Coloring.Transparent.Full,
+                        Background = App.Theme.Colors.Transparent,
                         CornerRadius = new CornerRadius(10),
                         HorizontalAlignment = HorizontalAlignment.Right,
                         VerticalAlignment = VerticalAlignment.Center,
-                        Margin = new Thickness(0, 0, 10, 0)
+                        Margin = new Thickness(0, 0, 10, 0),
+                        Foreground = new SolidColorBrush(App.Theme.Colors.Text.Default)
                     };
 
-                    public TextBlock name = new TextBlock
-                    {
-                        VerticalAlignment = VerticalAlignment.Center,
-                        TextTrimming = TextTrimming.CharacterEllipsis,
-                        FontSize = 15,
-                        FontWeight = FontWeights.SemiBold
-                    };
+                    public TextBlock name;
 
                     public ConversationMember User;
                     public int peer_id;
@@ -681,6 +674,12 @@ namespace Alika.UI
                     {
                         this.User = member;
                         this.peer_id = peer_id;
+
+                        this.name = ThemeHelpers.GetThemedText();
+                        this.name.VerticalAlignment = VerticalAlignment.Center;
+                        this.name.TextTrimming = TextTrimming.CharacterEllipsis;
+                        this.name.FontSize = 15;
+                        this.name.FontWeight = FontWeights.SemiBold;
 
                         this.HorizontalAlignment = HorizontalAlignment.Stretch;
                         this.Margin = new Thickness(5);
@@ -705,11 +704,11 @@ namespace Alika.UI
 
                         Button info = new Button
                         {
-                            Content = new FontIcon
+                            Content = new ThemedFontIcon
                             {
-                                Glyph = "\uE946"
+                                Glyph = Glyphs.Info
                             },
-                            Background = Coloring.Transparent.Full,
+                            Background = App.Theme.Colors.Transparent,
                             CornerRadius = new CornerRadius(10),
                             HorizontalAlignment = HorizontalAlignment.Right,
                             VerticalAlignment = VerticalAlignment.Center,
@@ -753,7 +752,7 @@ namespace Alika.UI
                     }
 
                     [Bindable]
-                    public class Actions : MenuFlyout
+                    public class Actions : ThemedMenuFlyout
                     {
                         public delegate void Event(ConversationMember member);
 
@@ -775,12 +774,12 @@ namespace Alika.UI
                             {
                                 if (member.IsAdmin)
                                 {
-                                    var demote = new MenuFlyoutItem
+                                    var demote = new ThemedMenuFlyoutItem
                                     {
                                         Text = Utils.LocString("Dialog/Demote"),
-                                        Icon = new FontIcon
+                                        Icon = new ThemedFontIcon
                                         {
-                                            Glyph = "\uE70D"
+                                            Glyph = Glyphs.DropMenu
                                         }
                                     };
                                     demote.Click += async (a, b) =>
@@ -801,12 +800,12 @@ namespace Alika.UI
                                 }
                                 else
                                 {
-                                    var promote = new MenuFlyoutItem
+                                    var promote = new ThemedMenuFlyoutItem
                                     {
                                         Text = Utils.LocString("Dialog/Promote"),
-                                        Icon = new FontIcon
+                                        Icon = new ThemedFontIcon
                                         {
-                                            Glyph = "\uE70E"
+                                            Glyph = Glyphs.DropUpMenu
                                         }
                                     };
                                     promote.Click += async (a, b) =>
@@ -829,12 +828,12 @@ namespace Alika.UI
 
                             if (member.CanKick)
                             {
-                                var kick = new MenuFlyoutItem
+                                var kick = new ThemedMenuFlyoutItem
                                 {
                                     Text = Utils.LocString("Dialog/Kick"),
-                                    Icon = new FontIcon
+                                    Icon = new ThemedFontIcon
                                     {
-                                        Glyph = "\uE711"
+                                        Glyph = Glyphs.Close
                                     }
                                 };
                                 kick.Click += async (a, b) =>
@@ -856,25 +855,23 @@ namespace Alika.UI
                     }
 
                     [Bindable]
-                    public class Information : Flyout
+                    public class Information : ThemedFlyout
                     {
                         public Information(ConversationMember member)
                         {
                             StackPanel stack = new StackPanel { HorizontalAlignment = HorizontalAlignment.Stretch };
 
-                            stack.Children.Add(new TextBlock
-                            {
-                                Text = Utils.LocString("Dialog/InvitedTime").Replace("%time%", member.JoinDate.ToDateTime().ToString(@"d.M.y H:mm:ss")),
-                                VerticalAlignment = VerticalAlignment.Center
-                            });
+                            var timeText = ThemeHelpers.GetThemedText();
+                            timeText.Text = Utils.LocString("Dialog/InvitedTime").Replace("%time%", member.JoinDate.ToDateTime().ToString(@"d.M.y H:mm:ss"));
+                            timeText.VerticalAlignment = VerticalAlignment.Center;
+                            stack.Children.Add(timeText);
 
                             if (member.InvitedBy != member.MemberId)
                             {
-                                stack.Children.Add(new TextBlock
-                                {
-                                    Text = Utils.LocString("Dialog/JoinedInfo").Replace("%user%", App.Cache.GetName(member.InvitedBy)),
-                                    VerticalAlignment = VerticalAlignment.Center
-                                });
+                                var invitedText = ThemeHelpers.GetThemedText();
+                                invitedText.Text = Utils.LocString("Dialog/JoinedInfo").Replace("%user%", App.Cache.GetName(member.InvitedBy));
+                                invitedText.VerticalAlignment = VerticalAlignment.Center;
+                                stack.Children.Add(invitedText);
                             }
 
                             this.Content = stack;
@@ -902,26 +899,21 @@ namespace Alika.UI
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                public TextBox Title = new TextBox
+                public ThemedTextBox Title = new ThemedTextBox
                 {
                     AcceptsReturn = false,
-                    Height = 15,
                     VerticalAlignment = VerticalAlignment.Bottom,
                     HorizontalAlignment = HorizontalAlignment.Stretch,
+                    Foreground = new SolidColorBrush(App.Theme.Colors.Text.Default),
                     Margin = new Thickness(5, 0, 0, 0)
                 };
 
                 public Button RemovePhoto = new Button
                 {
-                    Background = Coloring.Transparent.Full,
+                    Background = App.Theme.Colors.Transparent,
                     CornerRadius = new CornerRadius(10),
                     Padding = new Thickness(5),
                     VerticalAlignment = VerticalAlignment.Center,
-                    Content = new TextBlock
-                    {
-                        Text = Utils.LocString("Dialog/RemovePhoto"),
-                        FontWeight = FontWeights.SemiBold
-                    }
                 };
 
                 public Settings(ConversationInfo peer)
@@ -929,6 +921,11 @@ namespace Alika.UI
                     this.Peer = peer;
                     this.Title.Text = this.Peer.Settings.Title;
                     this.Width = 450;
+
+                    var removeText = ThemeHelpers.GetThemedText();
+                    removeText.Text = Utils.LocString("Dialog/RemovePhoto");
+                    this.RemovePhoto.Content = removeText;
+
                     this.Children.Add(new ProgressRing
                     {
                         Height = 50,
@@ -944,7 +941,6 @@ namespace Alika.UI
 
                 public void Load()
                 {
-                    StackPanel panel = new StackPanel();
                     Grid grid = new Grid();
                     grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                     grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -1037,14 +1033,12 @@ namespace Alika.UI
                         else b.Handled = false;
                     };
 
-                    panel.Children.Add(grid);
-
                     App.UILoop.AddAction(new UITask
                     {
                         Action = () =>
                         {
                             this.Children.Clear();
-                            this.Children.Add(panel);
+                            this.Children.Add(grid);
                         }
                     });
                 }
@@ -1078,7 +1072,7 @@ namespace Alika.UI
                                 this.RowDefinitions.Add(new RowDefinition { });
                                 this.RowDefinitions.Add(new RowDefinition { });
 
-                                var textbox = new TextBox
+                                var textbox = new ThemedTextBox
                                 {
                                     IsReadOnly = true,
                                     Text = link,
@@ -1096,12 +1090,12 @@ namespace Alika.UI
                                 Grid.SetRow(stack, 1);
                                 this.Children.Add(stack);
 
+                                var text = ThemeHelpers.GetThemedText();
+                                text.Text = Utils.LocString("Copy");
+
                                 var copy = new Button
                                 {
-                                    Content = new TextBlock
-                                    {
-                                        Text = Utils.LocString("Copy")
-                                    },
+                                    Content = text,
                                     Margin = new Thickness(0, 0, 2.5, 0)
                                 };
                                 stack.Children.Add(copy);
@@ -1123,12 +1117,11 @@ namespace Alika.UI
                                 };
                                 if (chat.Settings.Access.CanChangeInviteLink)
                                 {
+                                    var resetText = ThemeHelpers.GetThemedText();
+                                    resetText.Text = Utils.LocString("Reset");
                                     var reset = new Button
                                     {
-                                        Content = new TextBlock
-                                        {
-                                            Text = Utils.LocString("Reset")
-                                        },
+                                        Content = resetText,
                                         Margin = new Thickness(2.5, 0, 0, 0)
                                     };
                                     stack.Children.Add(reset);
@@ -1144,10 +1137,9 @@ namespace Alika.UI
                                                 {
                                                     Action = () =>
                                                     {
-                                                        reset.Content = new TextBlock
-                                                        {
-                                                            Text = Utils.LocString("Reset")
-                                                        };
+                                                        var content = ThemeHelpers.GetThemedText();
+                                                        content.Text = Utils.LocString("Reset");
+                                                        reset.Content = content;
                                                         textbox.Text = nlink;
                                                     }
                                                 });
@@ -1181,7 +1173,7 @@ namespace Alika.UI
                     this.Width = 500;
                     this.MinHeight = 300;
 
-                    var searchbar = new TextBox
+                    var searchbar = new ThemedTextBox
                     {
                         PlaceholderText = Utils.LocString("Search"),
                         HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -1283,12 +1275,11 @@ namespace Alika.UI
                             Height = 50,
                             Margin = new Thickness(0, 5, 10, 5)
                         });
-                        content.Children.Add(new TextBlock
-                        {
-                            Text = this.UserName,
-                            VerticalAlignment = VerticalAlignment.Center,
-                            FontWeight = FontWeights.SemiBold
-                        });
+                        var username = ThemeHelpers.GetThemedText();
+                        username.Text = this.UserName;
+                        username.VerticalAlignment = VerticalAlignment.Center;
+                        username.FontWeight = FontWeights.SemiBold;
+                        content.Children.Add(username);
                         this.Content = content;
                     }
                 }
@@ -1309,12 +1300,10 @@ namespace Alika.UI
                         gr.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                         gr.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
 
-                        var text = new TextBlock
-                        {
-                            Text = Utils.LocString("Dialog/InviteUserShowMessages"),
-                            VerticalAlignment = VerticalAlignment.Center,
-                            Margin = new Thickness(0, 0, 20, 0)
-                        };
+                        var text = ThemeHelpers.GetThemedText();
+                        text.Text = Utils.LocString("Dialog/InviteUserShowMessages");
+                        text.VerticalAlignment = VerticalAlignment.Center;
+                        text.Margin = new Thickness(0, 0, 20, 0);
                         Grid.SetColumn(text, 0);
                         gr.Children.Add(text);
                         var num = new Microsoft.UI.Xaml.Controls.NumberBox
@@ -1330,12 +1319,11 @@ namespace Alika.UI
                         gr.Children.Add(num);
                         this.Children.Add(gr);
 
+                        var addtext = ThemeHelpers.GetThemedText();
+                        addtext.Text = Utils.LocString("Add");
                         var okbtn = new Button
                         {
-                            Content = new TextBlock
-                            {
-                                Text = Utils.LocString("Add")
-                            },
+                            Content = addtext,
                             CornerRadius = new CornerRadius(10),
                             Margin = new Thickness(5),
                             HorizontalAlignment = HorizontalAlignment.Right

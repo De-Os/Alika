@@ -14,6 +14,7 @@ using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
+using static Alika.Theme;
 
 namespace Alika.UI.Dialog
 {
@@ -30,7 +31,7 @@ namespace Alika.UI.Dialog
 
             if (App.Cache.StickersSelector != null)
             {
-                var flyout = new Flyout { Content = App.Cache.StickersSelector };
+                var flyout = new ThemedFlyout { Content = App.Cache.StickersSelector };
                 App.Cache.StickersSelector.StickerSent += this.HideFlyout;
                 this.Stickers.Flyout = flyout;
             }

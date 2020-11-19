@@ -16,7 +16,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
+using static Alika.Theme;
 
 namespace Alika.UI
 {
@@ -65,7 +65,7 @@ namespace Alika.UI
                 this.Doc = doc;
 
                 this.Margin = new Thickness(5);
-                this.Background = Coloring.Transparent.Full;
+                this.Background = new SolidColorBrush(App.Theme.Colors.Main);
                 this.CornerRadius = new CornerRadius(10);
 
                 Grid content = new Grid
@@ -75,12 +75,12 @@ namespace Alika.UI
                 content.ColumnDefinitions.Add(new ColumnDefinition());
                 content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-                Image img = new Image
+                var img = new ThemedFontIcon
                 {
-                    Source = new SvgImageSource(new Uri(Utils.AssetTheme("document.svg"))),
+                    FontSize = 20,
+                    Glyph = Glyphs.Open,
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    MaxHeight = 35,
                     Margin = new Thickness(0, 0, 5, 0)
                 };
                 Grid.SetColumn(img, 0);
@@ -90,22 +90,18 @@ namespace Alika.UI
                 text.RowDefinitions.Add(new RowDefinition());
                 text.RowDefinitions.Add(new RowDefinition());
 
-                TextBlock name = new TextBlock
-                {
-                    Text = this.Doc.Title,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    FontWeight = FontWeights.Bold,
-                    TextTrimming = TextTrimming.CharacterEllipsis
-                };
+                var name = ThemeHelpers.GetThemedText();
+                name.Text = this.Doc.Title;
+                name.VerticalAlignment = VerticalAlignment.Center;
+                name.FontWeight = FontWeights.Bold;
+                name.TextTrimming = TextTrimming.CharacterEllipsis;
                 Grid.SetRow(name, 0);
                 text.Children.Add(name);
 
-                TextBlock desc = new TextBlock
-                {
-                    Text = Utils.FormatSize(this.Doc.Size, 2) + " • " + this.Doc.Extension,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    TextTrimming = TextTrimming.CharacterEllipsis
-                };
+                var desc = ThemeHelpers.GetThemedText();
+                desc.Text = Utils.FormatSize(this.Doc.Size, 2) + " • " + this.Doc.Extension;
+                desc.VerticalAlignment = VerticalAlignment.Center;
+                desc.TextTrimming = TextTrimming.CharacterEllipsis;
                 Grid.SetRow(desc, 1);
                 text.Children.Add(desc);
 
@@ -151,29 +147,26 @@ namespace Alika.UI
                 this.Width = 160;
                 this.Margin = new Thickness(10);
 
+                if (this.StickerSource.AnimationUrl != null) this.Image = new AnimatedVisualPlayer(); else this.Image = new Image();
+                this.Children.Add(this.Image);
+
                 this.LoadSticker();
+                App.Theme.ThemeChanged += this.LoadSticker;
             }
 
             public async void LoadSticker()
             {
-                if (this.StickerSource.AnimationUrl != null)
+                if (this.Image is AnimatedVisualPlayer anim)
                 {
-                    this.Image = new AnimatedVisualPlayer
+                    anim.Source = new LottieVisualSource
                     {
-                        Source = new LottieVisualSource
-                        {
-                            UriSource = new Uri(App.DarkTheme ? this.StickerSource.AnimationUrl.Replace(".json", "b.json") : this.StickerSource.AnimationUrl)
-                        }
+                        UriSource = new Uri(App.Theme.IsDark ? this.StickerSource.AnimationUrl.Replace(".json", "b.json") : this.StickerSource.AnimationUrl)
                     };
                 }
-                else
+                else if (this.Image is Image img)
                 {
-                    this.Image = new Image
-                    {
-                        Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.StickerSource.GetBestQuality(App.DarkTheme)))
-                    };
+                    img.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri(this.StickerSource.GetBestQuality(App.Theme.IsDark)));
                 }
-                this.Children.Add(this.Image);
             }
         }
 
@@ -191,11 +184,10 @@ namespace Alika.UI
 
             public Attachment.AudioMessageAtt Audio;
 
-            public Image image = new Image
+            public ThemedFontIcon image = new ThemedFontIcon
             {
-                Source = new SvgImageSource(new Uri(Utils.AssetTheme("play.svg"))),
-                Width = 25,
-                Height = 25
+                FontSize = 20,
+                Glyph = Glyphs.Play
             };
 
             public StackPanel wave = new StackPanel
@@ -206,11 +198,7 @@ namespace Alika.UI
                 Orientation = Orientation.Horizontal
             };
 
-            public TextBlock time = new TextBlock
-            {
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Right
-            };
+            public TextBlock time;
 
             private bool _onWaves = false;
             private bool _playing = false;
@@ -226,12 +214,12 @@ namespace Alika.UI
                     if (value)
                     {
                         this.media.Play();
-                        this.image.Source = new SvgImageSource(new Uri(Utils.AssetTheme("pause.svg")));
+                        this.image.Glyph = Glyphs.Pause;
                     }
                     else
                     {
                         this.media.Pause();
-                        this.image.Source = new SvgImageSource(new Uri(Utils.AssetTheme("play.svg")));
+                        this.image.Glyph = Glyphs.Play;
                     }
                     this._playing = value;
                 }
@@ -241,8 +229,11 @@ namespace Alika.UI
             {
                 while (audio.Waveform.Count < 128) audio.Waveform.Add(0);
                 this.Audio = audio;
-
                 this.media.Source = MediaSource.CreateFromUri(new Uri(this.Audio.LinkMP3));
+
+                this.time = ThemeHelpers.GetThemedText();
+                this.time.VerticalAlignment = VerticalAlignment.Center;
+                this.time.HorizontalAlignment = HorizontalAlignment.Right;
 
                 var TopPanel = new StackPanel
                 {
@@ -260,24 +251,21 @@ namespace Alika.UI
                 {
                     var trans_btn = new Button
                     {
-                        Content = new Image
+                        Content = new ThemedFontIcon
                         {
-                            Source = new SvgImageSource(new Uri(Utils.AssetTheme("fly_menu.svg"))),
-                            Height = 10,
-                            Width = 10,
+                            Glyph = Glyphs.More,
                             HorizontalAlignment = HorizontalAlignment.Center,
                             VerticalAlignment = VerticalAlignment.Center
                         },
                         CornerRadius = new CornerRadius(10),
-                        Background = Coloring.Transparent.Full,
-                        HorizontalAlignment = HorizontalAlignment.Right
+                        Background = App.Theme.Colors.Transparent,
+                        HorizontalAlignment = HorizontalAlignment.Right,
+                        Margin = new Thickness(5, 0, 0, 0)
                     };
-                    var trans_text = new TextBlock
-                    {
-                        Text = this.Audio.Transcript,
-                        Visibility = Visibility.Collapsed,
-                        TextWrapping = TextWrapping.Wrap
-                    };
+                    var trans_text = ThemeHelpers.GetThemedText();
+                    trans_text.Text = this.Audio.Transcript;
+                    trans_text.Visibility = Visibility.Collapsed;
+                    trans_text.TextWrapping = TextWrapping.Wrap;
                     trans_btn.Click += (a, b) => trans_text.Visibility = trans_text.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
 
                     TopPanel.Children.Add(trans_btn);
@@ -299,8 +287,8 @@ namespace Alika.UI
                     Action = () => this.Playing = false
                 });
                 this.media.PlaybackSession.PositionChanged += this.PlayStateChanged;
-                this.PointerEntered += (a, b) => this.Background = Coloring.Transparent.Percent(50);
-                this.PointerExited += (a, b) => this.Background = Coloring.Transparent.Full;
+                this.PointerEntered += (a, b) => this.Background = new SolidColorBrush(App.Theme.Colors.Main);
+                this.PointerExited += (a, b) => this.Background = App.Theme.Colors.Transparent;
 
                 this.Loaded += (a, b) => this.MaxWidth = this.ActualWidth;
             }
@@ -351,14 +339,20 @@ namespace Alika.UI
                     VerticalAlignment = VerticalAlignment.Stretch
                 };
 
-                public Brush FillColor = App.DarkTheme ? Coloring.MessageBox.VoiceMessage.Light : Coloring.MessageBox.VoiceMessage.Dark;
-                public Brush NoFillColor = Coloring.Transparent.Percent(100);
+                public SolidColorBrush FillColor = new SolidColorBrush(App.Theme.Colors.Accent);
+                public SolidColorBrush NoFillColor = new SolidColorBrush(App.Theme.Colors.SubAccent);
 
                 public WaveHolder(int wave, TimeSpan time)
                 {
                     this.Time = time;
                     this.Rectangle.Fill = this.FillColor;
                     this.Rectangle.Height = 10 * (wave / 10);
+
+                    App.Theme.ThemeChanged += () =>
+                    {
+                        this.FillColor.Color = App.Theme.Colors.Accent;
+                        this.NoFillColor.Color = App.Theme.Colors.SubAccent;
+                    };
                 }
 
                 public void ChangeFill(TimeSpan time)
@@ -436,9 +430,9 @@ namespace Alika.UI
                 }
                 else
                 {
-                    this.Content = new FontIcon
+                    this.Content = new ThemedFontIcon
                     {
-                        Glyph = "\uE71B"
+                        Glyph = Glyphs.Link
                     };
                 }
                 this.Title = lnk.Title;
@@ -457,9 +451,9 @@ namespace Alika.UI
         {
             public Wall(Attachment.WallAtt wall)
             {
-                this.Content = new FontIcon
+                this.Content = new ThemedFontIcon
                 {
-                    Glyph = "\uE8F3"
+                    Glyph = Glyphs.Post
                 };
                 this.Title = Utils.LocString("Attachments/Wall");
                 this.Subtitle = wall.Text.RemovePushes();
@@ -474,7 +468,7 @@ namespace Alika.UI
             {
                 this.Content = new FontIcon
                 {
-                    Glyph = "\uE8F2"
+                    Glyph = Glyphs.PostReply
                 };
                 this.Title = Utils.LocString("Attachments/WallReply");
                 this.Subtitle = reply.Text.RemovePushes();
@@ -487,9 +481,9 @@ namespace Alika.UI
         {
             public MoneyTransfer(Attachment.MoneyTransferAtt money)
             {
-                this.Content = new FontIcon
+                this.Content = new ThemedFontIcon
                 {
-                    Glyph = "\uE8C7"
+                    Glyph = Glyphs.Payment
                 };
                 this.Title = money.Amount.Text;
                 this.Subtitle = Utils.LocString("Attachments/MoneyTransfer");
@@ -502,9 +496,9 @@ namespace Alika.UI
         {
             public Story(Attachment.StoryAtt story)
             {
-                this.Content = new FontIcon
+                this.Content = new ThemedFontIcon
                 {
-                    Glyph = "\uF738"
+                    Glyph = Glyphs.History
                 };
                 this.Title = Utils.LocString("Attachments/History");
                 this.Link = "https://vk.com/" + story.ToAttachFormat(false);
@@ -580,25 +574,27 @@ namespace Alika.UI
             {
                 CornerRadius = new CornerRadius(10),
                 Margin = new Thickness(3),
-                Visibility = Visibility.Collapsed
+                Visibility = Visibility.Collapsed,
+                Foreground = new SolidColorBrush(App.Theme.Colors.Text.Default)
             };
 
-            private TextBlock _title = new TextBlock
-            {
-                TextTrimming = TextTrimming.CharacterEllipsis,
-                FontWeight = FontWeights.Bold
-            };
+            private TextBlock _title;
 
-            private TextBlock _subtitle = new TextBlock
-            {
-                TextTrimming = TextTrimming.CharacterEllipsis,
-                FontWeight = FontWeights.SemiBold
-            };
+            private TextBlock _subtitle;
 
             public LinkHolder()
             {
                 this.HorizontalAlignment = HorizontalAlignment.Stretch;
                 this.Padding = new Thickness(10);
+
+                this._title = ThemeHelpers.GetThemedText();
+                this._title.TextTrimming = TextTrimming.CharacterEllipsis;
+                this._title.FontWeight = FontWeights.Bold;
+
+                this._subtitle = ThemeHelpers.GetThemedText();
+                this._subtitle.TextTrimming = TextTrimming.CharacterEllipsis;
+                this._subtitle.FontWeight = FontWeights.SemiBold;
+
                 this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                 this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
@@ -628,15 +624,13 @@ namespace Alika.UI
         {
             public Button Remove = new Button
             {
-                Content = new Image
+                Content = new ThemedFontIcon
                 {
-                    Source = new SvgImageSource(new Uri(Utils.AssetTheme("close.svg"))),
-                    Width = 10,
-                    Height = 10,
+                    Glyph = Glyphs.Close
                 },
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Top,
-                Background = Coloring.Transparent.Full
+                Background = App.Theme.Colors.Transparent
             };
 
             public Grid Preview = new Grid();
@@ -692,27 +686,23 @@ namespace Alika.UI
                     Width = this.Width,
                     Height = this.Height
                 };
-                Image img = new Image
+                var img = new ThemedFontIcon
                 {
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
-                    Stretch = Windows.UI.Xaml.Media.Stretch.Fill,
-                    MaxWidth = 100,
-                    MaxHeight = 40,
-                    Source = new SvgImageSource(new Uri(Utils.AssetTheme("document.svg")))
+                    FontSize = 30,
+                    Glyph = Glyphs.Document
                 };
                 grid.Children.Add(img);
                 if (this.Document.Title != null)
                 {
-                    TextBlock text = new TextBlock
-                    {
-                        Text = this.Document.Title,
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Bottom,
-                        TextAlignment = TextAlignment.Center,
-                        Margin = new Thickness(0, 0, 0, 10),
-                        TextTrimming = TextTrimming.CharacterEllipsis
-                    };
+                    var text = ThemeHelpers.GetThemedText();
+                    text.Text = this.Document.Title;
+                    text.HorizontalAlignment = HorizontalAlignment.Center;
+                    text.VerticalAlignment = VerticalAlignment.Bottom;
+                    text.TextAlignment = TextAlignment.Center;
+                    text.Margin = new Thickness(0, 0, 0, 10);
+                    text.TextTrimming = TextTrimming.CharacterEllipsis;
                     grid.Children.Add(text);
                 }
                 this.Preview.Children.Add(grid);
@@ -751,9 +741,11 @@ namespace Alika.UI
                     Grid.SetRow(scroll, 0);
                     content.Children.Add(scroll);
 
+                    var closetext = ThemeHelpers.GetThemedText();
+                    closetext.Text = Utils.LocString("Dialog/Close");
                     Button close = new Button
                     {
-                        Content = new TextBlock { Text = Utils.LocString("Dialog/Close") },
+                        Content = closetext,
                         Margin = new Thickness(0, 5, 0, 0),
                         HorizontalAlignment = HorizontalAlignment.Right,
                     };

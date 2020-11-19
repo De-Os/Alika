@@ -2,7 +2,6 @@
 using Alika.Libs.VK.Responses;
 using Alika.Misc;
 using Alika.UI.Misc;
-using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +11,8 @@ using Windows.UI.Core;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Media;
+using static Alika.Theme;
 
 namespace Alika.UI
 {
@@ -30,7 +30,7 @@ namespace Alika.UI
                 Width = 20,
                 Height = 20
             },
-            Background = Coloring.Transparent.Full,
+            Background = App.Theme.Colors.Transparent,
             CornerRadius = new CornerRadius(10),
             Visibility = Visibility.Collapsed,
             Margin = new Thickness(5, 0, 0, 0)
@@ -48,7 +48,7 @@ namespace Alika.UI
             Visibility = Visibility.Collapsed
         };
 
-        private TextBox SearchBar = new TextBox
+        private ThemedTextBox SearchBar = new ThemedTextBox
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
             VerticalAlignment = VerticalAlignment.Center,
@@ -67,13 +67,17 @@ namespace Alika.UI
 
             App.LP.OnNewMessage += (msg) =>
             {
-                if (msg.PeerId == App.MainPage.PeerId)
+                try
                 {
-                    App.UILoop.AddAction(new UITask
+                    if (msg.PeerId == App.MainPage.PeerId)
                     {
-                        Action = () => this.Scroll.ChangeView(null, 0, null)
-                    });
+                        App.UILoop.AddAction(new UITask
+                        {
+                            Action = () => this.Scroll.ChangeView(null, 0, null)
+                        });
+                    }
                 }
+                catch { }
             };
 
             this.FoundChats.SelectionChanged += (a, b) =>
@@ -124,31 +128,16 @@ namespace Alika.UI
             }
         }
 
-        protected override void UpdateColors()
-        {
-            var brush = new AcrylicBrush
-            {
-                TintOpacity = 0.7,
-                BackgroundSource = AcrylicBackgroundSource.Backdrop,
-                TintColor = Coloring.Transparent.Percent(100).Color
-            };
-            this._topmenu.Background = brush;
-            this._bottomMenu.Background = brush;
-            this.FoundChats.Background = brush;
-        }
-
         private void LoadMenu()
         {
             var menu = new Button
             {
-                Background = Coloring.Transparent.Full,
-                Content = new FontIcon
+                Background = App.Theme.Colors.Transparent,
+                Content = new ThemedFontIcon
                 {
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    Glyph = "\uE70D",
-                    Width = 20,
-                    Height = 20
+                    Glyph = Glyphs.DropMenu
                 },
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -168,24 +157,24 @@ namespace Alika.UI
 
         private MenuFlyout GetMenu()
         {
-            var menu = new MenuFlyout();
+            var menu = new ThemedMenuFlyout();
 
-            var settings = new MenuFlyoutItem
+            var settings = new ThemedMenuFlyoutItem
             {
-                Icon = new FontIcon
+                Icon = new ThemedFontIcon
                 {
-                    Glyph = "\uE713"
+                    Glyph = Glyphs.Settings
                 },
                 Text = Utils.LocString("Settings")
             };
             settings.Click += (a, b) => new Settings();
             menu.Items.Add(settings);
 
-            var loadExport = new MenuFlyoutItem
+            var loadExport = new ThemedMenuFlyoutItem
             {
-                Icon = new FontIcon
+                Icon = new ThemedFontIcon
                 {
-                    Glyph = "\uE8DE"
+                    Glyph = Glyphs.Import
                 },
                 Text = Utils.LocString("Dialog/ExportLoad")
             };
@@ -193,16 +182,27 @@ namespace Alika.UI
             loadExport.RightTapped += (a, b) => new DialogExportReader(Window.Current.CoreWindow.GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down));
             menu.Items.Add(loadExport);
 
-            var openImportant = new MenuFlyoutItem
+            var openImportant = new ThemedMenuFlyoutItem
             {
-                Icon = new FontIcon
+                Icon = new ThemedFontIcon
                 {
-                    Glyph = "\uE734"
+                    Glyph = Glyphs.Star
                 },
                 Text = Utils.LocString("Dialog/ImportantMessages")
             };
             openImportant.Click += (a, b) => new ImportantMessages();
             menu.Items.Add(openImportant);
+
+            var themes = new ThemedMenuFlyoutItem
+            {
+                Icon = new ThemedFontIcon
+                {
+                    Glyph = Glyphs.Marker
+                },
+                Text = Utils.LocString("Themes/Name")
+            };
+            themes.Click += (a, b) => new ThemesWindow();
+            menu.Items.Add(themes);
 
             return menu;
         }
@@ -282,11 +282,9 @@ namespace Alika.UI
         public ChatsList(List<int> pinned = null)
         {
             if (pinned != null) this.IgnorePeers = pinned;
-            this.Background = new AcrylicBrush
+            this.Background = new ThemedAcrylicBrush
             {
-                TintOpacity = 0.7,
-                BackgroundSource = AcrylicBackgroundSource.HostBackdrop,
-                TintColor = Coloring.Transparent.Percent(100).Color
+                BackgroundSource = AcrylicBackgroundSource.HostBackdrop
             };
             this.SelectionChanged += (a, b) =>
             {
@@ -360,27 +358,17 @@ namespace Alika.UI
                 VerticalAlignment = VerticalAlignment.Center
             };
 
-            public TextBlock nameBlock = new TextBlock
-            {
-                FontSize = 15,
-                FontWeight = FontWeights.Bold,
-                TextTrimming = TextTrimming.CharacterEllipsis,
-                VerticalAlignment = VerticalAlignment.Center
-            };
+            public TextBlock nameBlock;
 
-            public TextBlock textBlock = new TextBlock
-            {
-                TextTrimming = TextTrimming.CharacterEllipsis,
-                VerticalAlignment = VerticalAlignment.Center
-            };
+            public TextBlock textBlock;
 
             public Avatar image;
 
-            public Image PinImage = new Image
+            public ThemedFontIcon PinImage = new ThemedFontIcon
             {
-                Source = new SvgImageSource(new System.Uri(Utils.AssetTheme("pin.svg"))),
-                Height = 10,
-                Width = 10,
+                FontSize = 10,
+                Glyph = Glyphs.Pin,
+                FontFamily = App.Icons,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Margin = new Thickness(5, 0, 5, 0),
@@ -417,23 +405,15 @@ namespace Alika.UI
                 }
             }
 
-            private MenuFlyout Flyout = new MenuFlyout();
+            private MenuFlyout Flyout = new ThemedMenuFlyout();
 
             private Border _unreadCount = new Border
             {
                 BorderThickness = new Thickness(0),
-                Background = Coloring.InvertedTransparent.Percent(20),
+                Background = new SolidColorBrush(App.Theme.Colors.Contrast),
                 CornerRadius = new CornerRadius(10),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                Child = new TextBlock
-                {
-                    Margin = new Thickness(5, 2, 5, 2),
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Text = "0",
-                    FontSize = 12.5
-                },
                 Visibility = Visibility.Collapsed,
                 MinWidth = 20
             };
@@ -451,21 +431,17 @@ namespace Alika.UI
                 }
             }
 
-            private TextBlock Date = new TextBlock
-            {
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Center
-            };
+            private TextBlock Date;
 
-            private Image ReadState = new Image
+            private ThemedFontIcon ReadState = new ThemedFontIcon
             {
-                Width = 12.5,
-                Height = 12.5,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                Source = new SvgImageSource(new Uri(Utils.AssetTheme("check.svg"))),
                 Visibility = Visibility.Collapsed,
-                Margin = new Thickness(0, 0, 5, 0)
+                Margin = new Thickness(0, 0, 5, 0),
+                Glyph = Glyphs.Custom.Check,
+                FontFamily = App.Icons,
+                FontSize = 12
             };
 
             public ChatItem(int PeerId, Message last_msg, bool pinned = false, int unread = 0)
@@ -479,7 +455,7 @@ namespace Alika.UI
                 this.UnreadCount = unread;
 
                 var conv = App.Cache.GetConversation(PeerId);
-                if (conv.LastMessageId >= last_msg.Id && last_msg.Id <= (conv.OutRead > conv.InRead ? conv.OutRead : conv.InRead)) this.ReadState.Source = new SvgImageSource(new Uri(Utils.AssetTheme("double_check.svg")));
+                if (conv.LastMessageId >= last_msg.Id && last_msg.Id <= (conv.OutRead > conv.InRead ? conv.OutRead : conv.InRead)) this.ReadState.Glyph = "\uE901";
 
                 App.LP.OnNewMessage += this.OnNewMessage;
                 App.LP.OnMessageEdition += (m) =>
@@ -510,36 +486,36 @@ namespace Alika.UI
                             {
                                 if (this.message.Id <= a.MsgId)
                                 {
-                                    this.ReadState.Source = new SvgImageSource(new Uri(Utils.AssetTheme("double_check.svg")));
+                                    this.ReadState.Glyph = "\uE901";
                                 }
                                 this.UnreadCount = a.Unread;
                             }
                         });
                     }
                 };
-                var pin = new MenuFlyoutItem
+                var pin = new ThemedMenuFlyoutItem
                 {
                     Text = pinned ? Utils.LocString("Dialog/Unpin") : Utils.LocString("Dialog/Pin"),
-                    Icon = new FontIcon
+                    Icon = new ThemedFontIcon
                     {
-                        Glyph = pinned ? "\uE735" : "\uE734"
+                        Glyph = pinned ? Glyphs.FilledStar : Glyphs.Star
                     }
                 };
                 this.Flyout.Items.Add(pin);
                 this.OnPin += () =>
                 {
                     pin.Text = Utils.LocString("Dialog/Unpin");
-                    pin.Icon = new FontIcon
+                    pin.Icon = new ThemedFontIcon
                     {
-                        Glyph = "\uE735"
+                        Glyph = Glyphs.FilledStar
                     };
                 };
                 this.OnUnPin += () =>
                 {
                     pin.Text = Utils.LocString("Dialog/Pin");
-                    pin.Icon = new FontIcon
+                    pin.Icon = new ThemedFontIcon
                     {
-                        Glyph = "\uE734"
+                        Glyph = Glyphs.Star
                     };
                 };
                 pin.Click += (a, b) => this.Pinned = !this.Pinned;
@@ -553,6 +529,31 @@ namespace Alika.UI
 
             private void Render()
             {
+                App.Theme.ThemeChanged += () => this._unreadCount.Background = new SolidColorBrush(App.Theme.Colors.Contrast);
+
+                this.nameBlock = ThemeHelpers.GetThemedText();
+                this.nameBlock.FontSize = 15;
+                this.nameBlock.FontWeight = FontWeights.Bold;
+                this.nameBlock.TextTrimming = TextTrimming.CharacterEllipsis;
+                this.nameBlock.VerticalAlignment = VerticalAlignment.Center;
+
+                this.textBlock = ThemeHelpers.GetThemedText();
+                this.textBlock.TextTrimming = TextTrimming.CharacterEllipsis;
+                this.textBlock.VerticalAlignment = VerticalAlignment.Center;
+
+                this.Date = ThemeHelpers.GetThemedText();
+                this.Date.VerticalAlignment = VerticalAlignment.Center;
+                this.Date.HorizontalAlignment = HorizontalAlignment.Center;
+
+                var unread = ThemeHelpers.GetThemedText(ThemeHelpers.TextTypes.Inverted);
+                unread.Margin = new Thickness(5, 2, 5, 2);
+                unread.HorizontalAlignment = HorizontalAlignment.Center;
+                unread.VerticalAlignment = VerticalAlignment.Center;
+                unread.Text = "0";
+                unread.FontSize = 12.5;
+                unread.Foreground = new SolidColorBrush(App.Theme.Colors.Text.Inverted);
+                this._unreadCount.Child = unread;
+
                 this.Height = 70;
                 this.HorizontalAlignment = HorizontalAlignment.Stretch;
                 this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
@@ -611,11 +612,11 @@ namespace Alika.UI
 
                 if (this._pinned) this.PinImage.Visibility = Visibility.Visible;
 
-                var export = new MenuFlyoutItem
+                var export = new ThemedMenuFlyoutItem
                 {
-                    Icon = new FontIcon
+                    Icon = new ThemedFontIcon
                     {
-                        Glyph = "\uEE71"
+                        Glyph = Glyphs.Export
                     },
                     Text = Utils.LocString("Dialog/Export")
                 };
@@ -690,7 +691,7 @@ namespace Alika.UI
                 if (msg.FromId == App.VK.UserId)
                 {
                     this.ReadState.Visibility = Visibility.Visible;
-                    this.ReadState.Source = new SvgImageSource(new Uri(Utils.AssetTheme(msg.ReadState == 1 ? "double_check.svg" : "check.svg")));
+                    this.ReadState.Glyph = msg.ReadState == 1 ? "\uE901" : "\uE900";
                 }
                 else this.ReadState.Visibility = Visibility.Collapsed;
             }
@@ -710,11 +711,9 @@ namespace Alika.UI
     {
         public PinnedChatsList(List<int> pinned)
         {
-            this.Background = new AcrylicBrush
+            this.Background = new ThemedAcrylicBrush
             {
-                TintOpacity = 0.7,
-                BackgroundSource = AcrylicBackgroundSource.Backdrop,
-                TintColor = Coloring.Transparent.Percent(100).Color
+                BackgroundSource = AcrylicBackgroundSource.Backdrop
             };
             this.SelectionChanged += (a, b) =>
             {

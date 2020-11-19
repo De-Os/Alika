@@ -1,6 +1,7 @@
 ﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using static Alika.Theme;
 
 namespace Alika.UI
 {
@@ -74,7 +75,6 @@ namespace Alika.UI
 
             this._topmenu.SizeChanged += (a, b) => this.ChangeScrollPadding(b.NewSize.Height, true);
             this._bottomMenu.SizeChanged += (a, b) => this.ChangeScrollPadding(b.NewSize.Height, false);
-            this.ActualThemeChanged += (a, b) => this.UpdateColors();
         }
 
         private void ChangeScrollPadding(double height, bool top)
@@ -85,13 +85,11 @@ namespace Alika.UI
             content.Margin = margin;
         }
 
-        protected virtual void UpdateColors()
+        protected void UpdateColors()
         {
-            var brush = new AcrylicBrush
+            var brush = new ThemedAcrylicBrush
             {
-                TintOpacity = 0.7,
-                BackgroundSource = AcrylicBackgroundSource.Backdrop,
-                TintColor = Coloring.Transparent.Percent(100).Color
+                BackgroundSource = AcrylicBackgroundSource.Backdrop
             };
             this._topmenu.Background = brush;
             this._bottomMenu.Background = brush;

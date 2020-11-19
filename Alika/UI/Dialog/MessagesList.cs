@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 
 namespace Alika.UI.Dialog
 {
@@ -266,8 +267,8 @@ namespace Alika.UI.Dialog
                         Glyph = "\uE97A"
                     },
                     Text = Utils.LocString("Dialog/Reply"),
-                    Background = Coloring.Transparent.Percent(100),
-                    Foreground = Coloring.InvertedTransparent.Percent(100),
+                    Background = new SolidColorBrush(App.Theme.Colors.Main),
+                    Foreground = new SolidColorBrush(App.Theme.Colors.Contrast),
                 };
                 item.Invoked += (a, b) =>
                     {

@@ -4,8 +4,9 @@ using Alika.UI.Dialog;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
-using Windows.UI.Xaml.Media.Imaging;
+using static Alika.Theme;
 
 namespace Alika
 {
@@ -76,21 +77,23 @@ namespace Alika
 
             this.Chats.Content = new ChatsHolder();
 
-            this.NoChatSelected.Children.Add(new Image
+            this.Background = new SolidColorBrush(App.Theme.Colors.Main);
+            App.Theme.ThemeChanged += () => this.Background = new SolidColorBrush(App.Theme.Colors.Main);
+
+            this.NoChatSelected.Children.Add(new ThemedFontIcon
             {
-                Source = new SvgImageSource(new System.Uri(Utils.AssetTheme("chat.svg"))),
-                Width = 100,
-                Height = 100,
+                FontFamily = App.Icons,
+                Glyph = Glyphs.Custom.Chat,
+                FontSize = 100,
                 HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Center
             });
-            this.NoChatSelected.Children.Add(new TextBlock
-            {
-                Text = Utils.LocString("Dialog/SelectChat"),
-                HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Center,
-                Margin = new Windows.UI.Xaml.Thickness(0, 10, 0, 0),
-                FontSize = 16,
-                TextAlignment = Windows.UI.Xaml.TextAlignment.Center
-            });
+            var text = ThemeHelpers.GetThemedText();
+            text.HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Center;
+            text.Margin = new Windows.UI.Xaml.Thickness(0, 10, 0, 0);
+            text.FontSize = 16;
+            text.Text = Utils.LocString("Dialog/SelectChat");
+            text.TextAlignment = Windows.UI.Xaml.TextAlignment.Center;
+            this.NoChatSelected.Children.Add(text);
             this.NoChatSelected.Transitions.Add(new PopupThemeTransition());
             this.Dialog.Children.Add(this.NoChatSelected);
             this.Dialog.PreviewKeyDown += (a, b) =>

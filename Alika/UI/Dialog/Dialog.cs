@@ -5,6 +5,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
+using static Alika.Theme;
 
 namespace Alika.UI.Dialog
 {
@@ -33,10 +34,9 @@ namespace Alika.UI.Dialog
         public Grid StickerSuggestions = new Grid
         {
             Height = 100,
-            Background = new AcrylicBrush
+            Background = new ThemedAcrylicBrush
             {
-                TintColor = Coloring.Transparent.Percent(25).Color,
-                TintOpacity = 0.7
+                BackgroundSource = AcrylicBackgroundSource.Backdrop
             },
             VerticalAlignment = VerticalAlignment.Bottom,
             HorizontalAlignment = HorizontalAlignment.Left,
@@ -48,7 +48,7 @@ namespace Alika.UI.Dialog
         public Button SendButton = new Buttons.Send();
         public Button Stickers = new Buttons.Stickers();
 
-        public TextBox SendText = new TextBox
+        public ThemedTextBox SendText = new ThemedTextBox
         {
             PlaceholderText = Utils.LocString("Dialog/TextBoxPlaceholder"),
             AcceptsReturn = true,
@@ -155,16 +155,11 @@ namespace Alika.UI.Dialog
 
                 var rect = new Windows.UI.Xaml.Shapes.Rectangle
                 {
-                    Fill = new SolidColorBrush(new Windows.UI.Color
-                    {
-                        A = 255,
-                        R = 75,
-                        G = 119,
-                        B = 168
-                    }),
+                    Fill = new SolidColorBrush(App.Theme.Colors.Accent),
                     Width = this.LineWidth,
                     Margin = new Thickness(0, 0, 10, 0)
                 };
+                App.Theme.ThemeChanged += () => rect.Fill = new SolidColorBrush(App.Theme.Colors.Accent);
                 Grid.SetColumn(rect, 0);
                 this.Children.Add(rect);
 
@@ -173,20 +168,17 @@ namespace Alika.UI.Dialog
                 text.RowDefinitions.Add(new RowDefinition());
                 Grid.SetColumn(text, 1);
 
-                var name = new TextBlock
-                {
-                    VerticalAlignment = VerticalAlignment.Bottom,
-                    TextTrimming = TextTrimming.CharacterEllipsis,
-                    Text = App.Cache.GetName(this.Message.FromId),
-                    FontWeight = FontWeights.Bold
-                };
+                var name = ThemeHelpers.GetThemedText();
+                name.VerticalAlignment = VerticalAlignment.Bottom;
+                name.TextTrimming = TextTrimming.CharacterEllipsis;
+                name.Text = App.Cache.GetName(this.Message.FromId);
+                name.FontWeight = FontWeights.Bold;
                 Grid.SetRow(name, 0);
-                var msg = new TextBlock
-                {
-                    VerticalAlignment = VerticalAlignment.Top,
-                    TextTrimming = TextTrimming.CharacterEllipsis,
-                    Text = this.Message.ToCompactText()
-                };
+
+                var msg = ThemeHelpers.GetThemedText();
+                msg.VerticalAlignment = VerticalAlignment.Top;
+                msg.TextTrimming = TextTrimming.CharacterEllipsis;
+                msg.Text = this.Message.ToCompactText();
                 Grid.SetRow(msg, 1);
 
                 text.Children.Add(msg);
@@ -196,12 +188,10 @@ namespace Alika.UI.Dialog
                 {
                     var cross = new Button
                     {
-                        Background = Coloring.Transparent.Full,
-                        Content = new FontIcon
+                        Background = App.Theme.Colors.Transparent,
+                        Content = new ThemedFontIcon
                         {
-                            Glyph = "\uE711",
-                            Height = 20,
-                            Width = 20,
+                            Glyph = Glyphs.Close,
                             HorizontalAlignment = HorizontalAlignment.Center,
                             VerticalAlignment = VerticalAlignment.Center
                         },

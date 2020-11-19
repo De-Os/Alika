@@ -13,6 +13,8 @@ using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media;
+using static Alika.Theme;
 
 namespace Alika.UI
 {
@@ -28,7 +30,7 @@ namespace Alika.UI
 
         public Event StickerSent;
 
-        public TextBox Search = new TextBox
+        public ThemedTextBox Search = new ThemedTextBox
         {
             PlaceholderText = Utils.LocString("Search")
         };
@@ -118,22 +120,21 @@ namespace Alika.UI
                 top.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                 Button back = new Button
                 {
-                    Content = new FontIcon
+                    Content = new ThemedFontIcon
                     {
-                        Glyph = "\uE72B"
+                        Glyph = Glyphs.Close
                     },
-                    Width = 40,
-                    Background = Coloring.Transparent.Full
+                    Background = App.Theme.Colors.Transparent
                 };
                 back.Click += (a, c) => (sender as SemanticZoom).IsZoomedInViewActive = false;
-                TextBlock title = new TextBlock
-                {
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(10, 0, 0, 0),
-                    FontWeight = FontWeights.Bold,
-                    FontSize = 20,
-                    TextTrimming = TextTrimming.CharacterEllipsis
-                };
+
+                var title = ThemeHelpers.GetThemedText();
+                title.VerticalAlignment = VerticalAlignment.Center;
+                title.Margin = new Thickness(10, 0, 0, 0);
+                title.FontWeight = FontWeights.Bold;
+                title.FontSize = 20;
+                title.TextTrimming = TextTrimming.CharacterEllipsis;
+
                 Grid.SetColumn(back, 0);
                 Grid.SetColumn(title, 1);
                 top.Children.Add(back);
@@ -184,12 +185,7 @@ namespace Alika.UI
                 Height = 38
             };
 
-            public TextBlock Title = new TextBlock
-            {
-                VerticalAlignment = VerticalAlignment.Center,
-                FontWeight = FontWeights.Bold,
-                TextTrimming = TextTrimming.CharacterEllipsis
-            };
+            public TextBlock Title;
 
             public StickerName(StickerPackInfo pack)
             {
@@ -199,6 +195,11 @@ namespace Alika.UI
 
             private async void Render()
             {
+                this.Title = ThemeHelpers.GetThemedText();
+                this.Title.VerticalAlignment = VerticalAlignment.Center;
+                this.Title.FontWeight = FontWeights.Bold;
+                this.Title.TextTrimming = TextTrimming.CharacterEllipsis;
+
                 Grid grid = new Grid();
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -225,21 +226,23 @@ namespace Alika.UI
                 this.Stickers = stickers;
 
                 var content = new StackPanel { Orientation = Orientation.Horizontal };
-                content.Children.Add(new FontIcon
+                content.Children.Add(new ThemedFontIcon
                 {
-                    Glyph = "\uF738",
+                    Glyph = Glyphs.History,
                     Margin = new Thickness(0, 0, 5, 0),
-                    VerticalAlignment = VerticalAlignment.Center,
+                    FontSize = 25,
                     Width = 38,
-                    Height = 38
-                });
-                content.Children.Add(new TextBlock
-                {
-                    Text = Utils.LocString("Dialog/RecentStickers"),
+                    Height = 38,
+                    HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
-                    FontWeight = FontWeights.Bold,
-                    TextTrimming = TextTrimming.CharacterEllipsis
+                    Foreground = new SolidColorBrush(App.Theme.Colors.Text.Default)
                 });
+                var text = ThemeHelpers.GetThemedText();
+                text.Text = Utils.LocString("Dialog/RecentStickers");
+                text.VerticalAlignment = VerticalAlignment.Center;
+                text.FontWeight = FontWeights.Bold;
+                text.TextTrimming = TextTrimming.CharacterEllipsis;
+                content.Children.Add(text);
                 this.Content = content;
             }
         }
@@ -277,12 +280,14 @@ namespace Alika.UI
 
                 foreach (var p in packs)
                 {
-                    if (packs.Count > 1) this.Children.Add(new TextBlock
+                    if (packs.Count > 1)
                     {
-                        Text = p.Product.Title,
-                        FontWeight = FontWeights.Bold,
-                        Margin = new Thickness(5)
-                    });
+                        var title = ThemeHelpers.GetThemedText();
+                        title.Text = p.Product.Title;
+                        title.FontWeight = FontWeights.Bold;
+                        title.Margin = new Thickness(5);
+                        this.Children.Add(title);
+                    }
                     var temp = new StackPanel { Orientation = Orientation.Horizontal };
                     foreach (var sticker in p.Product.Stickers)
                     {
@@ -343,15 +348,16 @@ namespace Alika.UI
                         Task.Factory.StartNew(() => App.VK.Messages.Send(App.MainPage.PeerId, sticker_id: this.Sticker.StickerId));
                         if (!Window.Current.CoreWindow.GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down)) this.StickerSent?.Invoke(sticker);
                     };
-                    this.PointerEntered += (a, b) => this.Background = Coloring.Transparent.Percent(50); // Sticker "selection" by background color
-                    this.PointerExited += (a, b) => this.Background = Coloring.Transparent.Full; // Remove selection
+                    this.PointerEntered += (a, b) => this.Background = new SolidColorBrush(App.Theme.Colors.Main); // Sticker "selection" by background color
+                    this.PointerExited += (a, b) => this.Background = App.Theme.Colors.Transparent; // Remove selection
                     this.Children.Add(this.Image);
                     this.LoadImage();
+                    App.Theme.ThemeChanged += this.LoadImage;
                 }
 
                 public async void LoadImage()
                 {
-                    this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri((App.DarkTheme ? this.Sticker.ImagesWithBackground : this.Sticker.Images).Find(s => s.Width == 128).Url));
+                    this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri((App.Theme.IsDark ? this.Sticker.ImagesWithBackground : this.Sticker.Images).Find(s => s.Width == 128).Url));
                 }
             }
         }
@@ -384,7 +390,7 @@ namespace Alika.UI
             set
             {
                 this._selected = value;
-                this.Background = value ? this.Background = Coloring.Transparent.Percent(75) : Coloring.Transparent.Full;
+                this.Background = value ? this.Background = new SolidColorBrush(App.Theme.Colors.Main) : App.Theme.Colors.Transparent;
             }
         }
 
@@ -395,17 +401,22 @@ namespace Alika.UI
             this.Margin = new Thickness(5);
             this.CornerRadius = new CornerRadius(10);
 
-            this.PointerEntered += (a, b) => this.Background = Coloring.Transparent.Percent(75); // Don't using this.Selected because it can bring issues with arrow keys choosing
-            this.PointerExited += (a, b) => { if (!this._selected) this.Background = Coloring.Transparent.Full; }; // Same^
+            this.PointerEntered += (a, b) => this.Background = new SolidColorBrush(App.Theme.Colors.Main); // Don't using this.Selected because it can bring issues with arrow keys choosing
+            this.PointerExited += (a, b) => { if (!this._selected) this.Background = App.Theme.Colors.Transparent; }; // Same^
 
             this.Children.Add(this.Image);
 
             this.LoadImage();
+            App.Theme.ThemeChanged += () =>
+            {
+                this.LoadImage();
+                this.Selected = this.Selected;
+            };
         }
 
         public async void LoadImage()
         {
-            this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri((App.DarkTheme ? this.Sticker.ImagesWithBackground : this.Sticker.Images).Find(s => s.Width == 128).Url));
+            this.Image.Source = await ImageCache.Instance.GetFromCacheAsync(new Uri((App.Theme.IsDark ? this.Sticker.ImagesWithBackground : this.Sticker.Images).Find(s => s.Width == 128).Url));
         }
     }
 }

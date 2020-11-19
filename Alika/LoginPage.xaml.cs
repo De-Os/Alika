@@ -286,7 +286,7 @@ namespace Alika
                 this.content.RowDefinitions.Add(new RowDefinition());
                 this.content.RowDefinitions.Add(new RowDefinition());
 
-                TextBlock desc = new TextBlock
+                var desc = new TextBlock
                 {
                     Text = Utils.LocString("Login/CodeText").Replace("%auth_app%", Utils.LocString("Login/Code_" + type)).Replace("%number%", phone_mask)
                 };

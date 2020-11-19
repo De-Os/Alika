@@ -139,6 +139,7 @@
     </Compile>
     <Compile Include="Caching.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="Glyphs.cs" />
     <Compile Include="Libs\Utils.cs" />
     <Compile Include="Libs\VK\Limits.cs" />
     <Compile Include="Libs\VK\Methods\Friends.cs" />
@@ -163,12 +164,13 @@
     </Compile>
     <Compile Include="Misc\DialogExport.cs" />
     <Compile Include="Misc\ImportantMessages.cs" />
+    <Compile Include="Misc\ThemesWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Theme.cs" />
     <Compile Include="UIThread.cs" />
     <Compile Include="UI\BlurView.cs" />
     <Compile Include="UI\ChatInformation.cs" />
     <Compile Include="UI\ChatsList.cs" />
-    <Compile Include="UI\Coloring.cs" />
     <Compile Include="UI\Dialog\Buttons.cs" />
     <Compile Include="UI\Dialog\GraffitiWindow.cs" />
     <Compile Include="UI\Dialog\MessageBox\MessageAttachment.cs" />
@@ -192,68 +194,6 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\UI\Dark\add_user.svg" />
-    <Content Include="Assets\UI\Dark\album.svg" />
-    <Content Include="Assets\UI\Dark\back.svg" />
-    <Content Include="Assets\UI\Dark\call.svg" />
-    <Content Include="Assets\UI\Dark\camera.svg" />
-    <Content Include="Assets\UI\Dark\chat.svg" />
-    <Content Include="Assets\UI\Dark\check.svg" />
-    <Content Include="Assets\UI\Dark\clip.svg" />
-    <Content Include="Assets\UI\Dark\close.svg" />
-    <Content Include="Assets\UI\Dark\document.svg" />
-    <Content Include="Assets\UI\Dark\double_check.svg" />
-    <Content Include="Assets\UI\Dark\download.svg" />
-    <Content Include="Assets\UI\Dark\edit.svg" />
-    <Content Include="Assets\UI\Dark\fly_menu.svg" />
-    <Content Include="Assets\UI\Dark\info.svg" />
-    <Content Include="Assets\UI\Dark\leave.svg" />
-    <Content Include="Assets\UI\Dark\link.svg" />
-    <Content Include="Assets\UI\Dark\mention.svg" />
-    <Content Include="Assets\UI\Dark\pause.svg" />
-    <Content Include="Assets\UI\Dark\pen.svg" />
-    <Content Include="Assets\UI\Dark\person.svg" />
-    <Content Include="Assets\UI\Dark\pin.svg" />
-    <Content Include="Assets\UI\Dark\play.svg" />
-    <Content Include="Assets\UI\Dark\send.svg" />
-    <Content Include="Assets\UI\Dark\settings.svg" />
-    <Content Include="Assets\UI\Dark\share.svg" />
-    <Content Include="Assets\UI\Dark\sticker.svg" />
-    <Content Include="Assets\UI\Dark\user.svg" />
-    <Content Include="Assets\UI\Dark\video.svg" />
-    <Content Include="Assets\UI\Dark\eye.svg" />
-    <Content Include="Assets\UI\Light\add_user.svg" />
-    <Content Include="Assets\UI\Light\album.svg" />
-    <Content Include="Assets\UI\Light\back.svg" />
-    <Content Include="Assets\UI\Light\call.svg" />
-    <Content Include="Assets\UI\Light\camera.svg" />
-    <Content Include="Assets\UI\Light\chat.svg" />
-    <Content Include="Assets\UI\Light\check.svg" />
-    <Content Include="Assets\UI\Light\clip.svg" />
-    <Content Include="Assets\UI\Light\close.svg" />
-    <Content Include="Assets\UI\Light\document.svg" />
-    <Content Include="Assets\UI\Light\double_check.svg" />
-    <Content Include="Assets\UI\Light\download.svg" />
-    <Content Include="Assets\UI\Light\edit.svg" />
-    <Content Include="Assets\UI\Light\eye.svg" />
-    <Content Include="Assets\UI\Light\fly_menu.svg" />
-    <Content Include="Assets\UI\Light\info.svg" />
-    <Content Include="Assets\UI\Light\leave.svg" />
-    <Content Include="Assets\UI\Light\link.svg" />
-    <Content Include="Assets\UI\Light\mention.svg" />
-    <Content Include="Assets\UI\Light\microphone.svg" />
-    <Content Include="Assets\UI\Light\pause.svg" />
-    <Content Include="Assets\UI\Light\pen.svg" />
-    <Content Include="Assets\UI\Light\person.svg" />
-    <Content Include="Assets\UI\Light\pin.svg" />
-    <Content Include="Assets\UI\Light\play.svg" />
-    <Content Include="Assets\UI\Light\send.svg" />
-    <Content Include="Assets\UI\Light\settings.svg" />
-    <Content Include="Assets\UI\Light\share.svg" />
-    <Content Include="Assets\UI\Light\sticker.svg" />
-    <Content Include="Assets\UI\Light\user.svg" />
-    <Content Include="Assets\UI\Light\video.svg" />
-    <Content Include="Assets\UI\Dark\microphone.svg" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -308,6 +248,17 @@
     <Content Include="settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="dark_theme.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="light_theme.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Fonts\icons.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <PRIResource Include="Strings\en-US\Themes.resw" />
+    <PRIResource Include="Strings\ru-RU\Themes.resw" />
     <PRIResource Include="Strings\ru-RU\MessageAction.resw" />
     <PRIResource Include="Strings\en-US\MessageAction.resw" />
     <PRIResource Include="Strings\ru-RU\Time.resw" />

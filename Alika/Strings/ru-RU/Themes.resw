@@ -117,68 +117,61 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Ago" xml:space="preserve">
-    <value>ago</value>
-    <comment>n ... ago</comment>
+  <data name="Create" xml:space="preserve">
+    <value>Создать</value>
   </data>
-  <data name="DaysFrom0To0" xml:space="preserve">
-    <value>days</value>
-    <comment>n days ago</comment>
+  <data name="Description" xml:space="preserve">
+    <value>%name% от %author%</value>
   </data>
-  <data name="DaysFrom1To1" xml:space="preserve">
-    <value>day</value>
-    <comment>1 day ago</comment>
+  <data name="Import" xml:space="preserve">
+    <value>Импортировать</value>
   </data>
-  <data name="DaysFrom2To4" xml:space="preserve">
-    <value>days</value>
-    <comment>2-4 days ago</comment>
+  <data name="Name" xml:space="preserve">
+    <value>Темы</value>
   </data>
-  <data name="DaysFrom5To9" xml:space="preserve">
-    <value>days</value>
-    <comment>5-9 days ago</comment>
+  <data name="NewTheme" xml:space="preserve">
+    <value>Новая тема</value>
   </data>
-  <data name="HoursFrom0To0" xml:space="preserve">
-    <value>hours</value>
-    <comment>n hours aog</comment>
+  <data name="NewThemeAuthor" xml:space="preserve">
+    <value>Автор...</value>
   </data>
-  <data name="HoursFrom1To1" xml:space="preserve">
-    <value>hour</value>
-    <comment>1 hour ago</comment>
+  <data name="NewThemeColorAccent" xml:space="preserve">
+    <value>Цвет акцента</value>
   </data>
-  <data name="HoursFrom2To4" xml:space="preserve">
-    <value>hours</value>
-    <comment>2-4 hours ago</comment>
+  <data name="NewThemeColorAcrylic" xml:space="preserve">
+    <value>Цвет блюр-элементов</value>
   </data>
-  <data name="HoursFrom5To9" xml:space="preserve">
-    <value>hours</value>
-    <comment>5-9 hours ago</comment>
+  <data name="NewThemeColorContrast" xml:space="preserve">
+    <value>Контрастный цвет</value>
   </data>
-  <data name="LastSeen" xml:space="preserve">
-    <value>Was online %date%</value>
-    <comment>Someone was online ...</comment>
+  <data name="NewThemeColorMain" xml:space="preserve">
+    <value>Основной цвет</value>
   </data>
-  <data name="MinutesFrom0To0" xml:space="preserve">
-    <value>minutes</value>
-    <comment>n minutes ago</comment>
+  <data name="NewThemeColorMessage" xml:space="preserve">
+    <value>Цвет фона сообщения</value>
   </data>
-  <data name="MinutesFrom1To1" xml:space="preserve">
-    <value>minute</value>
-    <comment>1 minute ago</comment>
+  <data name="NewThemeColorSubAccent" xml:space="preserve">
+    <value>Цвет суб-акцента</value>
   </data>
-  <data name="MinutesFrom2To4" xml:space="preserve">
-    <value>minutes</value>
-    <comment>2-4 minutes ago</comment>
+  <data name="NewThemeColorTextDefault" xml:space="preserve">
+    <value>Цвет текста</value>
   </data>
-  <data name="MinutesFrom5To9" xml:space="preserve">
-    <value>minutes</value>
-    <comment>5-9 minutes ago</comment>
+  <data name="NewThemeColorTextInverted" xml:space="preserve">
+    <value>Инвертированный цвет текста</value>
   </data>
-  <data name="Online" xml:space="preserve">
-    <value>Online</value>
-    <comment>Online text</comment>
+  <data name="NewThemeIsDark" xml:space="preserve">
+    <value>Обводка у стикеров</value>
   </data>
-  <data name="RightNow" xml:space="preserve">
-    <value>right now</value>
-    <comment>(was online) right now</comment>
+  <data name="NewThemeName" xml:space="preserve">
+    <value>Имя темы...</value>
+  </data>
+  <data name="NewThemeWrongAuthor" xml:space="preserve">
+    <value>Неправильное имя автора</value>
+  </data>
+  <data name="NewThemeWrongColors" xml:space="preserve">
+    <value>Неправильные цвета. Укажите все цвета перед сохранением</value>
+  </data>
+  <data name="NewThemeWrongName" xml:space="preserve">
+    <value>Неправильное имя темы</value>
   </data>
 </root>
