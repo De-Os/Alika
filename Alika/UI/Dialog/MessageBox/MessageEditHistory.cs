@@ -19,17 +19,16 @@ namespace Alika.UI.Dialog
 
             foreach (Message msg in Messages)
             {
+                var text = ThemeHelpers.GetThemedText();
+                text.Text = msg.UpdateTime.ToDateTime().ToString("HH:mm:ss, dd.MM.yy");
+                text.VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Center;
+                text.FontSize = 20;
                 var item = new Button
                 {
                     HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Stretch,
                     CornerRadius = new Windows.UI.Xaml.CornerRadius(10),
-                    Content = new TextBlock
-                    {
-                        Text = msg.UpdateTime.ToDateTime().ToString("HH:mm:ss, dd.MM.yy"),
-                        VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Center,
-                        FontSize = 20
-                    },
-                    Background = Coloring.Transparent.Full
+                    Content = text,
+                    Background = App.Theme.Colors.Transparent
                 };
                 item.Click += (a, b) => App.MainPage.Popup.Children.Add(new Popup
                 {

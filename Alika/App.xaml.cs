@@ -15,21 +15,23 @@ using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace Alika
 {
     sealed partial class App : Application
     {
-        public static bool DarkTheme = new UISettings().GetColorValue(UIColorType.Background).ToString() == "#FF000000"; // Bool for detecting system theme
         public static Caching Cache = new Caching(); // Global caching
         public static Config Settings;
         public static string appName = "alika.vk"; // Appname for password vault
-        public static UITasksLoop UILoop = new UITasksLoop();
+        public static FontFamily Icons = new FontFamily("Assets/Fonts/icons.ttf#icomoon"); // Custom FontIcons
+        public static UITasksLoop UILoop = new UITasksLoop(); // UI Tasks
         public static VK VK; // VK lib
         public static MainPage MainPage; // Main page
         public static LongPoll LP; // LongPoll
         public static LoginPage LoginPage; // Login page
+        public static Theme Theme = new Theme(); // Themes!
 
         public App()
         {
@@ -41,6 +43,9 @@ namespace Alika
         protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
             await Config.EnsureCreated();
+            var theme = new Theme();
+            await theme.LoadDefaultTheme(new UISettings().GetColorValue(UIColorType.Background).ToString() == "#FF000000");
+            App.Theme = theme;
 
             if (!(Window.Current.Content is Frame rootFrame))
             {
@@ -68,7 +73,7 @@ namespace Alika
                 }
                 Window.Current.Activate();
 
-                ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
+                var titleBar = ApplicationView.GetForCurrentView().TitleBar;
                 CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
                 titleBar.ButtonBackgroundColor = Colors.Transparent;
                 titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;

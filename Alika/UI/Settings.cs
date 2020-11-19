@@ -9,6 +9,7 @@ using System.Reflection;
 using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using static Alika.Theme;
 
 namespace Alika.UI
 {
@@ -44,13 +45,12 @@ namespace Alika.UI
                 var locName = Utils.LocString("Settings/" + finalName.Replace('.', '_').ToUpper());
                 if (set.PropertyType.IsClass && set.PropertyType != typeof(string) && !set.PropertyType.IsGenericType)
                 {
-                    this.menu.Children.Add(new TextBlock
-                    {
-                        Text = locName,
-                        FontSize = 15,
-                        FontWeight = Windows.UI.Text.FontWeights.SemiBold,
-                        Margin = new Thickness(margin, 0, 0, 0)
-                    });
+                    var lname = ThemeHelpers.GetThemedText();
+                    lname.Text = locName;
+                    lname.FontSize = 15;
+                    lname.FontWeight = Windows.UI.Text.FontWeights.SemiBold;
+                    lname.Margin = new Thickness(margin, 0, 0, 0);
+                    this.menu.Children.Add(lname);
                     this.GenerateSettings(set.PropertyType.GetProperties().ToList(), margin + 15, set.GetValue(parent), finalName);
                 }
                 else
@@ -80,7 +80,7 @@ namespace Alika.UI
                     }
                     else if (set.PropertyType == typeof(string))
                     {
-                        input = new TextBox
+                        input = new ThemedTextBox
                         {
                             Text = (string)value,
                             PlaceholderText = finalName
@@ -122,12 +122,11 @@ namespace Alika.UI
 
                     if (input != null)
                     {
-                        grid.Children.Add(new TextBlock
-                        {
-                            Text = locName,
-                            VerticalAlignment = VerticalAlignment.Center,
-                            Margin = new Thickness(5)
-                        });
+                        var ntext = ThemeHelpers.GetThemedText();
+                        ntext.Text = locName;
+                        ntext.VerticalAlignment = VerticalAlignment.Center;
+                        ntext.Margin = new Thickness(5);
+                        grid.Children.Add(ntext);
                         input.Margin = new Thickness(10, 0, 0, 0);
                         input.VerticalAlignment = VerticalAlignment.Center;
                         input.HorizontalAlignment = HorizontalAlignment.Right;
@@ -153,9 +152,11 @@ namespace Alika.UI
             };
             Grid.SetRow(scroll, 0);
             content.Children.Add(scroll);
+            var savetext = ThemeHelpers.GetThemedText();
+            savetext.Text = Utils.LocString("Save");
             var save = new Button
             {
-                Content = new TextBlock { Text = Utils.LocString("Save") },
+                Content = savetext,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 Margin = new Thickness(5)
             };

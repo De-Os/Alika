@@ -5,6 +5,7 @@ using Alika.UI.Items;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using static Alika.Theme;
 
 namespace Alika.UI.Dialog
 {
@@ -13,17 +14,17 @@ namespace Alika.UI.Dialog
     {
         public int peer_id;
 
-        public TextBlock name = new TextBlock
-        {
-            FontWeight = FontWeights.Bold,
-            FontSize = 18,
-            VerticalAlignment = VerticalAlignment.Bottom,
-            HorizontalAlignment = HorizontalAlignment.Left
-        };
+        public TextBlock name;
 
         public TopMenu(int peer_id)
         {
             this.peer_id = peer_id;
+
+            this.name = ThemeHelpers.GetThemedText();
+            this.name.FontWeight = FontWeights.Bold;
+            this.name.FontSize = 18;
+            this.name.VerticalAlignment = VerticalAlignment.Bottom;
+            this.name.HorizontalAlignment = HorizontalAlignment.Left;
 
             this.Margin = new Thickness(0, 25, 0, 10);
             this.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -44,11 +45,9 @@ namespace Alika.UI.Dialog
             var typing = new TypeState(this.peer_id);
             if (this.peer_id < 0 || this.peer_id > Limits.Messages.PEERSTART)
             {
-                defAbout = new TextBlock
-                {
-                    TextTrimming = TextTrimming.CharacterEllipsis,
-                    Text = Utils.LocString(this.peer_id < 0 ? "Dialog/Group" : "Dialog/Conference")
-                };
+                defAbout = ThemeHelpers.GetThemedText();
+                (defAbout as TextBlock).TextTrimming = TextTrimming.CharacterEllipsis;
+                (defAbout as TextBlock).Text = Utils.LocString(this.peer_id < 0 ? "Dialog/Group" : "Dialog/Conference");
             }
             else
             {
@@ -80,41 +79,41 @@ namespace Alika.UI.Dialog
         {
             Button button = new Button
             {
-                Content = new FontIcon
+                Content = new ThemedFontIcon
                 {
-                    Glyph = "\uE712",
+                    Glyph = Glyphs.More,
                     FontSize = 20
                 },
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Bottom,
                 Margin = new Thickness(0, 10, 5, 0),
-                Background = Coloring.Transparent.Full,
+                Background = App.Theme.Colors.Transparent,
                 Flyout = new FlyoutMenu(this.peer_id)
             };
             Grid.SetColumn(button, this.ColumnDefinitions.Count);
             this.Children.Add(button);
         }
 
-        public class FlyoutMenu : MenuFlyout
+        public class FlyoutMenu : ThemedMenuFlyout
         {
             public FlyoutMenu(int peer_id)
             {
-                var info = new MenuFlyoutItem
+                var info = new ThemedMenuFlyoutItem
                 {
-                    Icon = new FontIcon
+                    Icon = new ThemedFontIcon
                     {
-                        Glyph = "\uE946"
+                        Glyph = Glyphs.Info
                     },
                     Text = Utils.LocString("Dialog/TopMenuInformation")
                 };
                 info.Click += (a, b) => new ChatInformation(peer_id);
                 this.Items.Add(info);
 
-                var attachs = new MenuFlyoutItem
+                var attachs = new ThemedMenuFlyoutItem
                 {
-                    Icon = new FontIcon
+                    Icon = new ThemedFontIcon
                     {
-                        Glyph = "\uED25"
+                        Glyph = Glyphs.Open
                     },
                     Text = Utils.LocString("Dialog/TopMenuAttachments")
                 };
@@ -128,11 +127,11 @@ namespace Alika.UI.Dialog
                 }; ;
                 this.Items.Add(attachs);
 
-                var openImportant = new MenuFlyoutItem
+                var openImportant = new ThemedMenuFlyoutItem
                 {
-                    Icon = new FontIcon
+                    Icon = new ThemedFontIcon
                     {
-                        Glyph = "\uE734"
+                        Glyph = Glyphs.Star
                     },
                     Text = Utils.LocString("Dialog/ImportantMessages")
                 };
@@ -145,11 +144,11 @@ namespace Alika.UI.Dialog
 
                     if (conv.Settings.Access.CanInvite)
                     {
-                        var addUser = new MenuFlyoutItem
+                        var addUser = new ThemedMenuFlyoutItem
                         {
-                            Icon = new FontIcon
+                            Icon = new ThemedFontIcon
                             {
-                                Glyph = "\uE8FA"
+                                Glyph = Glyphs.AddUser
                             },
                             Text = Utils.LocString("Dialog/InviteUser")
                         };

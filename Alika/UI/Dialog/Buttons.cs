@@ -1,8 +1,7 @@
 ﻿using Alika.Libs;
-using System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media.Imaging;
+using static Alika.Theme;
 
 namespace Alika.UI.Dialog
 {
@@ -14,15 +13,15 @@ namespace Alika.UI.Dialog
             public Send()
             {
                 this.CornerRadius = new CornerRadius(5);
-                this.Content = new Image
+                this.Content = new ThemedFontIcon
                 {
-                    Source = new SvgImageSource(new Uri(Utils.AssetTheme("send.svg"))),
-                    Height = 20
+                    FontSize = 20,
+                    Glyph = Glyphs.Send
                 };
                 this.Width = 50;
                 this.Margin = new Thickness(5, 10, 20, 10);
                 this.HorizontalAlignment = HorizontalAlignment.Right;
-                this.Background = Coloring.Transparent.Full;
+                this.Background = App.Theme.Colors.Transparent;
             }
         }
 
@@ -32,16 +31,15 @@ namespace Alika.UI.Dialog
             public Attachment()
             {
                 this.CornerRadius = new CornerRadius(5);
-                this.Content = new Image
+                this.Content = new ThemedFontIcon
                 {
-                    Source = new SvgImageSource(new Uri(Utils.AssetTheme("clip.svg"))),
-                    Width = 20,
-                    Height = 20
+                    FontSize = 20,
+                    Glyph = Glyphs.Attach
                 };
                 this.Width = 50;
                 this.Margin = new Thickness(20, 10, 5, 10);
                 this.HorizontalAlignment = HorizontalAlignment.Left;
-                this.Background = Coloring.Transparent.Full;
+                this.Background = App.Theme.Colors.Transparent;
 
                 this.RightTapped += (a, b) => App.UILoop.RunAction(new UITask
                 {
@@ -66,15 +64,15 @@ namespace Alika.UI.Dialog
             public Stickers()
             {
                 this.CornerRadius = new CornerRadius(5);
-                this.Content = new Image
+                this.Content = new ThemedFontIcon
                 {
-                    Source = new SvgImageSource(new Uri(Utils.AssetTheme("sticker.svg"))),
-                    Height = 20
+                    FontSize = 20,
+                    Glyph = Glyphs.Emoji
                 };
                 this.Width = 50;
                 this.Margin = new Thickness(5, 10, 5, 10);
                 this.HorizontalAlignment = HorizontalAlignment.Right;
-                this.Background = Coloring.Transparent.Full;
+                this.Background = App.Theme.Colors.Transparent;
             }
         }
     }

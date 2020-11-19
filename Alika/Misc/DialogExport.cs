@@ -16,6 +16,8 @@ using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media;
+using static Alika.Theme;
 
 namespace Alika.Misc
 {
@@ -26,34 +28,34 @@ namespace Alika.Misc
         {
             HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Right,
             Margin = new Windows.UI.Xaml.Thickness(10),
-            CornerRadius = new Windows.UI.Xaml.CornerRadius(5),
-            Content = new TextBlock { Text = Utils.LocString("Dialog/ExportCreate") }
+            CornerRadius = new Windows.UI.Xaml.CornerRadius(5)
         };
 
         public ExportPopup(int peer_id)
         {
+            var confirmText = ThemeHelpers.GetThemedText();
+            confirmText.Text = Utils.LocString("Dialog/ExportCreate");
+            this.Confirm.Content = confirmText;
+
             var buttons = new RadioButtons
             {
                 Header = Utils.LocString("Dialog/ExportMode"),
                 HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Stretch,
                 Margin = new Windows.UI.Xaml.Thickness(10)
             };
-            buttons.Items.Add(new ExportButton
+            buttons.Items.Add(new ExportButton("Dialog/ExportModeMessages")
             {
                 Mode = DialogExport.ExportMode.MESSAGES,
-                Content = new TextBlock { Text = Utils.LocString("Dialog/ExportModeMessages") },
                 HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Stretch
             });
-            buttons.Items.Add(new ExportButton
+            buttons.Items.Add(new ExportButton("Dialog/ExportModeAttachments")
             {
                 Mode = DialogExport.ExportMode.ATTACHMENTS,
-                Content = new TextBlock { Text = Utils.LocString("Dialog/ExportModeAttachments") },
                 HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Stretch
             });
-            buttons.Items.Add(new ExportButton
+            buttons.Items.Add(new ExportButton("Dialog/ExportModeAll")
             {
                 Mode = DialogExport.ExportMode.ALL,
-                Content = new TextBlock { Text = Utils.LocString("Dialog/ExportModeAll") },
                 HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Stretch
             });
             buttons.SelectedIndex = 0;
@@ -66,6 +68,13 @@ namespace Alika.Misc
         private class ExportButton : RadioButton
         {
             public DialogExport.ExportMode Mode { get; set; }
+
+            public ExportButton(string name)
+            {
+                var content = ThemeHelpers.GetThemedText();
+                content.Text = Utils.LocString(name);
+                this.Content = content;
+            }
         }
     }
 
@@ -97,12 +106,11 @@ namespace Alika.Misc
                 {
                     var export = (App.MainPage.Chats.Content as ChatsHolder).MsgExport;
                     export.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                    export.Flyout = new Flyout
+                    var content = ThemeHelpers.GetThemedText();
+                    content.Text = Utils.LocString("Dialog/Exporting").Replace("%chat%", this.PeerId.ToString()).Replace("%ready%", "0").Replace("%total%", "0");
+                    export.Flyout = new ThemedFlyout
                     {
-                        Content = new TextBlock
-                        {
-                            Text = Utils.LocString("Dialog/Exporting").Replace("%chat%", this.PeerId.ToString()).Replace("%ready%", "0").Replace("%total%", "0")
-                        }
+                        Content = content
                     };
                 }
             });
@@ -299,12 +307,15 @@ namespace Alika.Misc
                                     {
                                         if (scroll.VerticalOffset >= scroll.ScrollableHeight) viewer.LoadMessages(250);
                                     };
+                                    var searchText = ThemeHelpers.GetThemedText();
+                                    searchText.Text = Utils.LocString("Search");
                                     var search = new Button
                                     {
-                                        Content = new TextBlock { Text = Utils.LocString("Search") },
+                                        Content = searchText,
                                         Margin = new Windows.UI.Xaml.Thickness(0, 5, 5, 0),
                                         CornerRadius = new Windows.UI.Xaml.CornerRadius(5),
-                                        HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Right
+                                        HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Right,
+                                        Foreground = new SolidColorBrush(App.Theme.Colors.Text.Default)
                                     };
                                     search.Click += (a, b) =>
                                     {
@@ -350,19 +361,21 @@ namespace Alika.Misc
                 topgrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Auto) });
                 topgrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new Windows.UI.Xaml.GridLength(1, Windows.UI.Xaml.GridUnitType.Auto) });
 
-                var searchbar = new TextBox
+                var searchbar = new ThemedTextBox
                 {
                     PlaceholderText = Utils.LocString("Dialog/TextBoxPlaceholder"),
                     HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Stretch,
-                    Margin = new Windows.UI.Xaml.Thickness(5),
+                    Margin = new Windows.UI.Xaml.Thickness(5)
                 };
                 var calendar = new CalendarDatePicker
                 {
                     Margin = new Windows.UI.Xaml.Thickness(0, 5, 2.5, 5)
                 };
+                var searchText = ThemeHelpers.GetThemedText();
+                searchText.Text = Utils.LocString("Search");
                 var button = new Button
                 {
-                    Content = new TextBlock { Text = Utils.LocString("Search") },
+                    Content = searchText,
                     Margin = new Windows.UI.Xaml.Thickness(0, 5, 5, 5),
                     CornerRadius = new Windows.UI.Xaml.CornerRadius(5)
                 };

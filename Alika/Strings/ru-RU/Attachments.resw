@@ -141,7 +141,7 @@
   <data name="Links" xml:space="preserve">
     <value>Ссылки</value>
   </data>
-  <data name="MoneyTranfer" xml:space="preserve">
+  <data name="MoneyTransfer" xml:space="preserve">
     <value>Денежный перевод</value>
   </data>
   <data name="Photo" xml:space="preserve">

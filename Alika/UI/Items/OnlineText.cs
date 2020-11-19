@@ -14,14 +14,14 @@ namespace Alika.UI.Items
         private int LastOnline;
         private int UserId;
 
-        private TextBlock Text = new TextBlock
-        {
-            TextTrimming = Windows.UI.Xaml.TextTrimming.CharacterEllipsis
-        };
+        private TextBlock Text;
 
         public OnlineText(int user_id)
         {
             this.UserId = user_id;
+
+            this.Text = ThemeHelpers.GetThemedText();
+            this.Text.TextTrimming = Windows.UI.Xaml.TextTrimming.CharacterEllipsis;
 
             this.Content = this.Text;
 

@@ -14,6 +14,7 @@ using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.System;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -114,8 +115,6 @@ namespace Alika.Libs
                 return ms.ToArray();
             }
         }
-
-        public static string AssetTheme(string filename, string path = "UI/") => "ms-appx:///Assets/" + path + (App.DarkTheme ? "Light" : "Dark") + "/" + filename;
 
         public static string FormatSize(int bytes, int round = 2)
         {
@@ -303,5 +302,13 @@ namespace Alika.Libs
             }
             return temptext;
         }
+
+        public static Color Invert(this Color color) => new Color
+        {
+            R = (byte)~color.R,
+            G = (byte)~color.G,
+            B = (byte)~color.B,
+            A = 255
+        };
     }
 }

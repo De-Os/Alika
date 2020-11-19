@@ -1,5 +1,4 @@
-﻿using Alika.Libs;
-using Alika.Libs.VK.Responses;
+﻿using Alika.Libs.VK.Responses;
 using Microsoft.Toolkit.Uwp.UI;
 using RestSharp;
 using System;
@@ -8,7 +7,7 @@ using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
+using static Alika.Theme;
 
 namespace Alika.UI
 {
@@ -17,11 +16,8 @@ namespace Alika.UI
         public Grid grid = new Grid
         {
             CornerRadius = new CornerRadius(10),
-            Background = new AcrylicBrush
+            Background = new ThemedAcrylicBrush
             {
-                FallbackColor = Coloring.Transparent.Percent(100).Color,
-                TintColor = Coloring.Transparent.Percent(100).Color,
-                TintOpacity = 0.7,
                 BackgroundSource = AcrylicBackgroundSource.Backdrop
             }
         };
@@ -29,11 +25,8 @@ namespace Alika.UI
         public Grid menu = new Grid
         {
             CornerRadius = new CornerRadius(10),
-            Background = new AcrylicBrush
+            Background = new ThemedAcrylicBrush
             {
-                FallbackColor = Coloring.Transparent.Percent(100).Color,
-                TintColor = Coloring.Transparent.Percent(100).Color,
-                TintOpacity = 0.7,
                 BackgroundSource = AcrylicBackgroundSource.Backdrop
             },
             HorizontalAlignment = HorizontalAlignment.Center,
@@ -46,7 +39,7 @@ namespace Alika.UI
 
         public Popup popup = new Popup
         {
-            ContentBackground = Coloring.Transparent.Full
+            ContentBackground = App.Theme.Colors.Transparent
         };
 
         public MediaViewer(Attachment attachment)
@@ -74,26 +67,27 @@ namespace Alika.UI
 
             Button download = new Button
             {
-                Content = new Image
+                Content = new ThemedFontIcon
                 {
-                    Source = new SvgImageSource(new Uri(Utils.AssetTheme("download.svg"))),
-                    Height = 30
+                    Glyph = Glyphs.Custom.Download,
+                    FontFamily = App.Icons,
+                    FontSize = 25
                 },
                 Margin = new Thickness(5),
-                Background = Coloring.Transparent.Full,
+                Background = App.Theme.Colors.Transparent,
                 CornerRadius = new CornerRadius(10),
                 Padding = new Thickness(5)
             };
             download.Click += (a, b) => this.Download();
             Button close = new Button
             {
-                Content = new Image
+                Content = new ThemedFontIcon
                 {
-                    Source = new SvgImageSource(new Uri(Utils.AssetTheme("close.svg"))),
-                    Height = 30
+                    Glyph = Glyphs.Close,
+                    FontSize = 25
                 },
                 Margin = new Thickness(5),
-                Background = Coloring.Transparent.Full,
+                Background = App.Theme.Colors.Transparent,
                 CornerRadius = new CornerRadius(10),
                 Padding = new Thickness(5)
             };
@@ -109,11 +103,8 @@ namespace Alika.UI
         {
             Grid grid = new Grid
             {
-                Background = new AcrylicBrush
+                Background = new ThemedAcrylicBrush
                 {
-                    FallbackColor = Coloring.Transparent.Percent(100).Color,
-                    TintColor = Coloring.Transparent.Percent(100).Color,
-                    TintOpacity = 0.7,
                     BackgroundSource = AcrylicBackgroundSource.Backdrop
                 }
             };

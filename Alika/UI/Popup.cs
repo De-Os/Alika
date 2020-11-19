@@ -1,5 +1,4 @@
 ﻿using Alika.Libs;
-using System;
 using System.Linq;
 using Windows.UI.Core;
 using Windows.UI.Text;
@@ -8,7 +7,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
-using Windows.UI.Xaml.Media.Imaging;
+using static Alika.Theme;
 
 namespace Alika.UI
 {
@@ -17,11 +16,8 @@ namespace Alika.UI
     {
         private Grid _content = new Grid
         {
-            Background = new AcrylicBrush
+            Background = new ThemedAcrylicBrush
             {
-                FallbackColor = Coloring.Transparent.Percent(100).Color,
-                TintColor = Coloring.Transparent.Percent(100).Color,
-                TintOpacity = 0.7,
                 BackgroundSource = AcrylicBackgroundSource.Backdrop
             },
             CornerRadius = new CornerRadius(10),
@@ -29,14 +25,7 @@ namespace Alika.UI
             MaxHeight = 600
         };
 
-        private TextBlock _title = new TextBlock
-        {
-            Margin = new Thickness(5, 0, 0, 5),
-            FontWeight = FontWeights.Bold,
-            TextTrimming = TextTrimming.CharacterEllipsis,
-            FontSize = 20,
-            Visibility = Visibility.Collapsed
-        };
+        private TextBlock _title;
 
         public Brush ContentBackground
         {
@@ -87,6 +76,13 @@ namespace Alika.UI
         public Popup()
         {
             this.Children.Add(this._content);
+
+            this._title = ThemeHelpers.GetThemedText();
+            this._title.Margin = new Thickness(5, 0, 0, 5);
+            this._title.FontWeight = FontWeights.Bold;
+            this._title.TextTrimming = TextTrimming.CharacterEllipsis;
+            this._title.FontSize = 20;
+            this._title.Visibility = Visibility.Collapsed;
 
             this.HorizontalAlignment = HorizontalAlignment.Stretch;
             this.VerticalAlignment = VerticalAlignment.Stretch;
@@ -149,13 +145,15 @@ namespace Alika.UI
         {
             public Menu(string title = null)
             {
-                if (title != null) this.Children.Add(new TextBlock
+                if (title != null)
                 {
-                    Margin = new Thickness(5, 0, 0, 2),
-                    Text = Utils.LocString(title),
-                    FontWeight = FontWeights.SemiLight,
-                    FontSize = 12.5
-                });
+                    var titletext = ThemeHelpers.GetThemedText();
+                    titletext.Margin = new Thickness(5, 0, 0, 2);
+                    titletext.Text = Utils.LocString(title);
+                    titletext.FontWeight = FontWeights.SemiLight;
+                    titletext.FontSize = 12.5;
+                    this.Children.Add(titletext);
+                }
             }
 
             [Bindable]
@@ -165,7 +163,7 @@ namespace Alika.UI
                 {
                     this.HorizontalAlignment = HorizontalAlignment.Stretch;
                     this.HorizontalContentAlignment = HorizontalAlignment.Left;
-                    this.Background = Coloring.Transparent.Full;
+                    this.Background = App.Theme.Colors.Transparent;
                     this.Padding = new Thickness(10);
                     this.CornerRadius = new CornerRadius(5);
 
@@ -173,32 +171,20 @@ namespace Alika.UI
                     content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
                     content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-                    FrameworkElement image;
-                    if (icon.EndsWith(".svg"))
+                    var image = new ThemedFontIcon
                     {
-                        image = new Image
-                        {
-                            Source = new SvgImageSource(new Uri(Utils.AssetTheme(icon)))
-                        };
-                    }
-                    else
-                    {
-                        image = new FontIcon
-                        {
-                            Glyph = icon
-                        };
-                    }
+                        Glyph = icon
+                    };
                     image.Width = 20;
                     image.Height = 20;
                     image.Margin = new Thickness(0, 0, 10, 0);
                     image.VerticalAlignment = VerticalAlignment.Center;
-                    var text = new TextBlock
-                    {
-                        VerticalAlignment = VerticalAlignment.Center,
-                        FontWeight = FontWeights.SemiBold,
-                        TextTrimming = TextTrimming.CharacterEllipsis,
-                        Text = Utils.LocString(title)
-                    };
+
+                    var text = ThemeHelpers.GetThemedText();
+                    text.VerticalAlignment = VerticalAlignment.Center;
+                    text.FontWeight = FontWeights.SemiBold;
+                    text.TextTrimming = TextTrimming.CharacterEllipsis;
+                    text.Text = Utils.LocString(title);
 
                     Grid.SetColumn(image, 0);
                     Grid.SetColumn(text, 1);

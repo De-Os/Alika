@@ -18,10 +18,7 @@ namespace Alika.UI.Items
 
         public event BasicEvent Hide;
 
-        private TextBlock Text = new TextBlock
-        {
-            TextTrimming = Windows.UI.Xaml.TextTrimming.CharacterEllipsis
-        };
+        private TextBlock Text;
 
         private List<int> current = new List<int>();
         private DateTime updated = DateTime.Now;
@@ -58,6 +55,9 @@ namespace Alika.UI.Items
 
         private void Load()
         {
+            this.Text = ThemeHelpers.GetThemedText();
+            this.Text.TextTrimming = Windows.UI.Xaml.TextTrimming.CharacterEllipsis;
+
             var stack = new StackPanel { Orientation = Orientation.Horizontal };
             stack.Children.Add(this.Text);
             this.Content = stack;

@@ -1,0 +1,17 @@
+{
+	"name": "Default light",
+	"author": "Alika",
+	"is_dark": false,
+	"colors": {
+		"accent": "#000000",
+		"subaccent": "#21a0cf",
+		"acrylic": "#ffffff",
+		"main": "#ffffff",
+		"contrast": "#919191",
+		"message": "#f5f5f5",
+		"text": {
+			"default": "#000000",
+			"inverted": "#ffffff"
+		}
+	}
+}

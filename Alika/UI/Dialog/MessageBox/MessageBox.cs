@@ -14,7 +14,8 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Media;
+using static Alika.Theme;
 
 namespace Alika.UI
 {
@@ -56,12 +57,7 @@ namespace Alika.UI
             public TextBubble Bubble;
             public Avatar Ava;
 
-            public TextBlock time = new TextBlock
-            {
-                VerticalAlignment = VerticalAlignment.Bottom,
-                Margin = new Thickness(0, 0, 0, 10),
-                Foreground = Coloring.InvertedTransparent.Percent(50)
-            };
+            public TextBlock time;
 
             public StackPanel states = new StackPanel
             {
@@ -70,12 +66,12 @@ namespace Alika.UI
 
             public Button Reply = new Button
             {
-                Content = new FontIcon
+                Content = new ThemedFontIcon
                 {
-                    Glyph = "\uE97A",
+                    Glyph = Glyphs.Reply,
                     FontSize = 15
                 },
-                Background = Coloring.Transparent.Full,
+                Background = App.Theme.Colors.Transparent,
                 CornerRadius = new CornerRadius(15),
                 Visibility = Visibility.Collapsed,
                 VerticalAlignment = VerticalAlignment.Bottom,
@@ -91,13 +87,12 @@ namespace Alika.UI
                     if (this._edited) return;
                     App.UILoop.AddAction(new UITask
                     {
-                        Action = () => this.states.Children.Insert(0, new Image
+                        Action = () => this.states.Children.Insert(0, new ThemedFontIcon
                         {
-                            Width = 15,
-                            Height = 15,
                             HorizontalAlignment = App.VK.UserId == this.Bubble.Message.FromId ? HorizontalAlignment.Right : HorizontalAlignment.Left,
                             VerticalAlignment = VerticalAlignment.Bottom,
-                            Source = new SvgImageSource(new Uri(Utils.AssetTheme("pen.svg")))
+                            FontSize = 12,
+                            Glyph = Glyphs.Pen
                         })
                     });
                     this._edited = true;
@@ -109,6 +104,11 @@ namespace Alika.UI
             public MessageGrid(Message msg, bool isStatic = false)
             {
                 this.MinWidth = 200;
+
+                this.time = ThemeHelpers.GetThemedText();
+                this.time.VerticalAlignment = VerticalAlignment.Bottom;
+                this.time.Margin = new Thickness(0, 0, 0, 10);
+
                 this.states.HorizontalAlignment = App.VK.UserId == msg.FromId ? HorizontalAlignment.Right : HorizontalAlignment.Left;
                 this.Bubble = new TextBubble(msg, isStatic);
                 this.LoadAvatar(msg.FromId);
@@ -140,20 +140,20 @@ namespace Alika.UI
                     if (!isStatic)
                     {
                         var conv = App.Cache.GetConversation(msg.PeerId);
-                        var readState = new Image
+                        var readState = new ThemedFontIcon
                         {
-                            Width = 15,
-                            Height = 15,
                             HorizontalAlignment = HorizontalAlignment.Right,
                             VerticalAlignment = VerticalAlignment.Bottom,
-                            Source = new SvgImageSource(new Uri(Utils.AssetTheme(msg.Id <= (conv.InRead > conv.OutRead ? conv.InRead : conv.OutRead) ? "double_check.svg" : "check.svg")))
+                            FontFamily = App.Icons,
+                            FontSize = 12,
+                            Glyph = msg.Id <= (conv.InRead > conv.OutRead ? conv.InRead : conv.OutRead) ? Glyphs.Custom.DoubleCheck : Glyphs.Custom.Check
                         };
                         App.LP.OnReadMessage += (rs) =>
                         {
                             if (rs.PeerId == msg.PeerId && rs.MsgId >= msg.Id) App.UILoop.AddAction(new UITask
                             {
                                 Priority = Windows.UI.Core.CoreDispatcherPriority.Low,
-                                Action = () => readState.Source = new SvgImageSource(new Uri(Utils.AssetTheme("double_check.svg")))
+                                Action = () => readState.Glyph = Glyphs.Custom.DoubleCheck
                             });
                         };
                         this.states.Children.Add(readState);
@@ -231,29 +231,29 @@ namespace Alika.UI
             public Border Border = new Border
             {
                 BorderThickness = new Thickness(1),
-                Background = App.DarkTheme ? Coloring.MessageBox.TextBubble.Dark : Coloring.MessageBox.TextBubble.Light,
                 Margin = new Thickness(10, 5, 10, 5),
                 MinHeight = 30,
                 MinWidth = 50,
                 CornerRadius = new CornerRadius(10)
             };
 
-            public TextBlock UserName = new TextBlock
-            {
-                FontWeight = FontWeights.Bold,
-                Margin = new Thickness(12, 5, 12, 1)
-            };
+            public TextBlock UserName;
 
             public TextBubble(Message msg, bool isStatic = false)
             {
                 this.Message = msg;
 
+                App.Theme.ThemeChanged += UpdateBorderColor;
+
+                this.UserName = ThemeHelpers.GetThemedText();
+                this.UserName.FontWeight = FontWeights.Bold;
+                this.UserName.Margin = new Thickness(12, 5, 12, 1);
+
                 this.UserName.Text = App.Cache.GetName(this.Message.FromId);
                 if (this.Message.FromId == App.VK.UserId) this.UserName.HorizontalTextAlignment = TextAlignment.Right;
 
                 this.Border.Child = new MessageContent(this.Message);
-                if (this.Message.Attachments?.Count > 0 && this.Message.Attachments.Any(i => i.Graffiti != null || i.Sticker != null)) this.Border.Background = Coloring.Transparent.Full;
-
+                UpdateBorderColor();
                 this.Children.Add(this.UserName);
                 this.Children.Add(this.Border);
 
@@ -273,6 +273,15 @@ namespace Alika.UI
                             });
                         }
                     };
+                }
+
+                void UpdateBorderColor()
+                {
+                    if (this.Message.Attachments?.Count > 0 && this.Message.Attachments.Any(i => i.Graffiti != null || i.Sticker != null))
+                    {
+                        this.Border.Background = App.Theme.Colors.Transparent;
+                    }
+                    else this.Border.Background = new SolidColorBrush(App.Theme.Colors.Message);
                 }
             }
 
@@ -428,16 +437,26 @@ namespace Alika.UI
                                         {
                                             if (t.Link)
                                             {
-                                                Hyperlink link = new Hyperlink { NavigateUri = new Uri(t.Url) };
-                                                link.Inlines.Add(new Run { Text = t.Text });
+                                                var r = ThemeHelpers.GetRun(ThemeHelpers.TextTypes.Link);
+                                                r.Text = t.Text;
+                                                var link = ThemeHelpers.GetHyperlink();
+                                                link.NavigateUri = new Uri(t.Url);
+                                                link.Inlines.Add(r);
                                                 p.Inlines.Add(link);
                                             }
-                                            else p.Inlines.Add(new Run { Text = t.Text });
+                                            else
+                                            {
+                                                var r = ThemeHelpers.GetRun();
+                                                r.Text = t.Text;
+                                                p.Inlines.Add(r);
+                                            }
                                         }
                                     }
                                     catch
                                     {
-                                        p.Inlines.Add(new Run { Text = this.Message.Text });
+                                        var r = ThemeHelpers.GetRun();
+                                        r.Text = this.Message.Text;
+                                        p.Inlines.Add(r);
                                     }
                                     this.Text.Blocks.Add(p);
                                 }
@@ -623,12 +642,14 @@ namespace Alika.UI
                                 this.Click += (object sender, RoutedEventArgs e) => Task.Factory.StartNew(() => App.VK.Messages.Send(peer_id, text: button.Action.Label, payload: button.Action.Payload));
                             }
 
-                            void SetText() => this.Content = new TextBlock
+                            void SetText()
                             {
-                                Text = button.Action.Label,
-                                HorizontalAlignment = HorizontalAlignment.Center,
-                                VerticalAlignment = VerticalAlignment.Center
-                            };
+                                var text = ThemeHelpers.GetThemedText();
+                                text.Text = button.Action.Label;
+                                text.HorizontalAlignment = HorizontalAlignment.Center;
+                                text.VerticalAlignment = VerticalAlignment.Center;
+                                this.Content = text;
+                            }
                         }
                     }
                 }
@@ -643,7 +664,7 @@ namespace Alika.UI
                     {
                         VerticalAlignment = VerticalAlignment.Stretch,
                         BorderThickness = new Thickness(0),
-                        Background = Coloring.InvertedTransparent.Percent(100),
+                        Background = new SolidColorBrush(App.Theme.Colors.Contrast),
                         Width = 2.5
                     };
 
@@ -666,13 +687,12 @@ namespace Alika.UI
                             Margin = new Thickness(5, 5, 0, 0),
                             VerticalAlignment = VerticalAlignment.Center
                         });
-                        topContent.Children.Add(new TextBlock
-                        {
-                            FontWeight = FontWeights.Bold,
-                            Text = App.Cache.GetName(msg.FromId),
-                            Margin = new Thickness(5, 5, 0, 0),
-                            VerticalAlignment = VerticalAlignment.Center
-                        });
+                        var name = ThemeHelpers.GetThemedText();
+                        name.FontWeight = FontWeights.Bold;
+                        name.Text = App.Cache.GetName(msg.FromId);
+                        name.Margin = new Thickness(5, 5, 0, 0);
+                        name.VerticalAlignment = VerticalAlignment.Center;
+                        topContent.Children.Add(name);
 
                         this.Children.Add(this.Border);
                         this.Children.Add(content);
@@ -689,15 +709,15 @@ namespace Alika.UI
         }
 
         [Bindable]
-        public class MessageFlyout : MenuFlyout
+        public class MessageFlyout : ThemedMenuFlyout
         {
             public MessageFlyout(Message msg, List<Message> editions = null)
             {
-                var reply = new MenuFlyoutItem
+                var reply = new ThemedMenuFlyoutItem
                 {
-                    Icon = new FontIcon
+                    Icon = new ThemedFontIcon
                     {
-                        Glyph = "\uE97A"
+                        Glyph = Glyphs.Reply
                     },
                     Text = Utils.LocString("Dialog/Reply")
                 };
@@ -711,11 +731,11 @@ namespace Alika.UI
 
                 if (editions != null && editions.Count > 0)
                 {
-                    var edHistory = new MenuFlyoutItem
+                    var edHistory = new ThemedMenuFlyoutItem
                     {
-                        Icon = new FontIcon
+                        Icon = new ThemedFontIcon
                         {
-                            Glyph = "\uEC92"
+                            Glyph = Glyphs.History
                         },
                         Text = Utils.LocString("Dialog/EditHistory")
                     };
@@ -736,14 +756,12 @@ namespace Alika.UI
             {
                 this.Padding = new Thickness(5);
                 this.VerticalAlignment = VerticalAlignment.Center;
-                var content = new TextBlock
-                {
-                    VerticalAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    TextAlignment = TextAlignment.Center
-                };
+                var content = ThemeHelpers.GetThemedText();
+                content.VerticalAlignment = VerticalAlignment.Center;
+                content.HorizontalAlignment = HorizontalAlignment.Center;
+                content.TextAlignment = TextAlignment.Center;
                 this.Content = content;
-                var menu = new MenuFlyout();
+                var menu = new ThemedMenuFlyout();
                 this.PointerPressed += (a, b) =>
                 {
                     if (menu.Items.Count > 0) menu.ShowAt(this);
@@ -767,13 +785,13 @@ namespace Alika.UI
                 content.Text = text;
             }
 
-            private MenuFlyoutItem GetUserItem(int user_id)
+            private ThemedMenuFlyoutItem GetUserItem(int user_id)
             {
-                var item = new MenuFlyoutItem
+                var item = new ThemedMenuFlyoutItem
                 {
-                    Icon = new FontIcon
+                    Icon = new ThemedFontIcon
                     {
-                        Glyph = "\uEE57"
+                        Glyph = Glyphs.UnknownUser
                     },
                     Text = App.Cache.GetName(user_id)
                 };
@@ -793,10 +811,9 @@ namespace Alika.UI
             this.VerticalAlignment = VerticalAlignment.Center;
             this.Padding = new Thickness(5);
             this.CornerRadius = new CornerRadius(10);
-            this.Content = new TextBlock
-            {
-                Text = time.ToString(time.Date.Year == DateTime.Now.Year ? "M" : "D")
-            };
+            var date = ThemeHelpers.GetThemedText();
+            date.Text = time.ToString(time.Date.Year == DateTime.Now.Year ? "M" : "D");
+            this.Content = date;
         }
     }
 }

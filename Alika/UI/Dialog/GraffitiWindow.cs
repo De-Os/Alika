@@ -8,7 +8,7 @@ using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media.Imaging;
+using static Alika.Theme;
 
 namespace Alika.UI.Dialog
 {
@@ -28,12 +28,6 @@ namespace Alika.UI.Dialog
         private Button Send = new Button
         {
             CornerRadius = new CornerRadius(10),
-            Content = new TextBlock
-            {
-                Text = Utils.LocString("Dialog/Send"),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            },
             Margin = new Thickness(10),
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
@@ -41,6 +35,12 @@ namespace Alika.UI.Dialog
         public GraffitiWindow()
         {
             this.Canvas.InkPresenter.InputDeviceTypes = CoreInputDeviceTypes.Mouse | CoreInputDeviceTypes.Pen | CoreInputDeviceTypes.Touch;
+
+            var sendtext = ThemeHelpers.GetThemedText();
+            sendtext.Text = Utils.LocString("Dialog/Send");
+            sendtext.HorizontalAlignment = HorizontalAlignment.Center;
+            sendtext.VerticalAlignment = VerticalAlignment.Center;
+            this.Send.Content = sendtext;
 
             this.RowDefinitions.Add(new RowDefinition());
             this.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
@@ -52,14 +52,14 @@ namespace Alika.UI.Dialog
             var image = new Button
             {
                 CornerRadius = new CornerRadius(5),
-                Content = new Image
+                Content = new ThemedFontIcon
                 {
-                    Source = new SvgImageSource(new Uri(Utils.AssetTheme("camera.svg"))),
-                    Width = 20,
-                    Height = 20
+                    FontSize = 15,
+                    FontFamily = App.Icons,
+                    Glyph = Glyphs.Custom.Camera
                 },
                 HorizontalAlignment = HorizontalAlignment.Right,
-                Background = Coloring.Transparent.Full
+                Background = App.Theme.Colors.Transparent
             };
             image.Click += this.UsePhoto;
             Grid.SetRow(toolbar, 0);
