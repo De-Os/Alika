@@ -94,18 +94,18 @@ namespace Alika.Libs.VK.Longpoll
 
         public void Generate()
         {
-            LPResponse lp = this.vk.Call<LPResponse>("messages.getLongPollServer", new Dictionary<string, dynamic> {
+            var lp = this.vk.Call<LPResponse>("messages.getLongPollServer", new Dictionary<string, dynamic> {
                 {"lp_version", 10},
                 {"need_pts", 0}
             });
             this._http = new RestClient("https://" + lp.Server) { Proxy = this._proxy };
             this.request = new RestRequest("");
-            request.AddParameter("act", "a_check");
-            request.AddParameter("key", lp.Key);
-            request.AddParameter("ts", lp.Ts);
-            request.AddParameter("wait", 50);
-            request.AddParameter("mode", 2 | 8 | 32 | 64 | 128);
-            request.AddParameter("version", 10);
+            this.request.AddParameter("act", "a_check");
+            this.request.AddParameter("key", lp.Key);
+            this.request.AddParameter("ts", lp.Ts);
+            this.request.AddParameter("wait", 25);
+            this.request.AddParameter("mode", 2 | 8 | 32 | 64 | 128);
+            this.request.AddParameter("version", 10);
             this.ts = lp.Ts;
             this.stop = false;
         }
@@ -119,13 +119,13 @@ namespace Alika.Libs.VK.Longpoll
                     try
                     {
                         this.request.AddOrUpdateParameter("ts", this.ts);
-                        string data = this._http.Get(this.request).Content;
+                        var data = this._http.Get(this.request).Content.Replace("<br>", "\n");
                         if (data == null || data.Length == 0)
                         {
                             this.stop = true;
                             this.Generate();
                         }
-                        JObject parsedData = JObject.Parse(data);
+                        var parsedData = JObject.Parse(data);
                         if (parsedData.ContainsKey("failed"))
                         {
                             if ((int)parsedData["failed"] != 1)
@@ -138,11 +138,13 @@ namespace Alika.Libs.VK.Longpoll
                         else
                         {
                             this.ts = (int)parsedData["ts"];
-                            JToken updates = parsedData["updates"];
+                            var updates = parsedData["updates"];
                             if (updates.HasValues) Event?.Invoke(updates);
                         }
                     }
-                    catch { }
+                    catch (Exception exc) {
+                        System.Diagnostics.Debug.WriteLine(exc);
+                    }
                 }
             });
         }

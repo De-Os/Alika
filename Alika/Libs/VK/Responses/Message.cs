@@ -84,7 +84,7 @@ namespace Alika.Libs.VK.Responses
                 this.PeerId = (int)message[3];
                 this.FromId = this.PeerId;
                 this.Date = (int)message[4];
-                this.Text = HttpUtility.HtmlDecode((string)message[5]).Replace("<br>", "\n");
+                this.Text = HttpUtility.HtmlDecode((string)message[5]);
                 if (message[6] != null && message[6].HasValues)
                 {
                     var additions = message[6];
