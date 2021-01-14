@@ -138,6 +138,9 @@
   <data name="Kibibyte" xml:space="preserve">
     <value>КиБ</value>
   </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Выйти из аккаунта</value>
+  </data>
   <data name="Megabyte" xml:space="preserve">
     <value>МБ</value>
   </data>

@@ -1,5 +1,6 @@
 ﻿using Alika.Libs;
 using Alika.Libs.VK;
+using Alika.Misc;
 using Alika.UI;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -12,8 +13,10 @@ using Windows.UI.Popups;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Imaging;
+using static Alika.Theme;
 
 namespace Alika
 {
@@ -23,14 +26,94 @@ namespace Alika
 
         public event OnLogin OnSuccesful;
 
+        private readonly TextBlock Title;
+        private readonly TextBox Number;
+        private readonly TextBox Password;
+        private readonly Button LoginButton;
+        private readonly Button LoginByTokenButton;
+        private readonly Button SettingButton;
+        private readonly Button ThemesButton;
+
         public LoginPage()
         {
             this.InitializeComponent();
 
-            this.title.Text = Utils.LocString("Login/Title");
-            this.number.PlaceholderText = Utils.LocString("Login/NumberPlaceholder");
-            this.password.PlaceholderText = Utils.LocString("Login/PasswordPlaceholder");
-            this.login.Content = new TextBlock { Text = Utils.LocString("Login/ButtonText") };
+            this.Background = new ThemedAcrylicBrush();
+
+            this.Title = ThemeHelpers.GetThemedText();
+            this.Title.Text = Utils.LocString("Login/Title");
+            this.Title.FontWeight = FontWeights.Bold;
+            this.Title.FontSize = 49;
+            this.titleHolder.Content = this.Title;
+
+            this.Number = new ThemedTextBox
+            {
+                PlaceholderText = Utils.LocString("Login/NumberPlaceholder"),
+                Width = 500
+            };
+            this.numHolder.Content = this.Number;
+
+            this.Password = new ThemedTextBox
+            {
+                PlaceholderText = Utils.LocString("Login/PasswordPlaceholder"),
+                Width = 500
+            };
+            this.pswdHolder.Content = this.Password;
+
+            var loginTxt = ThemeHelpers.GetThemedText();
+            loginTxt.Text = Utils.LocString("Login/ButtonText");
+            this.LoginButton = new ThemedButton
+            {
+                Content = loginTxt,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                CornerRadius = new CornerRadius(3),
+                Margin = new Thickness(0, 0, 5, 0)
+            };
+            Grid.SetColumn(this.LoginButton, 0);
+            this.Buttons.Children.Add(this.LoginButton);
+
+            this.LoginByTokenButton = new ThemedButton
+            {
+                Content = new ThemedFontIcon
+                {
+                    Glyph = Glyphs.Fingerprint
+                },
+                VerticalAlignment = VerticalAlignment.Stretch,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                CornerRadius = new CornerRadius(3),
+                Margin = new Thickness(5, 0, 5, 0)
+            };
+            Grid.SetColumn(this.LoginByTokenButton, 1);
+            this.Buttons.Children.Add(this.LoginByTokenButton);
+
+            this.ThemesButton = new ThemedButton
+            {
+                Content = new ThemedFontIcon
+                {
+                    Glyph = Glyphs.Marker
+                },
+                VerticalAlignment = VerticalAlignment.Stretch,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                CornerRadius = new CornerRadius(3),
+                Margin = new Thickness(5, 0, 5, 0)
+            };
+            Grid.SetColumn(this.ThemesButton, 2);
+            this.Buttons.Children.Add(this.ThemesButton);
+
+            this.SettingButton = new ThemedButton
+            {
+                Content = new ThemedFontIcon
+                {
+                    Glyph = Glyphs.Settings
+                },
+                VerticalAlignment = VerticalAlignment.Stretch,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                CornerRadius = new CornerRadius(3),
+                Margin = new Thickness(5, 0, 0, 0)
+            };
+            Grid.SetColumn(this.SettingButton, 3);
+            this.Buttons.Children.Add(this.SettingButton);
 
             this.RegisterEvents();
         }
@@ -38,56 +121,61 @@ namespace Alika
         private void RegisterEvents()
         {
             // Arrow navigation
-            this.number.KeyDown += (object sender, KeyRoutedEventArgs e) =>
+            this.Number.KeyDown += (object sender, KeyRoutedEventArgs e) =>
             {
                 if (e.Key == Windows.System.VirtualKey.Enter || e.Key == Windows.System.VirtualKey.Down)
                 {
-                    this.number.Focus(FocusState.Programmatic);
-                    this.password.Focus(FocusState.Pointer);
+                    this.Number.Focus(FocusState.Programmatic);
+                    this.Password.Focus(FocusState.Pointer);
                 }
             };
-            this.password.KeyDown += (object sender, KeyRoutedEventArgs e) =>
+            this.Password.KeyDown += (object sender, KeyRoutedEventArgs e) =>
             {
                 if (e.Key == Windows.System.VirtualKey.Enter)
                 {
-                    this.password.Focus(FocusState.Programmatic);
+                    this.Password.Focus(FocusState.Programmatic);
                     this.LoginClick(null, null);
                 }
                 else if (e.Key == Windows.System.VirtualKey.Up)
                 {
-                    this.password.Focus(FocusState.Programmatic);
-                    this.number.Focus(FocusState.Pointer);
+                    this.Password.Focus(FocusState.Programmatic);
+                    this.Number.Focus(FocusState.Pointer);
                 }
             };
             // Validating number
-            this.number.TextChanged += (object sender, TextChangedEventArgs e) =>
+            this.Number.TextChanged += (object sender, TextChangedEventArgs e) =>
             {
-                if (this.number.Text.Length > 0)
+                if (this.Number.Text.Length > 0)
                 {
-                    if (!Regex.IsMatch(this.number.Text.Last().ToString(), @"[\+\d]"))
+                    if (!Regex.IsMatch(this.Number.Text.Last().ToString(), @"[\+\d]"))
                     {
-                        this.number.Text = this.number.Text.Substring(0, this.number.Text.Length - 1);
-                        this.number.SelectionStart = this.number.Text.Length;
+                        this.Number.Text = this.Number.Text.Substring(0, this.Number.Text.Length - 1);
+                        this.Number.SelectionStart = this.Number.Text.Length;
                     }
                 }
             };
+
+            this.LoginButton.Click += this.LoginClick;
+            this.LoginByTokenButton.Click += this.TokenClick;
+            this.SettingButton.Click += this.OpenSettings;
+            this.ThemesButton.Click += (a, b) => new ThemesWindow();
         }
 
         private async void LoginClick(object sender, RoutedEventArgs e)
         {
-            if (this.number.Text.Length == 0)
+            if (this.Number.Text.Length == 0)
             {
                 await new MessageDialog(Utils.LocString("Login/ErrorNoNumber"), Utils.LocString("Error")).ShowAsync();
             }
             else
             {
-                if (this.password.Password.Length == 0)
+                if (this.Password.Text.Length == 0)
                 {
                     await new MessageDialog(Utils.LocString("Login/ErrorNoPassword"), Utils.LocString("Error")).ShowAsync();
                 }
                 else
                 {
-                    this.Login(this.number.Text, this.password.Password);
+                    this.Login(this.Number.Text, this.Password.Text);
                 }
             }
         }
@@ -100,21 +188,20 @@ namespace Alika
             content.RowDefinitions.Add(new RowDefinition());
             content.RowDefinitions.Add(new RowDefinition());
 
-            var tokenInput = new TextBox
+            var tokenInput = new ThemedTextBox
             {
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Width = 200,
                 Margin = new Thickness(5, 10, 5, 5),
                 PlaceholderText = Utils.LocString("Login/TokenPlaceholder")
             };
-            var okBtn = new Button
+            var btnText = ThemeHelpers.GetThemedText();
+            btnText.Text = Utils.LocString("Login/ButtonText");
+            var okBtn = new ThemedButton
             {
-                Content = new TextBlock
-                {
-                    Text = Utils.LocString("Login/ButtonText")
-                },
+                Content = btnText,
                 Margin = new Thickness(5, 5, 5, 10),
-                CornerRadius = new CornerRadius(10),
+                CornerRadius = new CornerRadius(3),
                 HorizontalAlignment = HorizontalAlignment.Right
             };
             Grid.SetRow(tokenInput, 0);
@@ -210,12 +297,13 @@ namespace Alika
         /// <summary>
         /// Dialog when captcha needed
         /// </summary>
+        [Bindable]
         public class Captcha : ContentDialog
         {
             public Grid content;
             public Image img;
 
-            public TextBox text = new TextBox
+            public TextBox text = new ThemedTextBox
             {
                 PlaceholderText = Utils.LocString("Login/CaptchaPlaceholder"),
                 Margin = new Thickness(10)
@@ -267,11 +355,12 @@ namespace Alika
         /// <summary>
         /// Dialog when 2fa needed
         /// </summary>
+        [Bindable]
         public class CodeDialog : ContentDialog
         {
             public Grid content;
 
-            public TextBox text = new TextBox
+            public TextBox text = new ThemedTextBox
             {
                 PlaceholderText = Utils.LocString("Login/CodePlaceholder"),
                 Margin = new Thickness(10)

@@ -33,7 +33,15 @@ namespace Alika.Misc
                 Content = this._content
             };
             LoadCurrent();
-            App.MainPage.Popup.Children.Add(this);
+
+            if (App.LoginPage != null)
+            {
+                App.LoginPage.Popup.Children.Add(this);
+            }
+            else
+            {
+                App.MainPage.Popup.Children.Add(this);
+            }
         }
 
         private async void LoadCurrent()
@@ -323,7 +331,8 @@ namespace Alika.Misc
             CreateColorBtn("Themes/NewThemeColorAcrylic", colors.Acrylic).ColorChanged += (a) => this.TempData.Colors.acrylic = a.ToHex();
             CreateColorBtn("Themes/NewThemeColorMain", colors.Main).ColorChanged += (a) => this.TempData.Colors.main = a.ToHex();
             CreateColorBtn("Themes/NewThemeColorContrast", colors.Contrast).ColorChanged += (a) => this.TempData.Colors.contrast = a.ToHex();
-            CreateColorBtn("Themes/NewThemeColorMessage", colors.Message).ColorChanged += (a) => this.TempData.Colors.message = a.ToHex();
+            CreateColorBtn("Themes/NewThemeColorMessageOut", colors.Message.Out).ColorChanged += (a) => this.TempData.Colors.Message._out = a.ToHex();
+            CreateColorBtn("Themes/NewThemeColorMessageIn", colors.Message.In).ColorChanged += (a) => this.TempData.Colors.Message._in = a.ToHex();
             CreateColorBtn("Themes/NewThemeColorTextDefault", colors.Text.Default).ColorChanged += (a) => this.TempData.Colors.Text._default = a.ToHex();
             CreateColorBtn("Themes/NewThemeColorTextInverted", colors.Text.Inverted).ColorChanged += (a) => this.TempData.Colors.Text._inverted = a.ToHex();
 
@@ -412,7 +421,8 @@ namespace Alika.Misc
                             && this.TempData.Colors.acrylic?.Length > 0
                             && this.TempData.Colors.contrast?.Length > 0
                             && this.TempData.Colors.main?.Length > 0
-                            && this.TempData.Colors.message?.Length > 0
+                            && this.TempData.Colors.Message._out?.Length > 0
+                            && this.TempData.Colors.Message._in?.Length > 0
                             && this.TempData.Colors.Text._default?.Length > 0
                             && this.TempData.Colors.Text._inverted?.Length > 0
                             )

@@ -65,6 +65,10 @@ namespace Alika
             }
         }
 
+        public delegate void OnLogout();
+
+        public OnLogout Logout;
+
         private StackPanel NoChatSelected = new StackPanel
         {
             HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Center,
@@ -115,5 +119,7 @@ namespace Alika
             });
             Task.Factory.StartNew(() => App.Cache.Update(App.VK.GetStickersKeywords().Dictionary));
         }
+
+        public void InvokeLogout() => this.Logout?.Invoke();
     }
 }

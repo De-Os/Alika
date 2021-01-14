@@ -94,6 +94,8 @@ namespace Alika.Libs.VK.Responses
                 }
 
                 if ((message[2].ToObject<Flags>() & Flags.OUTBOX) != Flags.NONE) this.FromId = App.VK.UserId;
+
+                if (this.FromId == App.VK.UserId) this.IsOut = 1;
             }
         }
 

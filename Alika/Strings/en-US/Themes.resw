@@ -147,8 +147,11 @@
   <data name="NewThemeColorMain" xml:space="preserve">
     <value>Main color</value>
   </data>
-  <data name="NewThemeColorMessage" xml:space="preserve">
-    <value>Message background color</value>
+  <data name="NewThemeColorMessageIn" xml:space="preserve">
+    <value>Incoming message background color</value>
+  </data>
+  <data name="NewThemeColorMessageOut" xml:space="preserve">
+    <value>Outgoing message background color</value>
   </data>
   <data name="NewThemeColorSubAccent" xml:space="preserve">
     <value>Sub accent color</value>

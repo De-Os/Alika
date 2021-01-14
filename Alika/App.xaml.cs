@@ -67,7 +67,7 @@ namespace Alika
                     else
                     {
                         App.LoginPage = new LoginPage();
-                        LoginPage.OnSuccesful += this.LoadMain;
+                        App.LoginPage.OnSuccesful += this.LoadMain;
                         rootFrame.Content = App.LoginPage;
                     }
                 }
@@ -78,6 +78,21 @@ namespace Alika
                 titleBar.ButtonBackgroundColor = Colors.Transparent;
                 titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
             }
+        }
+
+        private void Logout()
+        {
+            var vault = new PasswordVault();
+            foreach (var account in vault.RetrieveAll()) vault.Remove(account);
+            App.LoginPage = new LoginPage();
+            App.LoginPage.OnSuccesful += this.LoadMain;
+            App.MainPage = null;
+            App.LP = null;
+            App.VK = null;
+            Window.Current.Content = new Frame
+            {
+                Content = App.LoginPage
+            };
         }
 
         private bool DoesPasswordExists()
@@ -104,6 +119,9 @@ namespace Alika
             this.LoadProxy();
             App.LP = App.VK.GetLP();
             App.MainPage = new MainPage();
+            App.LoginPage = null;
+
+            App.MainPage.Logout += this.Logout;
 
             App.Settings.OnSettingUpdated += (a) =>
             {

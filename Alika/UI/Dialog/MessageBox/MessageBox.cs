@@ -281,7 +281,7 @@ namespace Alika.UI
                     {
                         this.Border.Background = App.Theme.Colors.Transparent;
                     }
-                    else this.Border.Background = new SolidColorBrush(App.Theme.Colors.Message);
+                    else this.Border.Background = new SolidColorBrush(msg.IsOut == 1 ? App.Theme.Colors.Message.Out : App.Theme.Colors.Message.In);
                 }
             }
 

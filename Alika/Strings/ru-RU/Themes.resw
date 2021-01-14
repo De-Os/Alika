@@ -147,8 +147,11 @@
   <data name="NewThemeColorMain" xml:space="preserve">
     <value>Основной цвет</value>
   </data>
-  <data name="NewThemeColorMessage" xml:space="preserve">
-    <value>Цвет фона сообщения</value>
+  <data name="NewThemeColorMessageIn" xml:space="preserve">
+    <value>Цвет фона входящего сообщения</value>
+  </data>
+  <data name="NewThemeColorMessageOut" xml:space="preserve">
+    <value>Цвет фона исходящего сообщения</value>
   </data>
   <data name="NewThemeColorSubAccent" xml:space="preserve">
     <value>Цвет суб-акцента</value>

@@ -5,8 +5,7 @@
     xmlns:local="using:Alika"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{ThemeResource SystemControlAcrylicWindowBrush}">
+    mc:Ignorable="d">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -19,22 +18,16 @@
                 <RowDefinition Height="55"></RowDefinition>
                 <RowDefinition Height="45"></RowDefinition>
             </Grid.RowDefinitions>
-            <TextBlock x:Name="title" HorizontalAlignment="Center" FontWeight="Bold" FontSize="49" />
-            <TextBox x:Name="number"  Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" />
-            <PasswordBox x:Name="password" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" />
-            <Grid Grid.Row="3" Width="500" MaxHeight="40">
+            <ContentControl x:Name="titleHolder" HorizontalAlignment="Center" />
+            <ContentControl x:Name="numHolder" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <ContentControl x:Name="pswdHolder" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Grid Grid.Row="3" Width="500" MaxHeight="40" x:Name="Buttons">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Button x:Name="token" Click="TokenClick" Grid.Column="0" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalAlignment="Stretch">
-                    <FontIcon Glyph="&#xE730;" />
-                </Button>
-                <Button x:Name="login" Click="LoginClick" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" />
-                <Button x:Name="settings" Click="OpenSettings" Grid.Column="2" HorizontalAlignment="Right" HorizontalContentAlignment="Center" VerticalAlignment="Stretch">
-                    <FontIcon Glyph="&#xE713;" />
-                </Button>
             </Grid>
         </Grid>
 

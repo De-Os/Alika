@@ -204,6 +204,17 @@ namespace Alika.UI
             themes.Click += (a, b) => new ThemesWindow();
             menu.Items.Add(themes);
 
+            var logout = new ThemedMenuFlyoutItem
+            {
+                Icon = new ThemedFontIcon
+                {
+                    Glyph = Glyphs.Leave
+                },
+                Text = Utils.LocString("Logout")
+            };
+            logout.Click += (a, b) => App.MainPage.InvokeLogout();
+            menu.Items.Add(logout);
+
             return menu;
         }
 

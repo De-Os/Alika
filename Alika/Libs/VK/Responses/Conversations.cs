@@ -26,6 +26,15 @@ namespace Alika.Libs.VK.Responses
         [JsonProperty("out_read")]
         public int OutRead;
 
+        [JsonIgnore]
+        public int LastRead
+        {
+            get
+            {
+                return InRead > OutRead ? InRead : OutRead;
+            }
+        }
+
         [JsonProperty("unread_count")]
         public int UnreadCount;
 

@@ -36,6 +36,9 @@
         public const string Marker = "\uED64";
         public const string Add = "\uE710";
         public const string Delete = "\uE74D";
+        public const string Leave = "\uE760";
+        public const string Warning = "\uE7BA";
+        public const string Fingerprint = "\uE928";
 
         public static class Custom
         {

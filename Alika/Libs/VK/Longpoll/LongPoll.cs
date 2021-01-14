@@ -142,7 +142,8 @@ namespace Alika.Libs.VK.Longpoll
                             if (updates.HasValues) Event?.Invoke(updates);
                         }
                     }
-                    catch (Exception exc) {
+                    catch (Exception exc)
+                    {
                         System.Diagnostics.Debug.WriteLine(exc);
                     }
                 }

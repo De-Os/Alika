@@ -142,6 +142,9 @@
     <value>Kib</value>
     <comment>Short kibibyte name</comment>
   </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Logout from account</value>
+  </data>
   <data name="Megabyte" xml:space="preserve">
     <value>Mb</value>
     <comment>Short megabyte name</comment>

@@ -8,7 +8,10 @@
 		"acrylic": "#ffffff",
 		"main": "#ffffff",
 		"contrast": "#919191",
-		"message": "#f5f5f5",
+		"message": {
+			"out": "#63c5f2",
+			"in": "#f5f5f5"
+		},
 		"text": {
 			"default": "#000000",
 			"inverted": "#ffffff"

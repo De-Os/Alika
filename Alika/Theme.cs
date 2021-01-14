@@ -197,6 +197,21 @@ namespace Alika
             }
         }
 
+        [Bindable]
+        public class ThemedButton : Button
+        {
+            public ThemedButton()
+            {
+                UpdateColors();
+                App.Theme.ThemeChanged += UpdateColors;
+
+                void UpdateColors()
+                {
+                    this.Foreground = new SolidColorBrush(App.Theme.Colors.Main);
+                }
+            }
+        }
+
         public class ThemeData
         {
             [JsonProperty("name")]
@@ -244,10 +259,7 @@ namespace Alika
                 public Color Contrast { get => this.contrast.ToColor(); }
 
                 [JsonProperty("message")]
-                public string message;
-
-                [JsonIgnore]
-                public Color Message { get => this.message.ToColor(); }
+                public MessageColors Message;
 
                 [JsonProperty("text")]
                 public TextColors Text;
@@ -272,6 +284,19 @@ namespace Alika
                     public string _inverted;
 
                     public Color Inverted { get => this._inverted.ToColor(); }
+                }
+
+                public struct MessageColors
+                {
+                    [JsonProperty("out")]
+                    public string _out;
+
+                    public Color Out { get => this._out.ToColor(); }
+
+                    [JsonProperty("in")]
+                    public string _in;
+
+                    public Color In { get => this._in.ToColor(); }
                 }
             }
         }
@@ -339,7 +364,6 @@ namespace Alika
                 case Theme.ThemedAcrylicBrush.ColorType.Accent: return App.Theme.Colors.Accent;
                 case Theme.ThemedAcrylicBrush.ColorType.Acrylic: return App.Theme.Colors.Acrylic;
                 case Theme.ThemedAcrylicBrush.ColorType.Contrast: return App.Theme.Colors.Contrast;
-                case Theme.ThemedAcrylicBrush.ColorType.Message: return App.Theme.Colors.Message;
                 case Theme.ThemedAcrylicBrush.ColorType.SubAccent: return App.Theme.Colors.SubAccent;
                 default: return App.Theme.Colors.Contrast;
             }
