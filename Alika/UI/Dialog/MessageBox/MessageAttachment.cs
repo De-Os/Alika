@@ -26,7 +26,7 @@ namespace Alika.UI
         /// Photo holder
         /// </summary>
         [Bindable]
-        public class Photo : Grid
+        public class Photo : ContentControl
         {
             public Attachment.PhotoAtt Picture;
             public Image Preview = new Image();
@@ -35,7 +35,14 @@ namespace Alika.UI
             {
                 this.Picture = photo;
 
-                this.Children.Add(this.Preview);
+                this.Content = new ScrollViewer
+                {
+                    MinZoomFactor = 1,
+                    ZoomMode = ZoomMode.Enabled,
+                    HorizontalScrollMode = ScrollMode.Auto,
+                    VerticalScrollMode = ScrollMode.Auto,
+                    Content = this.Preview
+                };
 
                 this.PointerPressed += (a, b) => new MediaViewer(new Attachment
                 {

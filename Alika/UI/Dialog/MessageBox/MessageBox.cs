@@ -277,7 +277,8 @@ namespace Alika.UI
 
                 void UpdateBorderColor()
                 {
-                    if (this.Message.Attachments?.Count > 0 && this.Message.Attachments.Any(i => i.Graffiti != null || i.Sticker != null))
+                    if ((this.Message.Attachments?.Count > 0 && this.Message.Attachments.Any(i => i.Graffiti != null || i.Sticker != null))
+                        || (this.Message.Text?.Length > 0 && Glyphs.EmojiRegex.IsMatch(this.Message.Text)))
                     {
                         this.Border.Background = App.Theme.Colors.Transparent;
                     }
@@ -371,96 +372,114 @@ namespace Alika.UI
                     {
                         Task.Factory.StartNew(() =>
                         {
-                            List<Match> markdown = new List<Match>();
-
-                            MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(this.Message.Text);
-                            MatchCollection links = new Regex(@"((http|https)\:\/\/)?[\w]*\.[a-zA-Z]{1,6}(\/[\w\?\-\=\&.]*)*").Matches(this.Message.Text);
-                            if (pushes.Count > 0) markdown.AddRange(pushes);
-                            if (links.Count > 0) markdown.AddRange(links);
-
-                            var parsed = new List<ParsedText>();
-
-                            if (markdown.Count > 0)
+                            if (Glyphs.EmojiRegex.IsMatch(this.Message.Text))
                             {
-                                for (int i = 0; i < markdown.Count; i++)
+                                App.UILoop.AddAction(new UITask
                                 {
-                                    var m = markdown[i];
-                                    if (i == 0 && !this.Message.Text.StartsWith(m.Value)) parsed.Add(new ParsedText { Text = this.Message.Text.Substring(0, m.Index) });
-                                    if (i > 0 && markdown[i - 1].Index != m.Index)
+                                    Action = () =>
                                     {
+                                        this.Text.FontSize = 30;
+                                        var p = new Paragraph();
+                                        var run = ThemeHelpers.GetRun();
+                                        run.Text = this.Message.Text;
+                                        p.Inlines.Add(run);
+                                        this.Text.Blocks.Add(p);
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                List<Match> markdown = new List<Match>();
+
+                                MatchCollection pushes = new Regex(@"\[(id|club)\d+\|[^\]]*]").Matches(this.Message.Text);
+                                MatchCollection links = new Regex(@"((http|https)\:\/\/)?[\w]*\.[a-zA-Z]{1,6}(\/[\w\?\-\=\&.]*)*").Matches(this.Message.Text);
+                                if (pushes.Count > 0) markdown.AddRange(pushes);
+                                if (links.Count > 0) markdown.AddRange(links);
+
+                                var parsed = new List<ParsedText>();
+
+                                if (markdown.Count > 0)
+                                {
+                                    for (int i = 0; i < markdown.Count; i++)
+                                    {
+                                        var m = markdown[i];
+                                        if (i == 0 && !this.Message.Text.StartsWith(m.Value)) parsed.Add(new ParsedText { Text = this.Message.Text.Substring(0, m.Index) });
+                                        if (i > 0 && markdown[i - 1].Index != m.Index)
+                                        {
+                                            try
+                                            {
+                                                Match prev = markdown[i - 1];
+                                                int start = prev.Index + prev.Length;
+                                                parsed.Add(new ParsedText { Text = this.Message.Text.Substring(start, m.Index - start) });
+                                            }
+                                            catch { }
+                                        }
+                                        // TODO: Fix crash on some messages
                                         try
                                         {
-                                            Match prev = markdown[i - 1];
-                                            int start = prev.Index + prev.Length;
-                                            parsed.Add(new ParsedText { Text = this.Message.Text.Substring(start, m.Index - start) });
-                                        }
-                                        catch { }
-                                    }
-                                    // TODO: Fix crash on some messages
-                                    try
-                                    {
-                                        if (!m.Value.Contains("["))
-                                        {
-                                            string link = m.Value;
-                                            if (!link.StartsWith("http://") && !link.StartsWith("https://")) link = "http://" + link;
-                                            parsed.Add(new ParsedText
+                                            if (!m.Value.Contains("["))
                                             {
-                                                Text = m.Value,
-                                                Link = true,
-                                                Url = link
-                                            });
-                                        }
-                                        else
-                                        {
-                                            parsed.Add(new ParsedText
-                                            {
-                                                Text = m.Value.Split("|")[1].Replace("]", ""),
-                                                Link = true,
-                                                Url = "https://vk.com/" + m.Value.Split("|")[0].Replace("[", "")
-                                            });
-                                        }
-                                    }
-                                    catch { }
-                                    if (i == markdown.Count - 1 && !this.Message.Text.EndsWith(m.Value)) parsed.Add(new ParsedText { Text = this.Message.Text.Substring(m.Index + m.Length) });
-                                }
-                            }
-                            else parsed.Add(new ParsedText { Text = this.Message.Text });
-
-                            App.UILoop.AddAction(new UITask
-                            {
-                                Action = () =>
-                                {
-                                    Paragraph p = new Paragraph();
-                                    try
-                                    {
-                                        foreach (var t in parsed)
-                                        {
-                                            if (t.Link)
-                                            {
-                                                var r = ThemeHelpers.GetRun(ThemeHelpers.TextTypes.Link);
-                                                r.Text = t.Text;
-                                                var link = ThemeHelpers.GetHyperlink();
-                                                link.NavigateUri = new Uri(t.Url);
-                                                link.Inlines.Add(r);
-                                                p.Inlines.Add(link);
+                                                string link = m.Value;
+                                                if (!link.StartsWith("http://") && !link.StartsWith("https://")) link = "http://" + link;
+                                                parsed.Add(new ParsedText
+                                                {
+                                                    Text = m.Value,
+                                                    Link = true,
+                                                    Url = link
+                                                });
                                             }
                                             else
                                             {
-                                                var r = ThemeHelpers.GetRun();
-                                                r.Text = t.Text;
-                                                p.Inlines.Add(r);
+                                                parsed.Add(new ParsedText
+                                                {
+                                                    Text = m.Value.Split("|")[1].Replace("]", ""),
+                                                    Link = true,
+                                                    Url = "https://vk.com/" + m.Value.Split("|")[0].Replace("[", "")
+                                                });
                                             }
                                         }
+                                        catch { }
+                                        if (i == markdown.Count - 1 && !this.Message.Text.EndsWith(m.Value)) parsed.Add(new ParsedText { Text = this.Message.Text.Substring(m.Index + m.Length) });
                                     }
-                                    catch
-                                    {
-                                        var r = ThemeHelpers.GetRun();
-                                        r.Text = this.Message.Text;
-                                        p.Inlines.Add(r);
-                                    }
-                                    this.Text.Blocks.Add(p);
                                 }
-                            });
+                                else parsed.Add(new ParsedText { Text = this.Message.Text });
+
+                                App.UILoop.AddAction(new UITask
+                                {
+                                    Action = () =>
+                                    {
+                                        var p = new Paragraph();
+                                        try
+                                        {
+                                            foreach (var t in parsed)
+                                            {
+                                                if (t.Link)
+                                                {
+                                                    var r = ThemeHelpers.GetRun(ThemeHelpers.TextTypes.Link);
+                                                    r.Text = t.Text;
+                                                    var link = ThemeHelpers.GetHyperlink();
+                                                    link.NavigateUri = new Uri(t.Url);
+                                                    link.Inlines.Add(r);
+                                                    p.Inlines.Add(link);
+                                                }
+                                                else
+                                                {
+                                                    var r = ThemeHelpers.GetRun();
+                                                    r.Text = t.Text;
+                                                    p.Inlines.Add(r);
+                                                }
+                                            }
+                                        }
+                                        catch
+                                        {
+                                            var r = ThemeHelpers.GetRun();
+                                            r.Text = this.Message.Text;
+                                            p.Inlines.Add(r);
+                                        }
+                                        this.Text.Blocks.Add(p);
+                                    }
+                                });
+                            }
                         });
                         this.Children.Add(this.Text);
                     }
@@ -547,6 +566,7 @@ namespace Alika.UI
                 {
                     public Keyboard(Message.MsgKeyboard keyboard, int peer_id, int msg_id = 0)
                     {
+                        this.Margin = new Thickness(3);
                         this.HorizontalAlignment = HorizontalAlignment.Stretch;
                         foreach (var btns in keyboard.Buttons)
                         {
@@ -557,6 +577,12 @@ namespace Alika.UI
                             foreach (var button in btns)
                             {
                                 var btn = new Button(button, peer_id, msg_id);
+                                var radius = new CornerRadius(2);
+                                if (button == keyboard.Buttons.First().First()) radius.TopLeft = 5;
+                                if (button == keyboard.Buttons.First().Last()) radius.TopRight = 5;
+                                if (button == keyboard.Buttons.Last().First()) radius.BottomLeft = 5;
+                                if (button == keyboard.Buttons.Last().Last()) radius.BottomRight = 5;
+                                btn.CornerRadius = radius;
                                 Grid.SetColumn(btn, grid.ColumnDefinitions.Count);
                                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                                 grid.Children.Add(btn);
@@ -573,8 +599,7 @@ namespace Alika.UI
                         public Button(Message.MsgKeyboard.Button button, int peer_id, int msg_id = 0)
                         {
                             this.HorizontalAlignment = HorizontalAlignment.Stretch;
-                            this.CornerRadius = new CornerRadius(5);
-                            this.Margin = new Thickness(5);
+                            this.Margin = new Thickness(2);
                             SetText();
                             if (button.Action.Type == "callback")
                             {

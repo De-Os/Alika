@@ -1,4 +1,6 @@
-﻿namespace Alika
+﻿using System.Text.RegularExpressions;
+
+namespace Alika
 {
     public static class Glyphs
     {
@@ -39,6 +41,8 @@
         public const string Leave = "\uE760";
         public const string Warning = "\uE7BA";
         public const string Fingerprint = "\uE928";
+
+        public static Regex EmojiRegex = new Regex("^(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])+$");
 
         public static class Custom
         {
