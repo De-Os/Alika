@@ -85,7 +85,11 @@ namespace Alika
             var vault = new PasswordVault();
             foreach (var account in vault.RetrieveAll()) vault.Remove(account);
             App.LoginPage = new LoginPage();
-            App.LoginPage.OnSuccesful += this.LoadMain;
+            App.LoginPage.OnSuccesful += () =>
+            {
+                this.LoadMain();
+                App.Theme.ReloadTheme();
+            };
             App.MainPage = null;
             App.LP = null;
             App.VK = null;

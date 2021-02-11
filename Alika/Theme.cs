@@ -53,37 +53,7 @@ namespace Alika
                     this.Colors = colors;
                     this.IsDark = json.IsDark;
 
-                    colors.Main.ApplyToResource(
-                        "TextControlBackgroundFocused",
-                        "TextControlBackgroundPointerOver",
-                        "CalendarDatePickerBackgroundFocused",
-                        "CalendarDatePickerBackground",
-                        "CalendarDatePickerBackgroundPressed"
-                        );
-                    colors.Text.Default.ApplyToResource(
-                        "SystemControlHighlightAltBaseHighBrush",
-                        "TextControlForegroundFocused",
-                        "CalendarDatePickerForeground"
-                        );
-                    colors.Accent.ApplyToResource(
-                        "TextControlButtonForegroundPressed",
-                        "CalendarDatePickerBackgroundPointerOver",
-                        "CalendarDatePickerTextForegroundSelected",
-                        "CalendarDatePickerBorderBrush"
-                        );
-                    colors.SubAccent.ApplyToResource(
-                        "TextControlButtonForegroundPointerOver",
-                        "CalendarDatePickerBorderBrushPointerOver",
-                        "CalendarDatePickerBorderBrushPressed"
-                        );
-                    colors.Acrylic.ApplyToResource(
-                        "FlyoutPresenterBackground"
-                        );
-
-                    var titleBar = ApplicationView.GetForCurrentView().TitleBar;
-                    titleBar.ButtonForegroundColor = colors.Accent;
-
-                    this.ThemeChanged?.Invoke();
+                    this.ReloadTheme();
                 }
             }
         }
@@ -99,6 +69,41 @@ namespace Alika
             }
             this.LoadTheme(File.ReadAllText(Utils.AppPath((dark ? "dark" : "light") + "_theme.json")));
             return;
+        }
+
+        public void ReloadTheme()
+        {
+            this.Colors.Main.ApplyToResource(
+                        "TextControlBackgroundFocused",
+                        "TextControlBackgroundPointerOver",
+                        "CalendarDatePickerBackgroundFocused",
+                        "CalendarDatePickerBackground",
+                        "CalendarDatePickerBackgroundPressed"
+                        );
+            this.Colors.Text.Default.ApplyToResource(
+                "SystemControlHighlightAltBaseHighBrush",
+                "TextControlForegroundFocused",
+                "CalendarDatePickerForeground"
+                );
+            this.Colors.Accent.ApplyToResource(
+                "TextControlButtonForegroundPressed",
+                "CalendarDatePickerBackgroundPointerOver",
+                "CalendarDatePickerTextForegroundSelected",
+                "CalendarDatePickerBorderBrush"
+                );
+            this.Colors.SubAccent.ApplyToResource(
+                "TextControlButtonForegroundPointerOver",
+                "CalendarDatePickerBorderBrushPointerOver",
+                "CalendarDatePickerBorderBrushPressed"
+                );
+            this.Colors.Acrylic.ApplyToResource(
+                "FlyoutPresenterBackground"
+                );
+
+            var titleBar = ApplicationView.GetForCurrentView().TitleBar;
+            titleBar.ButtonForegroundColor = this.Colors.Accent;
+
+            this.ThemeChanged?.Invoke();
         }
 
         [Bindable]

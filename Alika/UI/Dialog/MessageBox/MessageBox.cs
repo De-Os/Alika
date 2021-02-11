@@ -20,7 +20,7 @@ using static Alika.Theme;
 namespace Alika.UI
 {
     /// <summary>
-    /// Message box which holds MessageGrid (needed for future features)
+    /// Message box which holds MessageGrid
     /// </summary>
     [Bindable]
     public class MessageBox : ContentControl
@@ -103,14 +103,15 @@ namespace Alika.UI
 
             public MessageGrid(Message msg, bool isStatic = false)
             {
-                this.MinWidth = 200;
-
                 this.time = ThemeHelpers.GetThemedText();
                 this.time.VerticalAlignment = VerticalAlignment.Bottom;
                 this.time.Margin = new Thickness(0, 0, 0, 10);
 
                 this.states.HorizontalAlignment = App.VK.UserId == msg.FromId ? HorizontalAlignment.Right : HorizontalAlignment.Left;
-                this.Bubble = new TextBubble(msg, isStatic);
+                this.Bubble = new TextBubble(msg, isStatic)
+                {
+                    MinWidth = 100
+                };
                 this.LoadAvatar(msg.FromId);
 
                 var date = msg.Date.ToDateTime();
