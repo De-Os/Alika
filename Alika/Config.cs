@@ -90,30 +90,7 @@ namespace Alika
                 await folder.CreateFileAsync("settings.json");
                 await folder.WriteTextToFileAsync(File.ReadAllText(Utils.AppPath("settings.json")), "settings.json");
             }
-            if (!await folder.FileExistsAsync("pinned_chats.json"))
-            {
-                await folder.CreateFileAsync("pinned_chats.json");
-                await folder.WriteTextToFileAsync(JsonConvert.SerializeObject(new List<int>()), "pinned_chats.json");
-            }
             App.Settings = JsonConvert.DeserializeObject<Config>(await folder.ReadTextFromFileAsync("settings.json"));
-        }
-
-        public static async Task<List<int>> GetPinnedChats() => JsonConvert.DeserializeObject<List<int>>(await ApplicationData.Current.LocalFolder.ReadTextFromFileAsync("pinned_chats.json"));
-
-        public static async void UpdatePinnedChats(List<int> chats) => await ApplicationData.Current.LocalFolder.WriteTextToFileAsync(JsonConvert.SerializeObject(chats), "pinned_chats.json");
-
-        public static async void AddPinnedChat(int peer_id)
-        {
-            var chats = await GetPinnedChats();
-            if (!chats.Contains(peer_id)) chats.Add(peer_id);
-            UpdatePinnedChats(chats);
-        }
-
-        public static async void RemovePinnedChat(int peer_id)
-        {
-            var chats = await GetPinnedChats();
-            if (chats.Contains(peer_id)) chats.Remove(peer_id);
-            UpdatePinnedChats(chats);
         }
     }
 }

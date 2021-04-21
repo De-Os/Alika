@@ -139,7 +139,7 @@ namespace Alika
         {
             if (peer_id > Limits.Messages.PEERSTART)
             {
-                var avatar = this.GetConversation(peer_id).Settings.Photos?.Photo200;
+                var avatar = this.GetConversation(peer_id)?.Settings?.Photos?.Photo200;
                 return avatar ?? "https://vk.com/images/camera_200.png?ava=1";
             }
             else

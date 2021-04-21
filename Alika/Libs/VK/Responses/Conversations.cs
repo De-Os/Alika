@@ -47,6 +47,9 @@ namespace Alika.Libs.VK.Responses
         [JsonProperty("chat_settings")]
         public PeerSettings Settings;
 
+        [JsonProperty("sort_id")]
+        public PeerSortId SortId;
+
         public class PeerInfo
         {
             [JsonProperty("id")]
@@ -199,6 +202,15 @@ namespace Alika.Libs.VK.Responses
                 [JsonProperty("photo_200")]
                 public string Photo200;
             }
+        }
+
+        public class PeerSortId
+        {
+            [JsonProperty("major_id")]
+            public int MajorId;
+
+            [JsonProperty("minor_id")]
+            public int MinorId;
         }
     }
 

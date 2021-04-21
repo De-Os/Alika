@@ -51,7 +51,6 @@ namespace Alika
                     this.Dialog.Children.Add(this.NoChatSelected);
                     if (this.Chats.Content is ChatsHolder holder)
                     {
-                        holder.PinnedChats.SelectedItem = null;
                         holder.Chats.SelectedItem = null;
                     }
                 }

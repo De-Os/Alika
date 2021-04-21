@@ -27,6 +27,7 @@ namespace Alika.Libs.VK.Longpoll
             DELETE_ALL_MESSAGES = 13,
             CHANGE_MESSAGE = 18,
             RESET_CACHE_MESSAGE = 19,
+            CHAT_PIN_UNPIN = 20,
             EDIT_CHAT = 52,
             TYPING = 63,
             VOICING = 64,
@@ -65,6 +66,8 @@ namespace Alika.Libs.VK.Longpoll
 
         public delegate void TypeEvent(LPEvents.TypeState typeState);
 
+        public delegate void PinEvent(LPEvents.PinState pinState);
+
         public delegate void CallbackEvent(LPEvents.CallbackAction callbackAction);
 
         public event LPHandler Event;
@@ -80,6 +83,8 @@ namespace Alika.Libs.VK.Longpoll
         public event OnlineEvent UserOffline;
 
         public event TypeEvent Typing;
+
+        public event PinEvent ChatPinnedUnpinned;
 
         public event CallbackEvent Callback;
 
@@ -221,6 +226,16 @@ namespace Alika.Libs.VK.Longpoll
                 var callbacks = updates.Where(i => (int)i[0] == (int)Updates.CALLBACK_BUTTON_RESPONSE).Select(i => i[1].ToObject<LPEvents.CallbackAction>()).ToList();
                 if (callbacks.Count > 0) foreach (var cb in callbacks) this.Callback?.Invoke(cb);
             });
+
+            Task.Factory.StartNew(() =>
+            {
+                var pins = updates.Where(i => (int)i[0] == (int)Updates.CHAT_PIN_UNPIN).Select(i => new LPEvents.PinState
+                {
+                    PeerId = (int)i[1],
+                    MajorId = (int)i[2]
+                }).ToList();
+                if (pins.Count > 0) foreach (var pin in pins) this.ChatPinnedUnpinned?.Invoke(pin);
+            });
         }
     }
 
@@ -255,6 +270,12 @@ namespace Alika.Libs.VK.Longpoll
         {
             public List<int> UserIds;
             public int Peerid;
+        }
+
+        public struct PinState
+        {
+            public int PeerId;
+            public int MajorId;
         }
 
         public struct CallbackAction

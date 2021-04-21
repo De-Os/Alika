@@ -406,5 +406,15 @@ namespace Alika.Libs.VK.Methods
             if (author_id != 0) request.Add("author_id", author_id);
             return this._vk.Call<string>("messages.sendMessageEvent", request);
         }
+
+        /// <summary>
+        /// messages.pinConversation
+        /// </summary>
+        public int PinConversation(int peer_id) => this._vk.Call<int>("messages.pinConversation", new Dictionary<string, dynamic> { { "peer_id", peer_id } });
+
+        /// <summary>
+        /// messages.unpinConversation
+        /// </summary>
+        public int UnpinConversation(int peer_id) => this._vk.Call<int>("messages.unpinConversation", new Dictionary<string, dynamic> { { "peer_id", peer_id } });
     }
 }
