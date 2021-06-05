@@ -1,6 +1,6 @@
 ﻿using Alika.Libs;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
@@ -119,11 +119,24 @@ namespace Alika.UI.Items
 
         private string Format(double num)
         {
-            if (num >= 10 && num <= 20) return "From0To0";
-            var end = int.Parse(num.ToString().Last().ToString());
-            if (end == 1) return "From1To1";
-            if (end >= 2 && end <= 4) return "From2To4";
-            return "From5To9";
+            var strnum = num.ToString();
+            var length = strnum.Length;
+            if (num > 10 && int.Parse(strnum.Substring(length - 2)) > 10 && int.Parse(strnum.Substring(length - 2)) < 20)
+            {
+                return "Many";
+            }
+            else
+            {
+                if (strnum.EndsWith('1'))
+                {
+                    return "One";
+                }
+                else if ((new List<string> { "2", "3", "4" }).Contains(strnum.Substring(length - 1)))
+                {
+                    return "Some";
+                }
+                else return "Many";
+            }
         }
     }
 }

@@ -120,44 +120,35 @@
   <data name="Ago" xml:space="preserve">
     <value>назад</value>
   </data>
-  <data name="DaysFrom0To0" xml:space="preserve">
+  <data name="DaysMany" xml:space="preserve">
     <value>дней</value>
   </data>
-  <data name="DaysFrom1To1" xml:space="preserve">
+  <data name="DaysOne" xml:space="preserve">
     <value>день</value>
   </data>
-  <data name="DaysFrom2To4" xml:space="preserve">
+  <data name="DaysSome" xml:space="preserve">
     <value>дня</value>
   </data>
-  <data name="DaysFrom5To9" xml:space="preserve">
-    <value>дней</value>
-  </data>
-  <data name="HoursFrom0To0" xml:space="preserve">
+  <data name="HoursMany" xml:space="preserve">
     <value>часов</value>
   </data>
-  <data name="HoursFrom1To1" xml:space="preserve">
+  <data name="HoursOne" xml:space="preserve">
     <value>час</value>
   </data>
-  <data name="HoursFrom2To4" xml:space="preserve">
+  <data name="HoursSome" xml:space="preserve">
     <value>часа</value>
-  </data>
-  <data name="HoursFrom5To9" xml:space="preserve">
-    <value>часов</value>
   </data>
   <data name="LastSeen" xml:space="preserve">
     <value>Был(а) онлайн %date%</value>
   </data>
-  <data name="MinutesFrom0To0" xml:space="preserve">
+  <data name="MinutesMany" xml:space="preserve">
     <value>минут</value>
   </data>
-  <data name="MinutesFrom1To1" xml:space="preserve">
+  <data name="MinutesOne" xml:space="preserve">
     <value>минуту</value>
   </data>
-  <data name="MinutesFrom2To4" xml:space="preserve">
+  <data name="MinutesSome" xml:space="preserve">
     <value>минуты</value>
-  </data>
-  <data name="MinutesFrom5To9" xml:space="preserve">
-    <value>минут</value>
   </data>
   <data name="Online" xml:space="preserve">
     <value>Онлайн</value>

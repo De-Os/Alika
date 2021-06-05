@@ -121,57 +121,45 @@
     <value>ago</value>
     <comment>n ... ago</comment>
   </data>
-  <data name="DaysFrom0To0" xml:space="preserve">
+  <data name="DaysMany" xml:space="preserve">
     <value>days</value>
     <comment>n days ago</comment>
   </data>
-  <data name="DaysFrom1To1" xml:space="preserve">
+  <data name="DaysOne" xml:space="preserve">
     <value>day</value>
-    <comment>1 day ago</comment>
+    <comment>1 days ago</comment>
   </data>
-  <data name="DaysFrom2To4" xml:space="preserve">
+  <data name="DaysSome" xml:space="preserve">
     <value>days</value>
     <comment>2-4 days ago</comment>
   </data>
-  <data name="DaysFrom5To9" xml:space="preserve">
-    <value>days</value>
-    <comment>5-9 days ago</comment>
-  </data>
-  <data name="HoursFrom0To0" xml:space="preserve">
+  <data name="HoursMany" xml:space="preserve">
     <value>hours</value>
-    <comment>n hours aog</comment>
+    <comment>n hours ago</comment>
   </data>
-  <data name="HoursFrom1To1" xml:space="preserve">
+  <data name="HoursOne" xml:space="preserve">
     <value>hour</value>
     <comment>1 hour ago</comment>
   </data>
-  <data name="HoursFrom2To4" xml:space="preserve">
+  <data name="HoursSome" xml:space="preserve">
     <value>hours</value>
     <comment>2-4 hours ago</comment>
-  </data>
-  <data name="HoursFrom5To9" xml:space="preserve">
-    <value>hours</value>
-    <comment>5-9 hours ago</comment>
   </data>
   <data name="LastSeen" xml:space="preserve">
     <value>Was online %date%</value>
     <comment>Someone was online ...</comment>
   </data>
-  <data name="MinutesFrom0To0" xml:space="preserve">
+  <data name="MinutesMany" xml:space="preserve">
     <value>minutes</value>
     <comment>n minutes ago</comment>
   </data>
-  <data name="MinutesFrom1To1" xml:space="preserve">
+  <data name="MinutesOne" xml:space="preserve">
     <value>minute</value>
     <comment>1 minute ago</comment>
   </data>
-  <data name="MinutesFrom2To4" xml:space="preserve">
+  <data name="MinutesSome" xml:space="preserve">
     <value>minutes</value>
     <comment>2-4 minutes ago</comment>
-  </data>
-  <data name="MinutesFrom5To9" xml:space="preserve">
-    <value>minutes</value>
-    <comment>5-9 minutes ago</comment>
   </data>
   <data name="Online" xml:space="preserve">
     <value>Online</value>

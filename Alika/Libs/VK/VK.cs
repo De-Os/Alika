@@ -1,6 +1,7 @@
 ﻿using Alika.Libs.VK.Longpoll;
 using Alika.Libs.VK.Methods;
 using Alika.Libs.VK.Responses;
+using MessagePack;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
@@ -61,7 +62,6 @@ namespace Alika.Libs.VK
         public Type Call<Type>(string method, Dictionary<string, dynamic> fields = null)
         {
             var result = this.CallMethod(method, fields);
-            if (result.Contains("money_transfer")) System.Diagnostics.Debug.WriteLine(result);
             BasicResponse<Type> job = JsonConvert.DeserializeObject<BasicResponse<Type>>(result);
             if (job == null || job?.Error != null)
             {
@@ -106,7 +106,7 @@ namespace Alika.Libs.VK
         /// <returns>JSON string</returns>
         public string CallMethod(string method, Dictionary<string, dynamic> fields = null)
         {
-            var request = new RestRequest(method);
+            var request = new RestRequest(method + ".msgpack");
             request.AddOrUpdateParameter("access_token", this.Token);
             request.AddOrUpdateParameter("v", API_VER);
 
@@ -115,7 +115,7 @@ namespace Alika.Libs.VK
                 foreach (KeyValuePair<string, dynamic> field in fields) request.AddOrUpdateParameter(field.Key, field.Value);
             }
 
-            return this._http.Post(request).Content;
+            return MessagePackSerializer.ConvertToJson(this._http.Post(request).RawBytes);
         }
 
         /// <summary>
